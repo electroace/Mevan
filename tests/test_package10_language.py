@@ -64,7 +64,7 @@ def test_login_page_follows_the_language(fx):
 
 
 def test_dictionary_keys_exist_in_the_interface_and_have_translations():
-    sources=''.join((ROOT/name).read_text(encoding='utf-8') for name in ('index.html','projects_ui.html','dashboard_ui.html','diagnostic_review.html','mevan_nav.py','server.py','approved_reports.py','mevan_report_model.py'))
+    sources=''.join((ROOT/name).read_text(encoding='utf-8') for name in ('index.html','projects_ui.html','dashboard_ui.html','diagnostic_review.html','mevan_nav.py','server.py','approved_reports.py','mevan_report_model.py','mevan_ai.py'))
     import approved_reports
     sources+=approved_reports.DEMO_NOTICE+approved_reports.DEMO_FOOTER  # sastavljeni iz DEMO oznake
     missing=[key for key in mevan_i18n.EN if key not in sources]

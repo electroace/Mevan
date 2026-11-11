@@ -7,6 +7,7 @@ promijeni, ključ se više ne može pročitati i treba ga unijeti ponovo.
 Bez unesenog ključa i dalje vrijede varijable okruženja OPENAI_API_KEY i MEVAN_AI_MODEL.
 """
 import base64
+import calendar
 import hashlib
 import ipaddress
 import json
@@ -28,11 +29,17 @@ DEFAULT_OPENAI_MODEL = 'gpt-4.1-mini'
 ANTHROPIC_VERSION = '2023-06-01'
 # Noviji Claude modeli razmišljaju prije odgovora i to troše iz max_tokens; rezerva čuva prostor za sam odgovor.
 ANTHROPIC_THINKING_HEADROOM = 4096
+# Dubina razmišljanja Claude modela (output_config.effort). Prazno znači zadanu vrijednost modela.
+EFFORTS = (('', 'Zadano za model'), ('low', 'Nisko (najbrže, najjeftinije)'), ('medium', 'Srednje'), ('high', 'Visoko'), ('xhigh', 'Vrlo visoko (najsporije, najskuplje)'))
 JSON_ONLY = ' Odgovori isključivo jednim JSON objektom, bez teksta prije ili poslije i bez oznaka koda.'
 
 
 class SettingsError(ValueError):
     """Poruka je namijenjena korisniku; nikada ne sadrži ključ."""
+
+
+class AllowanceExceeded(Exception):
+    """Dostignut je mjesečni broj AI poziva koji je administrator dozvolio u aplikaciji."""
 
 
 def db_path():
@@ -43,7 +50,36 @@ def _connect(db=None):
     connection = sqlite3.connect(db or db_path())
     connection.execute('CREATE TABLE IF NOT EXISTS ai_settings (id INTEGER PRIMARY KEY CHECK(id=1), provider TEXT NOT NULL, '
                        'model TEXT NOT NULL, base_url TEXT NOT NULL, key_cipher TEXT NOT NULL, key_hint TEXT NOT NULL, updated INTEGER NOT NULL)')
+    columns = {row[1] for row in connection.execute('PRAGMA table_info(ai_settings)')}
+    if 'effort' not in columns:  # baze nastale prije izbora razmišljanja i mjesečnog limita
+        connection.execute("ALTER TABLE ai_settings ADD COLUMN effort TEXT NOT NULL DEFAULT ''")
+    if 'monthly_limit' not in columns:
+        connection.execute('ALTER TABLE ai_settings ADD COLUMN monthly_limit INTEGER NOT NULL DEFAULT 0')
+    connection.execute('CREATE TABLE IF NOT EXISTS ai_usage (ts INTEGER NOT NULL, provider TEXT NOT NULL, model TEXT NOT NULL, '
+                       'input_tokens INTEGER NOT NULL, output_tokens INTEGER NOT NULL)')
     return connection
+
+
+def _month_start(now=None):
+    moment = time.gmtime(now if now is not None else time.time())
+    return calendar.timegm((moment.tm_year, moment.tm_mon, 1, 0, 0, 0))
+
+
+def usage_this_month(db=None):
+    """AI pozivi i tokeni potrošeni kroz ovu aplikaciju od početka mjeseca (UTC)."""
+    with _connect(db) as connection:
+        calls, tokens_in, tokens_out = connection.execute(
+            'SELECT COUNT(*), COALESCE(SUM(input_tokens),0), COALESCE(SUM(output_tokens),0) FROM ai_usage WHERE ts>=?', (_month_start(),)).fetchone()
+    return {'calls': calls, 'input_tokens': tokens_in, 'output_tokens': tokens_out}
+
+
+def _record_usage(config, tokens_in, tokens_out):
+    try:
+        with _connect(config.get('db')) as connection:
+            connection.execute('INSERT INTO ai_usage(ts,provider,model,input_tokens,output_tokens) VALUES(?,?,?,?,?)',
+                               (int(time.time()), config['provider'], config['model'], int(tokens_in or 0), int(tokens_out or 0)))
+    except (sqlite3.Error, TypeError, ValueError):
+        pass  # evidencija potrošnje ne smije oboriti poziv koji je uspio
 
 
 def _cipher():
@@ -73,11 +109,16 @@ def _valid_base_url(value):
     return value.rstrip('/')
 
 
-def save_settings(provider, model, base_url='', api_key='', db=None):
+def save_settings(provider, model, base_url='', api_key='', db=None, effort='', monthly_limit=0):
     """Sačuvaj izbor servisa. Prazan ključ zadržava postojeći, ali samo za isti servis i adresu."""
     provider, model, base_url, api_key = str(provider or ''), str(model or '').strip(), str(base_url or '').strip(), str(api_key or '').strip()
+    effort = str(effort or '')
     if provider not in PROVIDERS:
         raise SettingsError('Nepoznat AI servis.')
+    if effort not in dict(EFFORTS):
+        raise SettingsError('Nepoznata dubina razmišljanja.')
+    if isinstance(monthly_limit, bool) or not isinstance(monthly_limit, int) or not 0 <= monthly_limit <= 100000:
+        raise SettingsError('Mjesečni limit AI poziva mora biti cijeli broj od 0 do 100000 (0 znači bez limita).')
     if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:/-]{0,99}', model):
         raise SettingsError('Unesite naziv modela (slova, cifre i znakovi . _ : / -).')
     base_url = _valid_base_url(base_url) if provider == 'compatible' else PROVIDERS[provider]['base_url']
@@ -91,10 +132,11 @@ def save_settings(provider, model, base_url='', api_key='', db=None):
             cipher, hint = current[2], current[3]
         else:
             raise SettingsError('Unesite API ključ za odabrani servis.')
-        connection.execute('INSERT INTO ai_settings(id,provider,model,base_url,key_cipher,key_hint,updated) VALUES(1,?,?,?,?,?,?) '
+        connection.execute('INSERT INTO ai_settings(id,provider,model,base_url,key_cipher,key_hint,updated,effort,monthly_limit) VALUES(1,?,?,?,?,?,?,?,?) '
                            'ON CONFLICT(id) DO UPDATE SET provider=excluded.provider,model=excluded.model,base_url=excluded.base_url,'
-                           'key_cipher=excluded.key_cipher,key_hint=excluded.key_hint,updated=excluded.updated',
-                           (provider, model, base_url, cipher, hint, int(time.time())))
+                           'key_cipher=excluded.key_cipher,key_hint=excluded.key_hint,updated=excluded.updated,'
+                           'effort=excluded.effort,monthly_limit=excluded.monthly_limit',
+                           (provider, model, base_url, cipher, hint, int(time.time()), effort, monthly_limit))
     return public_settings(db)
 
 
@@ -106,20 +148,22 @@ def clear_settings(db=None):
 
 def _stored(db=None):
     with _connect(db) as connection:
-        return connection.execute('SELECT provider, model, base_url, key_cipher, key_hint, updated FROM ai_settings WHERE id=1').fetchone()
+        return connection.execute('SELECT provider, model, base_url, key_cipher, key_hint, updated, effort, monthly_limit FROM ai_settings WHERE id=1').fetchone()
 
 
 def public_settings(db=None):
     """Ono što preglednik smije vidjeti: bez ključa, samo zadnja četiri znaka."""
     row = _stored(db)
     providers = [{'id': key, 'label': item['label'], 'model_hint': item['model_hint']} for key, item in PROVIDERS.items()]
+    shared = {'providers': providers, 'efforts': [{'id': key, 'label': label} for key, label in EFFORTS], 'usage': usage_this_month(db)}
     if row:
         return {'source': 'app', 'provider': row[0], 'model': row[1], 'base_url': row[2] if row[0] == 'compatible' else '',
-                'key_set': True, 'key_hint': row[4], 'updated': row[5], 'providers': providers}
+                'key_set': True, 'key_hint': row[4], 'updated': row[5], 'effort': row[6], 'monthly_limit': row[7], **shared}
     if os.getenv('OPENAI_API_KEY', '').strip():
         return {'source': 'environment', 'provider': 'openai', 'model': os.getenv('MEVAN_AI_MODEL', DEFAULT_OPENAI_MODEL), 'base_url': '',
-                'key_set': True, 'key_hint': '', 'updated': None, 'providers': providers}
-    return {'source': 'none', 'provider': 'openai', 'model': '', 'base_url': '', 'key_set': False, 'key_hint': '', 'updated': None, 'providers': providers}
+                'key_set': True, 'key_hint': '', 'updated': None, 'effort': '', 'monthly_limit': 0, **shared}
+    return {'source': 'none', 'provider': 'openai', 'model': '', 'base_url': '', 'key_set': False, 'key_hint': '', 'updated': None,
+            'effort': '', 'monthly_limit': 0, **shared}
 
 
 def active_config(db=None):
@@ -130,20 +174,26 @@ def active_config(db=None):
             key = _cipher().decrypt(row[3].encode()).decode()
         except Exception:  # promijenjena tajna ili oštećen zapis: ponaša se kao da ključ nije unesen
             return None
-        return {'provider': row[0], 'model': row[1], 'base_url': row[2], 'key': key}
+        return {'provider': row[0], 'model': row[1], 'base_url': row[2], 'key': key, 'effort': row[6], 'monthly_limit': row[7], 'db': db}
     key = os.getenv('OPENAI_API_KEY', '').strip()
     if key:
-        return {'provider': 'openai', 'model': os.getenv('MEVAN_AI_MODEL', DEFAULT_OPENAI_MODEL), 'base_url': PROVIDERS['openai']['base_url'], 'key': key}
+        return {'provider': 'openai', 'model': os.getenv('MEVAN_AI_MODEL', DEFAULT_OPENAI_MODEL), 'base_url': PROVIDERS['openai']['base_url'], 'key': key,
+                'effort': '', 'monthly_limit': 0, 'db': db}
     return None
 
 
-def chat(config, body, timeout=60, limit=200000):
+def chat(config, body, timeout=60, limit=200000, enforce_allowance=True):
     """Pošalji zahtjev u OpenAI obliku odabranom servisu i vrati tekst odgovora.
+
+    Prije poziva se provjerava mjesečni limit koji je administrator postavio; nakon poziva se bilježi potrošnja.
 
     Mrežne greške (urllib.error) i neispravan oblik odgovora (KeyError, ValueError) prolaze dalje,
     kao i ranije, da ih pozivalac pretvori u poruku za korisnika.
     """
     wants_json = (body.get('response_format') or {}).get('type') == 'json_object'
+    allowed = config.get('monthly_limit') or 0
+    if enforce_allowance and allowed and usage_this_month(config.get('db'))['calls'] >= allowed:
+        raise AllowanceExceeded(f'Dostignut je mjesečni limit od {allowed} AI poziva postavljen u aplikaciji (Podaci i sigurnost → AI servis).')
     if config['provider'] == 'anthropic':
         system = '\n\n'.join(m['content'] for m in body['messages'] if m['role'] == 'system')
         # Bez temperature: noviji Claude modeli odbijaju svaku vrijednost osim zadane (HTTP 400).
@@ -152,6 +202,8 @@ def chat(config, body, timeout=60, limit=200000):
                    'messages': [{'role': m['role'], 'content': m['content']} for m in body['messages'] if m['role'] != 'system']}
         if system or wants_json:
             payload['system'] = system + (JSON_ONLY if wants_json else '')
+        if config.get('effort'):
+            payload['output_config'] = {'effort': config['effort']}
         url, headers = config['base_url'] + '/messages', {'x-api-key': config['key'], 'anthropic-version': ANTHROPIC_VERSION}
         # Razmišljanje prije odgovora produžava poziv i povećava odgovor servisa.
         timeout, limit = max(timeout, 240), max(limit, 1_000_000)
@@ -162,10 +214,13 @@ def chat(config, body, timeout=60, limit=200000):
                                      headers={**headers, 'Content-Type': 'application/json'}, method='POST')
     with urllib.request.urlopen(request, timeout=timeout) as response:
         answer = json.loads(response.read(limit))
+    usage = answer.get('usage') if isinstance(answer.get('usage'), dict) else {}
     if config['provider'] == 'anthropic':
+        _record_usage(config, usage.get('input_tokens'), usage.get('output_tokens'))
         text = ''.join(block['text'] for block in answer['content'] if block.get('type') == 'text')
         cut_short = answer.get('stop_reason') == 'max_tokens'
     else:
+        _record_usage(config, usage.get('prompt_tokens'), usage.get('completion_tokens'))
         text = answer['choices'][0]['message']['content']
         cut_short = answer['choices'][0].get('finish_reason') == 'length'
     if not isinstance(text, str):
@@ -188,7 +243,7 @@ def json_object_text(text):
 
 def test_connection(config):
     """Kratak poziv odabranom servisu; uspjeh znači da servis prihvata ključ, model i oblik zahtjeva."""
-    chat(config, {'messages': [{'role': 'user', 'content': 'Odgovori samo riječju: OK'}], 'max_tokens': 16}, timeout=40, limit=50000)
+    chat(config, {'messages': [{'role': 'user', 'content': 'Odgovori samo riječju: OK'}], 'max_tokens': 16}, timeout=40, limit=50000, enforce_allowance=False)
     return True
 
 

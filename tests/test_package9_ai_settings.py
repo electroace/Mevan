@@ -46,7 +46,8 @@ def test_key_is_saved_encrypted_and_never_returned(fx):
     for text in (r.text,fx.client.get('/api/ai/settings').text,fx.client.get('/api/backup').text,fx.client.get('/api/audit').text):
         assert KEY not in text
     assert KEY.encode() not in open(fx.server.DB,'rb').read()
-    assert mevan_ai.active_config(fx.server.DB)=={'provider':'anthropic','model':'claude-sonnet-5-5','base_url':'https://api.anthropic.com/v1','key':KEY}
+    active=mevan_ai.active_config(fx.server.DB)
+    assert {k:active[k] for k in ('provider','model','base_url','key')}=={'provider':'anthropic','model':'claude-sonnet-5-5','base_url':'https://api.anthropic.com/v1','key':KEY}
 
 
 def test_settings_need_login_and_same_origin(fx):
@@ -262,3 +263,85 @@ def test_workspace_with_a_stored_analysis_is_accepted_by_the_server(fx):
     saved=fx.client.put('/api/workspace',json=workspace,headers={**fx.headers,'If-Match':version})
     assert saved.status_code==200,saved.text
     assert fx.client.get('/api/workspace').json()['workspace']['companies'][0]['diagnostics'][0]['v3']==stored
+
+
+# ---- 11: razmišljanje, mjesečni limit, potrošnja i upozorenje o kreditima
+
+def test_reasoning_level_is_saved_and_sent_only_to_claude(fx,monkeypatch):
+    saved=fx.client.put('/api/ai/settings',json={**FORM,'effort':'low','monthly_limit':5},headers=fx.headers).json()
+    assert saved['effort']=='low' and saved['monthly_limit']==5 and [e['id'] for e in saved['efforts']]==['','low','medium','high','xhigh']
+    config=mevan_ai.active_config(fx.server.DB)
+    seen=capture(monkeypatch,{'content':[{'type':'text','text':'ok'}],'usage':{'input_tokens':11,'output_tokens':7}})
+    mevan_ai.chat(config,{'messages':[{'role':'user','content':'U'}],'max_tokens':20})
+    assert json.loads(seen[0].data)['output_config']=={'effort':'low'}
+    fx.client.put('/api/ai/settings',json={**FORM,'effort':''},headers=fx.headers)
+    mevan_ai.chat(mevan_ai.active_config(fx.server.DB),{'messages':[{'role':'user','content':'U'}],'max_tokens':20})
+    assert 'output_config' not in json.loads(seen[1].data)
+    openai={**config,'provider':'openai','base_url':'https://api.openai.com/v1','effort':'low'}
+    capture(monkeypatch,{'choices':[{'message':{'content':'ok'},'finish_reason':'stop'}]})
+    seen=capture(monkeypatch,{'choices':[{'message':{'content':'ok'},'finish_reason':'stop'}]})
+    mevan_ai.chat(openai,{'messages':[{'role':'user','content':'U'}],'max_tokens':20})
+    assert 'output_config' not in json.loads(seen[0].data)
+    assert fx.client.put('/api/ai/settings',json={**FORM,'effort':'najjace'},headers=fx.headers).status_code==422
+    assert fx.client.put('/api/ai/settings',json={**FORM,'monthly_limit':-1},headers=fx.headers).status_code==422
+
+
+def test_usage_is_counted_and_the_monthly_allowance_stops_further_calls(fx,monkeypatch):
+    fx.client.put('/api/ai/settings',json={**FORM,'monthly_limit':2},headers=fx.headers)
+    capture(monkeypatch,{'content':[{'type':'text','text':'Nacrt'}],'usage':{'input_tokens':100,'output_tokens':40}})
+    draft={'dimension':'F','criteria':[{'code':'F01','name':'Profitabilnost','score':'2','proof':'confirmed','finding':'Nalaz','evidence':'Dokaz','kpi':'','recommendation':'','applicable':'yes','financial':''}],'financial_effects':[]}
+    for _ in range(2):
+        assert fx.client.post('/api/ai/draft',json=draft,headers=fx.headers).status_code==200
+    usage=fx.client.get('/api/ai/settings').json()['usage']
+    assert usage=={'calls':2,'input_tokens':200,'output_tokens':80}
+    blocked=fx.client.post('/api/ai/draft',json=draft,headers=fx.headers)
+    assert blocked.status_code==429 and 'mjesečni limit od 2 AI poziva' in blocked.json()['detail']
+    # Integrisana analiza kao pozadinski posao javlja isti razlog.
+    job=fx.client.post('/api/v3/analyze/start',json={'assess':{'F01':{'applicable':'yes','score':'2','proof':'confirmed','evidence':'Dokaz','finding':'Nalaz'}},'effects':[]},headers=fx.headers).json()['job']
+    state=_wait_for_job(fx.client,job)
+    assert state['status']=='error' and state['code']==429 and 'mjesečni limit' in state['detail']
+    # Provjera veze radi i kad je limit dostignut; limit 0 znači bez ograničenja.
+    assert fx.client.post('/api/ai/test',headers=fx.headers).status_code==200
+    fx.client.put('/api/ai/settings',json={**FORM,'monthly_limit':0},headers=fx.headers)
+    assert fx.client.post('/api/ai/draft',json=draft,headers=fx.headers).status_code==200
+
+
+def test_existing_database_gets_the_new_columns(tmp_path):
+    import sqlite3
+    db=tmp_path/'staro.sqlite3'
+    with sqlite3.connect(db) as connection:
+        connection.execute('CREATE TABLE ai_settings (id INTEGER PRIMARY KEY CHECK(id=1), provider TEXT NOT NULL, model TEXT NOT NULL, base_url TEXT NOT NULL, key_cipher TEXT NOT NULL, key_hint TEXT NOT NULL, updated INTEGER NOT NULL)')
+        connection.execute("INSERT INTO ai_settings VALUES(1,'anthropic','claude-sonnet-5-5','https://api.anthropic.com/v1','x','abcd',1)")
+    public=mevan_ai.public_settings(db)
+    assert public['effort']=='' and public['monthly_limit']==0 and public['usage']=={'calls':0,'input_tokens':0,'output_tokens':0}
+
+
+def test_every_ai_button_warns_about_credits_first():
+    from pathlib import Path
+    root=Path(mevan_ai.__file__).parent
+    index=(root/'index.html').read_text(encoding='utf-8')
+    assert "async function runV3(){\n if(!await mvConfirmAiCost('Integrisana analiza'))return;" in index
+    assert "async function makeAIDraft(dim){if(!await mvConfirmAiCost('AI nacrt'))return;" in index
+    assert "if(!basic&&!await mvConfirmAiCost('AI projektni nacrt'))return;" in (root/'projects_ui.html').read_text(encoding='utf-8')
+    import mevan_nav
+    assert 'window.mvConfirmAiCost=async function(action){' in mevan_nav.JS and "okLabel:'Pokreni i potroši kredite'" in mevan_nav.JS
+
+
+def test_shared_and_page_scripts_are_valid_javascript(tmp_path):
+    """Sintaksna greška u zajedničkoj skripti gasi poruke, potvrde i prevod na svim ekranima."""
+    import re,subprocess
+    from pathlib import Path
+    import mevan_nav
+    root=Path(mevan_ai.__file__).parent
+    sources={'nav':mevan_nav.JS}
+    for name in ('index.html','projects_ui.html','dashboard_ui.html','diagnostic_review.html'):
+        sources[name]=(root/name).read_text(encoding='utf-8')
+    count=0
+    for name,html in sources.items():
+        for number,script in enumerate(re.findall(r'<script\b[^>]*>(.*?)</script>',html,re.S)):
+            if not script.strip():continue
+            path=tmp_path/f'{name}-{number}.js';path.write_text(script,encoding='utf-8')
+            result=subprocess.run(['node','--check',str(path)],capture_output=True,text=True)
+            assert result.returncode==0,(name,number,result.stderr[:400])
+            count+=1
+    assert count>=6

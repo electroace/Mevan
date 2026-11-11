@@ -289,6 +289,11 @@ async def diagnostic_v2(req:Request):
 def health():return {'status':'ok'}
 
 
+@app.exception_handler(mevan_ai.AllowanceExceeded)
+async def ai_allowance_exceeded(request:Request,error:mevan_ai.AllowanceExceeded):
+    # Limit postavlja administrator u aplikaciji; nije poruka AI servisa.
+    return JSONResponse({'detail':str(error)},status_code=429)
+
 @app.get('/api/ai/settings')
 def ai_settings(req:Request):
     if not logged(req):raise HTTPException(401)
@@ -304,7 +309,8 @@ async def ai_settings_save(req:Request):
     try:data=json.loads(raw)
     except ValueError:raise HTTPException(422,'Neispravan zahtjev')
     if not isinstance(data,dict):raise HTTPException(422,'Neispravan zahtjev')
-    try:saved=mevan_ai.save_settings(data.get('provider'),data.get('model'),data.get('base_url'),data.get('api_key'),DB)
+    try:saved=mevan_ai.save_settings(data.get('provider'),data.get('model'),data.get('base_url'),data.get('api_key'),DB,
+                                     effort=data.get('effort') or '',monthly_limit=data.get('monthly_limit',0))
     except mevan_ai.SettingsError as e:raise HTTPException(422,str(e))
     with conn() as c:
         c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'ai_settings_saved',saved['provider']+' / '+saved['model']))
@@ -719,6 +725,8 @@ async def mevan_v3_start(req: Request):
             V3_JOBS[job].update(status='done',result=_v3_analysis(data,rules))
         except HTTPException as error:
             V3_JOBS[job].update(status='error',code=error.status_code,detail=str(error.detail))
+        except mevan_ai.AllowanceExceeded as error:
+            V3_JOBS[job].update(status='error',code=429,detail=str(error))
         except Exception:
             V3_JOBS[job].update(status='error',code=500,detail='Analiza nije završena zbog neočekivane greške; ništa nije odobreno.')
     threading.Thread(target=run,daemon=True).start()

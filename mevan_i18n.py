@@ -335,6 +335,25 @@ PATTERNS[:0] = [
     (r'^Status analize: (.+)$', 'Analysis status: $1'),
 ]
 
+# ---- AI: razmišljanje, mjesečni limit i upozorenje o kreditima
+EN.update({
+    'AI poziv troši kredite': 'This AI call spends credits', 'Pokreni i potroši kredite': 'Run and spend credits',
+    '{a} šalje podatke dijagnostike AI servisu i troši kredite na računu tog servisa.': '{a} sends diagnostic data to the AI service and spends credits on that service account.',
+    'Servis: {a} · model {b}': 'Service: {a} · model {b}', 'razmišljanje: {a}': 'reasoning: {a}',
+    'Ovaj mjesec iskorišteno {a} od {b} dozvoljenih AI poziva.': 'This month {a} of {b} allowed AI calls have been used.',
+    'Ovaj mjesec AI poziva kroz MEVAN: {a}.': 'AI calls through MEVAN this month: {a}.',
+    'Integrisana analiza': 'The integrated analysis', 'AI nacrt': 'The AI draft', 'AI projektni nacrt': 'The AI project draft',
+    'Razmišljanje (samo Claude)': 'Reasoning (Claude only)', 'Mjesečni limit AI poziva (0 = bez limita)': 'Monthly AI call limit (0 = no limit)',
+    'Zadano za model': 'Model default', 'Nisko (najbrže, najjeftinije)': 'Low (fastest, cheapest)', 'Srednje': 'Medium', 'Visoko': 'High',
+    'Vrlo visoko (najsporije, najskuplje)': 'Very high (slowest, most expensive)',
+    'Stanje kredita kod AI servisa nije dostupno aplikaciji; vidi se samo u konzoli servisa (Billing). Ovdje se prikazuje potrošnja kroz MEVAN.': 'The credit balance at the AI service is not available to the app; it is visible only in the service console (Billing). Usage through MEVAN is shown here.',
+    'ChatGPT (OpenAI)': 'ChatGPT (OpenAI)', 'Claude (Anthropic)': 'Claude (Anthropic)', 'Drugi servis (OpenAI-kompatibilan API)': 'Other service (OpenAI-compatible API)',
+})
+PATTERNS[:0] = [
+    (r'^Ovaj mjesec kroz MEVAN: (\S+) od (\S+) dozvoljenih AI poziva · (\S+) ulaznih i (\S+) izlaznih tokena\.$', 'This month through MEVAN: $1 of $2 allowed AI calls · $3 input and $4 output tokens.'),
+    (r'^Ovaj mjesec kroz MEVAN: (\S+) AI poziva · (\S+) ulaznih i (\S+) izlaznih tokena\.$', 'This month through MEVAN: $1 AI calls · $2 input and $3 output tokens.'),
+]
+
 def lang_of(request):
     value = request.cookies.get(COOKIE, '')
     return value if value in LANGS else DEFAULT

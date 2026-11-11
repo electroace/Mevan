@@ -215,6 +215,20 @@ JS = """<script id="mevan-nav-script">
   });
  }
  window.mvConfirm=function(message,options){options=options||{};return ask({title:options.title,message:message,okLabel:options.okLabel,danger:options.danger})};
+ // Prije svakog AI poziva korisnik vidi kojem servisu ide zahtjev i da se troše krediti; false znači da je odustao.
+ window.mvConfirmAiCost=async function(action){
+  var info=null;
+  try{var reply=await fetch('/api/ai/settings');if(reply.ok)info=await reply.json()}catch(e){}
+  if(!info||info.source==='none')return true; // bez podešenog servisa nema troška; server vraća jasnu poruku
+  var service=(info.providers.find(function(p){return p.id===info.provider})||{}).label||info.provider;
+  var effort=info.provider==='anthropic'?((info.efforts.find(function(e){return e.id===(info.effort||'')})||{}).label||''):'';
+  var used=info.usage||{calls:0};
+  var fill=function(template,a,b){return mvT(template).replace('{a}',a).replace('{b}',b===undefined?'':b)};
+  var lines=[fill('{a} šalje podatke dijagnostike AI servisu i troši kredite na računu tog servisa.',mvT(action)),
+   fill('Servis: {a} · model {b}',mvT(service),info.model)+(effort?' · '+fill('razmišljanje: {a}',mvT(effort)):''),
+   info.monthly_limit?fill('Ovaj mjesec iskorišteno {a} od {b} dozvoljenih AI poziva.',used.calls,info.monthly_limit):fill('Ovaj mjesec AI poziva kroz MEVAN: {a}.',used.calls)];
+  return ask({title:'AI poziv troši kredite',message:lines.join('\\n'),okLabel:'Pokreni i potroši kredite'});
+ };
  window.mvAsk=function(label,value,options){options=options||{};return ask({title:options.title||'Unos',message:options.message,label:label,value:value,okLabel:options.okLabel||'Sačuvaj',danger:options.danger})};
  // Svaki vidljivi natpis polja povezuje se s poljem ispod njega (čitači ekrana, klik na natpis).
  var main=document.querySelector('.mv-main'),counter=0,queued=false,CONTROL='input:not([type=hidden]),select,textarea';
