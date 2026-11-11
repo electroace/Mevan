@@ -63,3 +63,18 @@ Nijedan stvarni poziv OpenAI, Anthropic ili trećem servisu nije izvršen, jer z
 - Ako servis vrati tekst oko JSON objekta, objekat se izdvaja. Ako je odgovor odsječen zbog dužine, to se prijavljuje kao razlog umjesto pokušaja čitanja nepotpunog JSON-a (za sve servise).
 
 **Provjere:** `pytest` 242 prolaza (dva nova testa). Mobilni tok s integrisanom analizom prolazi. Stvarni poziv Anthropic servisu nije izvršen iz razvojnog okruženja.
+
+## Dopuna 9.3 — „Unexpected token '<' … is not valid JSON” pri integrisanoj analizi
+
+**Greška:** preglednik je umjesto odgovora aplikacije dobio HTML stranicu greške s hostinga. Dva uzroka u aplikaciji:
+- AI poziv se izvršavao u glavnoj petlji servera, pa server za to vrijeme nije odgovarao ni na šta, ni na provjeru zdravlja (`/health`) kojom hosting utvrđuje da je servis živ.
+- Cijela analiza je bila jedan dug HTTP zahtjev; uz Claude može trajati duže nego što mreža ispred servera drži zahtjev otvorenim.
+
+**Popravka:**
+- Svi AI pozivi se izvršavaju u zasebnoj niti; server ostaje dostupan dok AI radi.
+- Integrisana analiza je pozadinski posao: `POST /api/v3/analyze/start` vraća oznaku posla, a preglednik svake tri sekunde pita `GET /api/v3/analyze/job/{oznaka}` dok rezultat ne stigne (najduže oko sedam minuta). Stari `POST /api/v3/analyze` i dalje radi.
+- Ako server ipak vrati nešto što nije JSON, korisnik vidi razumljivu poruku umjesto tehničke greške.
+
+**Ograničenja:** poslovi se drže u memoriji jednog procesa. Ako se server ponovo pokrene dok analiza traje, posao nestaje i analizu treba pokrenuti ponovo (aplikacija to kaže). Nacrt po modulu („AI nacrt (server)”) i dalje je jedan zahtjev, ali više ne blokira server.
+
+**Provjere:** `pytest` 245 prolaza (tri nova testa: posao u pozadini dok `/health` odgovara, zaštita novih adresa, AI pozivi izvan glavne petlje). Mobilni browser tok prolazi kroz novi način pokretanja i čitanja analize. Stvarni poziv Anthropic servisu i Render nisu testirani iz razvojnog okruženja.

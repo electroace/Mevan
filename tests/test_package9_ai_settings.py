@@ -189,3 +189,53 @@ def test_integrated_analysis_says_why_a_draft_was_rejected(fx,monkeypatch):
     monkeypatch.setattr(mevan_ai.urllib.request,'urlopen',slow)
     assert 'nije odgovorio na vrijeme' in fx.client.post('/api/v3/analyze',json=request,headers=fx.headers).json()['detail']
     assert 'v3_ai_draft_rejected' in fx.client.get('/api/audit').text
+
+
+def _wait_for_job(client,job):
+    import time
+    for _ in range(100):
+        state=client.get('/api/v3/analyze/job/'+job).json()
+        if state.get('status')!='running':
+            return state
+        time.sleep(.05)
+    raise AssertionError('posao nije završen')
+
+
+def test_integrated_analysis_runs_as_a_background_job(fx,monkeypatch):
+    import threading
+    fx.client.put('/api/ai/settings',json=FORM,headers=fx.headers)
+    request={'company':{'name':'QA'},'assess':{'F01':{'applicable':'yes','score':'2','proof':'confirmed','evidence':'Dokaz','finding':'Nalaz'}},'effects':[]}
+    release=threading.Event()
+    def slow_invalid(req,timeout=None):
+        release.wait(5)
+        return Reply({'content':[{'type':'text','text':'{"executive_summary": "Sažetak"}'}],'stop_reason':'end_turn'})
+    monkeypatch.setattr(mevan_ai.urllib.request,'urlopen',slow_invalid)
+    started=fx.client.post('/api/v3/analyze/start',json=request,headers=fx.headers)
+    assert started.status_code==202
+    job=started.json()['job']
+    # Dok AI servis radi, server odgovara na druge zahtjeve (provjera zdravlja, stanje posla).
+    assert fx.client.get('/api/v3/analyze/job/'+job).json()=={'status':'running'}
+    assert fx.client.get('/health').json()=={'status':'ok'}
+    release.set()
+    state=_wait_for_job(fx.client,job)
+    assert state['status']=='error' and state['code']==502 and state['detail'].endswith('Razlog: Nepotpuna AI analiza.')
+    assert fx.client.get('/api/v3/analyze/job/'+job).status_code==404  # rezultat se čita jednom
+
+
+def test_background_job_endpoints_are_protected(fx):
+    request={'assess':{},'effects':[]}
+    assert fx.client.post('/api/v3/analyze/start',json=request,headers={'Origin':'https://evil.example'}).status_code==403
+    assert fx.client.post('/api/v3/analyze/start',content='nije json',headers={**fx.headers,'Content-Type':'application/json'}).status_code==400
+    assert fx.client.get('/api/v3/analyze/job/nepostojeci').status_code==404
+    fx.client.post('/logout',headers=fx.headers,follow_redirects=False)
+    assert fx.client.get('/api/v3/analyze/job/nepostojeci').status_code==401
+    assert fx.client.post('/api/v3/analyze/start',json=request,headers=fx.headers).status_code==401
+
+
+def test_ai_calls_do_not_block_the_server_loop():
+    from pathlib import Path
+    source=(Path(mevan_ai.__file__).parent/'server.py').read_text(encoding='utf-8')
+    # U async rutama svaki poziv AI servisa ide u zasebnu nit.
+    assert source.count('await asyncio.to_thread(mevan_ai.chat,')==3
+    assert 'return await asyncio.to_thread(_v3_analysis,data,rules)' in source
+    assert source.count('mevan_ai.chat(ai,')==1  # jedini direktni poziv je unutar _v3_analysis, koja uvijek radi u niti

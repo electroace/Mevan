@@ -8,6 +8,8 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Resp
 from pydantic import BaseModel
 from diagnostic_engine import analyze
 from mevan_nav import render_page
+import asyncio
+import threading
 import mevan_ai
 import mevan_i18n
 
@@ -393,7 +395,7 @@ async def ai_draft(req:Request):
                   {'role':'user','content':json.dumps({'dimension':data['dimension'],'criteria':cleaned},ensure_ascii=False)}],
       'temperature':0.2,'max_tokens':1200}
     try:
-        draft=mevan_ai.chat(ai,payload,timeout=35,limit=100000)
+        draft=await asyncio.to_thread(mevan_ai.chat,ai,payload,35,100000)
         return {'draft':draft,'source':'generative_ai','approved':False}
     except (urllib.error.URLError,KeyError,ValueError,TimeoutError):
         raise HTTPException(502,'AI servis trenutno nije dostupan; pokušajte kasnije.')
@@ -453,7 +455,7 @@ async def ai_integrated(req:Request):
                   {'role':'user','content':json.dumps(context,ensure_ascii=False)}],
       'temperature':0.1,'max_tokens':3300}
     try:
-        draft=mevan_ai.chat(ai,body,timeout=85,limit=150000)
+        draft=await asyncio.to_thread(mevan_ai.chat,ai,body,85,150000)
         if not isinstance(draft,str) or not draft.strip():raise ValueError()
         with conn() as c:
             c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',
@@ -513,7 +515,7 @@ async def decision_intelligence(req:Request):
                       {'role':'user','content':json.dumps(context,ensure_ascii=False)}],
           'temperature':0.1,'max_tokens':3900}
     try:
-        draft=mevan_ai.chat(ai,body,timeout=85,limit=180000)
+        draft=await asyncio.to_thread(mevan_ai.chat,ai,body,85,180000)
         if not isinstance(draft,str) or not draft.strip():raise ValueError()
         with conn() as c:
             c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',
@@ -525,12 +527,8 @@ async def decision_intelligence(req:Request):
         raise HTTPException(502,'AI servis nije vratio ispravan odgovor.')
 
 
-@app.post('/api/v3/analyze')
-async def mevan_v3_analyze(req: Request):
-    """One evidence-aware analysis; two report views share one canonical fact base.
-
-    This endpoint is a v3 foundation, NOT final report generation or approval.
-    """
+async def _v3_request(req: Request):
+    """Provjera prijave, izvora i ulaza za integrisanu analizu; vraća ulaz i obračun po pravilima."""
     if not logged(req): raise HTTPException(401)
     if not same_origin(req): raise HTTPException(403)
     raw=await req.body()
@@ -543,6 +541,15 @@ async def mevan_v3_analyze(req: Request):
         rules=analyze({'assess':data['assess'],'effects':data['effects']})
     except (ValueError,TypeError,AttributeError):
         raise HTTPException(400,'Neispravan ulaz')
+    return data,rules
+
+
+def _v3_analysis(data, rules):
+    """One evidence-aware analysis; two report views share one canonical fact base.
+
+    This is a v3 foundation, NOT final report generation or approval. Poziv AI servisa može trajati
+    minutama, pa se ova funkcija uvijek izvršava izvan glavne petlje servera.
+    """
     from diagnostic_engine import CODES
     criteria=[]
     for code in sorted(CODES):
@@ -680,6 +687,55 @@ async def mevan_v3_analyze(req: Request):
         with conn() as c:
             c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'v3_ai_draft_rejected',reason))
         raise HTTPException(502,'AI nije vratio ispravan strukturirani nacrt; ništa nije odobreno. Razlog: '+reason+'.')
+
+
+@app.post('/api/v3/analyze')
+async def mevan_v3_analyze(req: Request):
+    """Analiza u jednom zahtjevu. Aplikacija koristi /start i /job, jer AI poziv može trajati duže od mrežnih limita."""
+    data,rules=await _v3_request(req)
+    return await asyncio.to_thread(_v3_analysis,data,rules)
+
+
+# Dugi AI pozivi idu kao pozadinski posao: preglednik ga pokrene, pa svakih nekoliko sekundi pita za rezultat.
+# Poslovi su u memoriji jednog procesa; nakon ponovnog pokretanja servera posao više ne postoji i analiza se ponavlja.
+V3_JOBS={}
+V3_JOB_TTL=30*60
+
+def _v3_purge():
+    limit=time.time()-V3_JOB_TTL
+    for key in [key for key,item in V3_JOBS.items() if item['ts']<limit]:
+        V3_JOBS.pop(key,None)
+
+@app.post('/api/v3/analyze/start',status_code=202)
+async def mevan_v3_start(req: Request):
+    data,rules=await _v3_request(req)
+    _v3_purge()
+    if sum(1 for item in V3_JOBS.values() if item['status']=='running')>=3:
+        raise HTTPException(429,'Analiza je već u toku. Sačekajte da završi.')
+    job=secrets.token_urlsafe(18)
+    V3_JOBS[job]={'status':'running','ts':time.time()}
+    def run():
+        try:
+            V3_JOBS[job].update(status='done',result=_v3_analysis(data,rules))
+        except HTTPException as error:
+            V3_JOBS[job].update(status='error',code=error.status_code,detail=str(error.detail))
+        except Exception:
+            V3_JOBS[job].update(status='error',code=500,detail='Analiza nije završena zbog neočekivane greške; ništa nije odobreno.')
+    threading.Thread(target=run,daemon=True).start()
+    return {'job':job}
+
+@app.get('/api/v3/analyze/job/{job}')
+def mevan_v3_job(job:str,req:Request):
+    if not logged(req): raise HTTPException(401)
+    item=V3_JOBS.get(job)
+    if item is None:
+        raise HTTPException(404,'Analiza nije pronađena. Server je možda ponovo pokrenut; pokrenite analizu ponovo.')
+    if item['status']=='running':
+        return {'status':'running'}
+    V3_JOBS.pop(job,None)
+    if item['status']=='error':
+        return {'status':'error','code':item['code'],'detail':item['detail']}
+    return {'status':'done','result':item['result']}
 
 from project_execution import router as project_router
 app.include_router(project_router)

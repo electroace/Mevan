@@ -381,8 +381,19 @@ async function runV3(){
  v3Busy=true;v3Error='';v3Result=null;page='v2';render();
  try{
   const body=analysisInput(),signature=analysisSignature(body);
-  const response=await fetch('/api/v3/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const obj=await response.json();if(!response.ok)throw Error(obj.detail||'Analiza nije dostupna');
+  // Analiza ide kao pozadinski posao: AI poziv može trajati duže nego što mreža drži jedan zahtjev otvorenim.
+  const readJson=async reply=>{try{return await reply.json()}catch(e){throw Error('Server nije vratio ispravan odgovor (HTTP '+reply.status+'). Servis je zauzet ili se ponovo pokreće; pokušajte ponovo za minutu.')}};
+  const started=await fetch('/api/v3/analyze/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const ticket=await readJson(started);if(!started.ok)throw Error(ticket.detail||'Analiza nije dostupna');
+  let obj=null;
+  for(let attempt=0;attempt<140&&!obj;attempt++){
+   await new Promise(resolve=>setTimeout(resolve,attempt?3000:800));
+   const poll=await fetch('/api/v3/analyze/job/'+encodeURIComponent(ticket.job));
+   const state=await readJson(poll);if(!poll.ok)throw Error(state.detail||'Analiza nije dostupna');
+   if(state.status==='error')throw Error(state.detail||'Analiza nije dostupna');
+   if(state.status==='done')obj=state.result;
+  }
+  if(!obj)throw Error('Analiza traje duže od sedam minuta. Pokušajte ponovo.');
   if(!obj.analysis||!obj.facts||!Array.isArray(obj.criteria))throw Error('Nepotpuna analiza');
   if(signature!==analysisSignature(analysisInput()))throw Error('Podaci su promijenjeni tokom analize. Ponovo pokrenite analizu.');
   v3Source=signature;v3Result=obj;
