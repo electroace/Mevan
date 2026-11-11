@@ -1,4 +1,4 @@
-# Četvrti paket — 11.11.2026. (korak 1: meni i zaglavlje)
+# Četvrti paket — 11.11.2026. (meni, zaglavlje i dugmad)
 
 Osnova: treći paket. Mijenja se samo raspored, nazivi i izgled navigacije. Poslovna logika, API, baza i izvještaji nisu mijenjani.
 
@@ -13,11 +13,21 @@ Osnova: treći paket. Mijenja se samo raspored, nazivi i izgled navigacije. Posl
 
 ## Šta nije mijenjano
 
-Nijedna funkcija nije uklonjena. Sve ranije stavke menija postoje pod istim `data-page` oznakama. Dugmad unutar stranica još nisu standardizovana; to je korak 2.
+Nijedna funkcija nije uklonjena. Sve ranije stavke menija postoje pod istim `data-page` oznakama.
+
+## Korak 2: dugmad
+
+1. **Jedan izgled dugmadi na svim ekranima.** Stil je definisan jednom, u `mevan_nav.py`: glavno (`btn`), sporedno (`btn secondary`), opasno (`btn danger`) i malo (`btn small`). Stranice više nemaju vlastite stilove dugmadi.
+2. **Jedno glavno dugme po dijelu ekrana.** Na Projektima su glavna: „Kreiraj nacrt”, „Sačuvaj scenarije”, „Sačuvaj nacrt”, „Odobri implementaciju”, „Evidentiraj efekat” i „Sačuvaj sedmični pregled”. U vođenom toku: „Sačuvaj i nastavi” i „Odobri pregledanu reviziju”.
+3. **Opasne radnje su crvene i odvojene:** „Vrati METALPRO simulaciju”, „Obriši lokalne podatke”, „Vrati” (sigurnosna kopija) i „Ukloni”. Potvrde prije izvršenja su iste kao ranije.
+4. **Izvještaji po modulima:** četiri dugmeta u svakom redu su jednaka (sporedna), jer nijedno nije glavno.
+5. Naslov „MEVAN 4.0 · Integrisana dijagnostika” sada glasi „Integrisana analiza (AI)”, kao u meniju.
+
+Nazivi dugmadi, njihovi `id` i funkcije koje pozivaju nisu mijenjani.
 
 ## Provjere
 
-- `pytest`: 180 prolaza (172 ranija + 8 novih u `tests/test_package4_nav.py`).
+- `pytest`: 186 prolaza (172 ranija + 14 novih u `tests/test_package4_nav.py`).
 - Word QA 12/12.
 - Oba postojeća mobilna browser toka prolaze; u njih je dodat samo korak otvaranja menija na telefonu.
 - Ručni browser prolaz na 1366 px i 390 px: svi ekrani, direktni linkovi, osvježavanje, zatvaranje menija, bez JavaScript grešaka.

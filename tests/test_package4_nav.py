@@ -65,3 +65,53 @@ def test_unknown_screen_or_broken_page_is_rejected():
         mevan_nav.nav_html('nepoznato')
     with pytest.raises(ValueError):
         mevan_nav.render_page('<html></html>','projects')
+
+
+# ---- korak 2: dugmad
+
+def _buttons(html):
+    # Dugme „print()” pripada zasebnom prozoru za pregled izvještaja, ne ekranu aplikacije.
+    return [b for b in re.findall(r'<button\b([^>]*)>(.*?)</button>',html,re.S) if 'onclick="print()"' not in b[0]]
+
+
+def _root():
+    from pathlib import Path
+    return Path(mevan_nav.__file__).parent
+
+
+@pytest.mark.parametrize('name',['projects_ui.html','diagnostic_review.html','index.html'])
+def test_every_button_uses_the_shared_style(name):
+    html=(_root()/name).read_text(encoding='utf-8')
+    for attrs,_ in _buttons(html):
+        cls=re.search(r'class="([^"]*)"',attrs)
+        assert cls and 'btn' in cls.group(1).split(),attrs
+    page_style=html[:html.index('</style>')]
+    for local in ('button{padding','button.secondary{','.btn{border:1px solid'):
+        assert local not in page_style,local
+    assert "className='secondary'" not in html
+
+
+def test_shared_style_defines_all_button_roles():
+    for rule in ('.mv-main .btn{','.mv-main .btn.secondary{','.mv-main .btn.danger{','.mv-main .btn.small{',
+                 '.mv-main .btn:disabled{','.mv-main .btn:focus-visible{','.mv-main .btn[hidden]{display:none}'):
+        assert rule in mevan_nav.CSS,rule
+
+
+def test_destructive_actions_are_marked_and_still_confirmed():
+    html=(_root()/'index.html').read_text(encoding='utf-8')
+    roles={re.sub(r'<[^>]+>','',text).strip():re.search(r'class="([^"]*)"',attrs).group(1).split() for attrs,text in _buttons(html)}
+    for label in ('Vrati METALPRO simulaciju','Obriši lokalne podatke','Vrati','Ukloni'):
+        assert 'danger' in roles[label],label
+    assert "if(!confirm('Ovo će zamijeniti sve lokalne podatke DEMO simulacijom." in html
+    assert "confirm('Obrisati sve lokalne podatke?')" in html
+    assert "if(confirmation!=='VRATI-PODATKE')return;" in html
+    assert "confirm('Ukloniti nalaz?')" in html
+
+
+def test_primary_actions_per_screen():
+    def primary(name):
+        html=(_root()/name).read_text(encoding='utf-8')
+        return [re.sub(r'<[^>]+>','',text).strip() for attrs,text in _buttons(html)
+                if re.search(r'class="([^"]*)"',attrs).group(1).split()==['btn']]
+    assert primary('projects_ui.html')==['Kreiraj nacrt','Sačuvaj scenarije','Sačuvaj nacrt','Odobri implementaciju','Evidentiraj efekat','Sačuvaj sedmični pregled']
+    assert primary('diagnostic_review.html')==['Sačuvaj i nastavi','Odobri pregledanu reviziju']
