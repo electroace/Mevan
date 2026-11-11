@@ -152,7 +152,8 @@ JS = """<script id="mevan-nav-script">
   if(has(key))return words[key];
   for(var i=0;i<patterns.length;i++){var found=patterns[i][0].exec(key);if(found)return patterns[i][1].replace(/\\$(\\d)/g,function(_,n){var part=found[+n]||'';return has(part)?words[part]:part})}
   for(var j=0;j<prefixes.length;j++){if(key.indexOf(prefixes[j]+' ')===0)return words[prefixes[j]]+key.slice(prefixes[j].length)}
-  if(key.indexOf(' · ')>0){var parts=key.split(' · '),changed=false,out=parts.map(function(part){if(has(part)){changed=true;return words[part]}return part});if(changed)return out.join(' · ')}
+  var separator=key.indexOf('  |  ')>0?'  |  ':key.indexOf(' · ')>0?' · ':'';
+  if(separator){var parts=key.split(separator),changed=false,out=parts.map(function(part){if(has(part)){changed=true;return words[part]}return part});if(changed)return out.join(separator)}
   return null;
  }
  function swap(value){var key=value.trim();if(!key)return value;var next=phrase(key);return next===null?value:value.replace(key,next)}

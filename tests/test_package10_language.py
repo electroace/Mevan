@@ -128,3 +128,33 @@ def test_locked_report_labels_follow_the_language_but_content_does_not(api,fmt):
     by_cookie,_,_=doc_text(client,aid,'detailed',fmt,tmp_path)
     assert 'Consultant summary' in flat(by_cookie)
     assert 'Sažetak konsultanta' in flat(doc_text(client,aid,'detailed',fmt,tmp_path,'?lang=bs')[0])
+
+
+# ---- korak 3: katalog kriterija i Word izvozi iz preglednika
+
+def test_english_catalogue_covers_all_61_criteria_with_the_same_structure():
+    import json
+    from mevan_criteria_en import CRITERIA_EN, FIELDS
+    html=(ROOT/'index.html').read_text(encoding='utf-8')
+    source=json.loads(re.search(r'const CRITERIA=(\[.*?\]);\n',html,re.S).group(1))
+    assert len(source)==61 and {c['code'] for c in source}==set(CRITERIA_EN)
+    for criterion in source:
+        english=CRITERIA_EN[criterion['code']]
+        assert set(english)==set(FIELDS) and all(isinstance(v,str) and v.strip() for v in english.values()),criterion['code']
+        assert 'dim' not in english and 'code' not in english  # šifra i dimenzija se nikad ne zamjenjuju
+        assert english['question'].endswith('?')==criterion['question'].endswith('?'),criterion['code']
+        assert (english['financial']==english['recommendation'])==(criterion['financial']==criterion['recommendation']),criterion['code']
+
+
+def test_catalogue_is_sent_only_in_english_and_applied_before_use():
+    assert 'window.MV_CRITERIA_EN={"F01"' in mevan_i18n.client_script('en') and 'MV_CRITERIA_EN' not in mevan_i18n.client_script('bs')
+    html=(ROOT/'index.html').read_text(encoding='utf-8')
+    apply="if(typeof window!=='undefined'&&window.MV_LANG==='en'&&window.MV_CRITERIA_EN)for(const c of CRITERIA)Object.assign(c,window.MV_CRITERIA_EN[c.code]||{});"
+    assert html.count(apply)==1 and html.index(apply)<html.index('const DIMS=[...new Set(CRITERIA.map(c=>c.dim))];')
+
+
+def test_browser_word_exports_use_the_dictionary():
+    html=(ROOT/'index.html').read_text(encoding='utf-8')
+    assert html.count("if(typeof mvT==='function'&&typeof value==='string')value=mvT(value);")==1
+    assert html.count("if(typeof mvT==='function'&&typeof v==='string')v=mvT(v);")==1
+    assert "${typeof mvT==='function'?mvT('Strana'):'Strana'} " in html

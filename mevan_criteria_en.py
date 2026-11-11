@@ -1,0 +1,75 @@
+"""Engleski prevod kataloga od 61 kriterija (prikazni tekstovi).
+
+Šifre, dimenzije i redoslijed su isti kao u `index.html`. Prevod je radni: stručni izrazi metodologije
+treba da pregleda vlasnik metodologije prije upotrebe kod klijenta. Polja po redu:
+naziv, pitanje, dokazi, KPI, preporuka, finansijski aspekt.
+"""
+BY_CAUSE = 'Improvement based on the confirmed cause'
+PERF = 'Performance management'
+
+_ROWS = {
+    'F01': ('Profitability', 'Are EBITDA and margin calculated reliably and analysed by period?', 'P&L for 12–24 months; EBITDA reconciliation', 'EBITDA %; trend', 'Margin and profit-driver analysis', None),
+    'F02': ('Contribution margin', 'Is the contribution known by product, customer and order?', 'Sales; variable costs; costings', 'Contribution KM/%', 'Portfolio profitability', None),
+    'F03': ('Cost structure', 'Are variances in material, labour, energy and overheads explained?', 'General ledger; cost centres; trend', 'Cost per unit', 'Cost-driver analysis', None),
+    'F04': ('Standard costs', 'Are the BOM, norms and standards up to date and compared with actuals?', 'BOM; labour norms; variance reports', 'Standard vs actual variance', 'Standard costing', None),
+    'F05': ('Labour productivity', 'Is productivity linked to labour cost and utilisation?', 'Hours worked; output; payroll', 'KM/unit; units/hour', 'Labour capacity analysis', None),
+    'F06': ('Scrap and rework', 'Is the cost of scrap and rework measured by cause?', 'NCR; scrap; rework; material values', 'COPQ KM; scrap %', 'Root cause / quality', None),
+    'F07': ('Inventory', 'Is inventory controlled by turnover, age and risk?', 'Inventory balance and ageing structure', 'DIO; obsolete inventory', 'ABC/XYZ and inventory policy', None),
+    'F08': ('Working capital', 'Are receivables, payables and cash actively planned?', 'AR/AP ageing; cash flow', 'DSO; DPO; CCC', 'Working capital programme', None),
+    'F09': ('Budget and variances', 'Are the budget and forecast regularly compared with actuals?', 'Budget; forecast; monthly variances', 'Forecast error %', 'Rolling forecast', None),
+    'F10': ('Financial reporting', 'Is the data accurate, timely and reconciled with operations?', 'Close calendar; ERP; reconciliations', 'Days to report', 'Management reporting', None),
+    'F11': ('Investments', 'Does CAPEX have a business case and a post-investment review?', 'CAPEX requests; ROI/NPV; realisation', 'ROI; payback', 'CAPEX governance', None),
+    'F12': ('Financial decision-making', 'Are operational decisions made with financial scenarios?', 'Minutes; decisions; KPI reports', '% of decisions with analysis', 'Performance governance', None),
+    'O01': ('Labour productivity', 'Pieces or standard hours per effective working hour', 'Work orders; time records; norms', 'Output / effective hours', BY_CAUSE, 'Labour cost; additional contribution'),
+    'O02': ('Capacity utilisation', 'Match between load and available capacity', 'Capacity plan; shifts; actual production', 'Load / available capacity', BY_CAUSE, 'Lost margin or unnecessary cost'),
+    'O03': ('OEE / equipment effectiveness', 'Availability, performance and quality of critical equipment', 'Machine log; downtime; quality', 'OEE = A × P × Q', BY_CAUSE, 'Downtime; lost capacity'),
+    'O04': ('Unplanned downtime', 'Duration, frequency and causes of stoppages', 'Downtime log; CMMS; shift reports', 'Downtime minutes / planned hours', BY_CAUSE, 'Downtime cost; lost margin'),
+    'O05': ('Scrap and rework', 'Quality losses by product and cause', 'Quality control; complaints; work orders', 'Scrap %; FPY; rework hours', BY_CAUSE, 'Material, labour and complaints'),
+    'O06': ('Lead time', 'Time from order to completion of production', 'ERP timestamps; VSM; orders', 'Lead time; WIP', BY_CAUSE, 'Tied-up cash; delays'),
+    'O07': ('Tool / batch changeovers', 'Duration and standardisation of set-up', 'Set-up records; video analysis; plan', 'Average set-up (min)', BY_CAUSE, 'Lost capacity; batch size'),
+    'O08': ('Standardised work', 'Existence and use of standard procedures', 'Work instructions; audit; Gemba', 'Compliance with standard %', BY_CAUSE, 'Variation; quality; productivity'),
+    'O09': ('Material flow and WIP', 'Transport, waiting and inter-stage inventory', 'Spaghetti map; VSM; WIP reports', 'WIP days; flow distance', BY_CAUSE, 'Tied-up cash; handling'),
+    'O10': ('Preventive maintenance', 'Planning and execution of maintenance', 'CMMS; plans; failure records', 'PM compliance %; MTBF; MTTR', BY_CAUSE, 'Failures; spare parts'),
+    'O11': ('Delivery from production', 'Adherence to production deadlines and quantities', 'Plan and actuals; ERP; delivery notes', 'Plan attainment %; OTD %', BY_CAUSE, 'Penalties; emergency shifts; lost sales'),
+    'O12': ('Line balancing', 'Distribution of work and flow constraints', 'Cycle measurement; takt; layout', 'Line balance %; takt vs cycle', BY_CAUSE, 'Unused labour; waiting'),
+    'O13': ('Energy efficiency', 'Energy consumption per unit of output', 'Bills; measurements; production records', 'kWh / unit', BY_CAUSE, 'Energy; emissions'),
+    'O14': ('Safety and ergonomics', 'Control of operational risks and ergonomic strain', 'Risk assessments; incidents; Gemba', 'Incidents; closed measures %', BY_CAUSE, 'Injuries; downtime; risk'),
+    'O15': ('Continuous improvement', 'Suggestion system, kaizen and sustainability of measures', 'Kaizen register; audit; KPI trend', 'Implemented measures / month', BY_CAUSE, 'Sum of verified benefits'),
+    'P01': ('Demand forecast', 'Is the forecast based on data and is its accuracy measured regularly?', 'Forecast, orders, sales history', 'WAPE, bias', 'Segment forecasts; track WAPE and bias', 'Inadequate production; excess/shortage of inventory'),
+    'P02': ('S&OP / IBP', 'Is there a regular process for aligning sales, operations and finance?', 'S&OP minutes, scenarios, approved plan', 'Plan alignment; number of escalations', 'Introduce monthly S&OP and weekly executive alignment', 'Unrealistic plans, lost margin'),
+    'P03': ('Master production schedule', 'Is there a realistic, frozen and rolling production plan?', 'MPS, weekly plan, version changes', 'Plan attainment; schedule adherence', 'Rolling plan of 6+ weeks; freeze rules', 'Overtime, urgent changes'),
+    'P04': ('Capacity planning', 'Is the plan checked against people, machines and bottlenecks?', 'RCCP, capacities, shifts, takt times', 'Load on the critical resource', 'RCCP and TOC constraint analysis', 'Waiting, lost sales'),
+    'P05': ('MRP and material requirements', 'Are material requirements tied to an accurate BOM and plan?', 'BOM, MRP exceptions, reservations', 'Stockout; planned vs actual consumption', 'Clean up BOM and MRP parameters', 'Work stoppages, excess purchasing'),
+    'P06': ('Supplier reliability', 'Are supplier lead time, quality and risk tracked?', 'Purchase orders, receipts, complaints', 'Supplier OTD; PPM', 'Supplier segmentation and scorecard', 'Emergency transport, downtime'),
+    'P07': ('Inventory policy', 'Are safety stocks, ABC/XYZ and turnover defined?', 'Inventory balance, ageing, stock counts', 'DIO; turnover; obsolete %', 'ABC/XYZ and replenishment parameters', 'Tied-up cash, write-offs'),
+    'P08': ('ERP data accuracy', 'Are balances, lead times, BOMs and routings reliable and up to date?', 'ERP transactions, stock counts, master data', 'Inventory accuracy; BOM accuracy', 'Master-data governance and daily posting', 'Wrong decisions, downtime'),
+    'P09': ('Production plan execution', 'Is execution measured daily and are variances analysed?', 'Daily plan/actuals, reasons', 'Plan attainment %', 'Daily tier meetings and variance Pareto', 'Delays, unplanned work'),
+    'P10': ('Delivery reliability', 'Are customer deadlines realistic and measurably met?', 'Orders, delivery notes, complaints', 'OTIF; OTD', 'ATP/CTP and control of promised dates', 'Penalties, lost customers'),
+    'P11': ('Internal and outbound logistics', 'Are material and dispatch flows stable?', 'Material flow, warehouse locations', 'Handling time; transport cost', 'VSM, milk-run, warehouse standard', 'Waiting, extra handling'),
+    'P12': ('Deviation management', 'Are there owners, deadlines and closure of deviation causes?', 'Action log, escalations, minutes', 'On-time action closure %', 'PDCA, action owner and weekly review', 'Recurring problems'),
+    'L01': ('Organisational structure', 'Are functions, reporting lines and deputies clearly defined?', 'Organisation chart, job descriptions, interviews', 'Share of key roles with documented responsibility', 'Define RACI and the organisation map', 'Unclear decisions, waiting'),
+    'L02': ('Accountability for results', 'Does every KPI have a named owner and a tracking rhythm?', 'KPI reports, minutes, RACI', 'Share of KPIs with an owner and an action', 'KPI ownership and weekly review', 'Variances nobody owns'),
+    'L03': ('Managerial competence', 'Can managers plan, lead and solve problems?', 'Interviews, simulations, evaluations', 'Share of managers assessed', 'Individual development plans', 'Poor decisions and escalations'),
+    'L04': ('Skills matrix', 'Are key operational skills recorded and covered?', 'Skills matrices, certificates, on-the-job checks', 'Coverage of critical operations (%)', 'Introduce a skill matrix and cross-training', 'Downtime due to absence'),
+    'L05': ('Onboarding and training', 'Is there standard onboarding and a competence check?', 'Training plans, tests, records', 'Time to independence (days)', 'Standardise onboarding', 'Scrap and longer onboarding'),
+    'L06': ('Performance management', 'Are there clear goals, feedback and corrective actions?', 'Goals, evaluations, meetings', 'Share of development measures implemented', 'Monthly performance review', 'Low productivity'),
+    'L07': ('Communication and escalation', 'Do problems quickly reach the person who can solve them?', 'Shift minutes, escalation procedures', 'Average escalation time (h)', 'Daily management and escalation matrix', 'Waiting and delays'),
+    'L08': ('Engagement and retention', 'Do we know the causes of departures and the barriers to engagement?', 'Turnover, exit interviews, surveys', 'Voluntary turnover (%)', 'Cause analysis and retention plan', 'Replacement and training cost'),
+    'L09': ('Safety and culture of accountability', 'Are risks reported and preventive measures carried out?', 'Incident records, training, site visit', 'Closed preventive measures (%)', 'Preventive safety review', 'Injuries and work stoppages'),
+    'L10': ('Succession and sustainability', 'Can the system function without a key individual or consultant?', 'Succession plan, deputies, audit', 'Share of critical functions with a trained deputy', 'Mentoring and succession plan', 'Dependence on an individual'),
+    'M01': ('Strategy and goals', 'Are annual and quarterly goals measurable and linked to production?', 'Strategic plan, annual goals, KPI tree', 'Share of goals with an owner and a measure', 'Hoshin Kanri / KPI cascade', PERF),
+    'M02': ('Roles and decision rights', 'Are process owners, authorities and escalations clearly defined?', 'RACI, job classification, authority matrix', 'Share of processes with a clear owner', 'RACI and governance', PERF),
+    'M03': ('Daily management', 'Are there daily meetings with variances, actions and owners?', 'Daily boards, minutes, daily reports', 'Share of daily actions closed', 'Daily Management System', PERF),
+    'M04': ('KPI architecture', 'Are KPIs defined, accurate and linked to the business result?', 'KPI catalogue, definitions, data sources', 'Share of KPIs with a definition and a source', 'KPI dictionary / tier meetings', PERF),
+    'M05': ('Business review rhythm', 'Are weekly and monthly performance reviews held?', 'Agendas, minutes, decisions', 'Timeliness and execution of decisions', 'Management review cadence', PERF),
+    'M06': ('Deviation management', 'Are systemic causes of repeated deviations investigated?', 'A3, 5 Why, CAPA records', 'Share of recurring problems', 'A3 / DMAIC / CAPA', PERF),
+    'M07': ('Action plan execution', 'Is there a single record of measures, deadlines and status?', 'Action plans, closure history', 'On-time action closure %', 'Action tracking / escalation', PERF),
+    'M08': ('Risk management', 'Are operational, financial and continuity risks identified?', 'Risk register, FMEA, continuity plan', 'Share of high risks with measures', 'Risk register / FMEA', PERF),
+    'M09': ('Change management', 'Are changes tested, communicated and stabilised?', 'Pilot records, SOP revisions, training', 'Share of changes sustained for 90 days', 'PDCA / change management', PERF),
+    'M10': ('Digital data and ERP discipline', 'Are transactions timely, accurate and traceable?', 'ERP logs, reconciliations, audit trail', 'Accuracy and timeliness of postings', 'Data governance / ERP controls', PERF),
+    'M11': ('Cross-functional coordination', 'Are sales, production, purchasing and finance aligned?', 'S&OP minutes, conflicting priorities', 'Share of cross-functional blockers resolved', 'S&OP / cross-functional governance', PERF),
+    'M12': ('Continuous improvement and sustainability', 'Are there regular initiatives and a check that effects are sustained?', 'Kaizen register, 30/60/90 audit', 'Share of confirmed sustained improvements', 'Kaizen / sustain audit', PERF),
+}
+
+FIELDS = ('name', 'question', 'evidence', 'kpi', 'recommendation', 'financial')
+CRITERIA_EN = {code: dict(zip(FIELDS, row[:5] + (row[5] or row[4],))) for code, row in _ROWS.items()}

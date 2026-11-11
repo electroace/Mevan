@@ -277,6 +277,61 @@ PATTERNS = [
     (r'^Novi status: (.+)$', 'New status: $1'),
 ]
 
+# ---- Word izvozi iz preglednika (stranica „Izvještaji” i integrisana analiza)
+EN.update({
+    'IZVJEŠTAJ O OPERATIVNOJ I POSLOVNOJ ZRELOSTI': 'OPERATIONAL AND BUSINESS MATURITY REPORT', 'Detaljni izvještaj': 'Detailed report', 'Izvršni sažetak': 'Executive summary',
+    'METALPRO DEMO – SIMULIRANI PODACI': 'METALPRO DEMO – SIMULATED DATA', 'ZAKLJUČANI NACRT': 'LOCKED DRAFT', 'NEODOBRENI NACRT – NIJE ZA KLIJENTA': 'UNAPPROVED DRAFT – NOT FOR THE CLIENT',
+    'Ocjene mjere zrelost procesa, a ne direktno ostvareni poslovni rezultat. Potvrđeni statusi u DEMO podacima ne znače provjeru stvarne kompanije.': 'Scores measure process maturity, not a directly achieved business result. Confirmed statuses in DEMO data do not mean a real company was checked.',
+    '01  |  Izvršni pregled': '01  |  Executive overview', 'Pokazatelj': 'Indicator', 'Obuhvat': 'Coverage', 'Status izvještaja': 'Report status',
+    'DEMO snimak — simulacija': 'DEMO snapshot — simulation', 'Radni nacrt': 'Working draft', 'Dokazna osnova': 'Evidence basis', 'Isključivo simulirana': 'Simulated only',
+    'Prema unesenim dokazima; potrebna stručna provjera': 'Based on entered evidence; expert review required',
+    'UPOZORENJE: Dijagnostika nije kompletirana. Indeks se odnosi samo na potvrđene primjenjive kriterije.': 'WARNING: The diagnostic is not complete. The index covers confirmed applicable criteria only.',
+    'Pregled pet dimenzija': 'Overview of the five dimensions', 'Dimenzija': 'Dimension', 'Indeks / 100': 'Index / 100', 'Prioriteti za provjeru': 'Priorities for review',
+    'Sljedeći kriteriji imaju najniže potvrđene ocjene zrelosti. To su kandidati za analizu, a ne automatski dokazani korijenski uzroci.': 'The following criteria have the lowest confirmed maturity scores. They are candidates for analysis, not automatically proven root causes.',
+    'Kriterij': 'Criterion', 'Ocjena': 'Score', 'Pitanje za rukovodstvo': 'Question for management',
+    'Nema potvrđenih ocjena na osnovu kojih se može odrediti prioritet.': 'There are no confirmed scores from which a priority can be set.', 'Odluke koje treba pripremiti': 'Decisions to prepare',
+    '02  |  Finansijski efekti i ograničenja': '02  |  Financial effects and limitations', 'Stručno potvrđeno u registru': 'Expert-confirmed in the register',
+    'Direktne godišnje uštede': 'Direct annual savings', 'Izbjegnuti budući troškovi': 'Avoided future costs', 'Oslobođeni obrtni kapital (jednokratno)': 'Released working capital (one-off)',
+    'Nepotvrđene stavke': 'Unconfirmed items', 'Moguća preklapanja': 'Possible overlaps',
+    'DEMO SCENARIJ (nije potvrđena korist): godišnji potencijal 52.167 KM i jednokratno oslobađanje obrtnog kapitala 160.000 KM. Kategorije se ne sabiraju bez provjere preklapanja, osnovice i realizacije.': 'DEMO SCENARIO (not a confirmed benefit): annual potential of 52,167 KM and a one-off working capital release of 160,000 KM. Categories are not added up without checking overlaps, baseline and realisation.',
+    'Godišnje uštede, izbjegnuti troškovi, dodatna kontribucija i jednokratno oslobađanje gotovine nisu ista finansijska kategorija. Procjena potencijala nije realizovana ušteda.': 'Annual savings, avoided costs, additional contribution and a one-off cash release are not the same financial category. An estimate of potential is not a realised saving.',
+    '03  |  Integrisana COO analiza': '03  |  Integrated COO analysis',
+    'Integrisana analiza nije unesena ili nije odobrena. Sam indeks zrelosti nije dovoljan za tvrdnje o uzročno-posljedičnim vezama.': 'The integrated analysis has not been entered or approved. The maturity index alone is not enough for claims about cause and effect.',
+    'Neodobreno / promijenjeni podaci.': 'Not approved / data changed.', 'DEMO snimak — simulirani podaci': 'DEMO snapshot — simulated data',
+    '04  |  Plan prvih 90 dana': '04  |  Plan for the first 90 days', 'Odgovorni': 'Owner', 'Nije uneseno': 'Not entered', 'Nije dodijeljen': 'Not assigned', 'Nije određen': 'Not set', 'Nije definisan': 'Not defined',
+    'Nema evidentiranog 90-dnevnog plana za ovaj prikaz. Aktivnosti, odgovorni, rokovi i KPI moraju biti dogovoreni s klijentom.': 'No 90-day plan is recorded for this view. Activities, owners, due dates and KPIs must be agreed with the client.',
+    'Nije primjenjivo — obuhvat': 'Not applicable — scope', '05  |  Registar kriterija i dokaza': '05  |  Register of criteria and evidence', 'Polje': 'Field', 'Nalaz / podatak': 'Finding / data',
+    'Dijagnostičko pitanje': 'Diagnostic question', 'Potrebni dokaz': 'Required evidence', 'Nedostupno': 'Unavailable', 'Dostavljeni dokaz': 'Evidence provided', 'Nije dostavljen': 'Not provided',
+    'Nalaz': 'Finding', 'Nije unesen': 'Not entered', 'Finansijski aspekt': 'Financial aspect', 'Nije procijenjen': 'Not assessed', 'Nije unesena': 'Not entered', 'Nije potvrđeno': 'Not confirmed',
+    'Metodologija i ograničenja': 'Methodology and limitations',
+    'Skala zrelosti 0–5. N/P se isključuje; kriterij bez potvrđenih dokaza ne dobija automatski nulu. Indeks prikazuje samo potvrđene primjenjive ocjene. Niske ocjene nisu dokaz uzroka bez dodatne analize.': 'Maturity scale 0–5. N/A is excluded; a criterion without confirmed evidence does not automatically get a zero. The index shows confirmed applicable scores only. Low scores are not proof of a cause without further analysis.',
+    'Dokument je radni dijagnostički materijal. Finansijski efekti zahtijevaju provjeru osnovice, formule, perioda, preklapanja i odobrenje odgovorne osobe.': 'This document is working diagnostic material. Financial effects require a check of the baseline, formula, period and overlaps, and approval by the responsible person.',
+    # integrisana analiza
+    'Detaljni dijagnostički izvještaj': 'Detailed diagnostic report', 'Direktorski dijagnostički izvještaj': 'Executive diagnostic report', 'MEVAN 4.0 · RADNI NACRT · NIJE ODOBRENO': 'MEVAN 4.0 · WORKING DRAFT · NOT APPROVED',
+    '01  |  Izvršni sažetak': '01  |  Executive summary', 'Dokazi': 'Evidence', 'Nezavisna verifikacija nije izvršena': 'No independent verification has been carried out', 'Nacrt / neodobreno': 'Draft / not approved',
+    'Pet dimenzija': 'Five dimensions', 'Procijenjeno / obuhvaćeno': 'Assessed / covered',
+    'Ocjene su simulirana samoprocjena; broj procijenjenih kriterija nije broj nezavisno verificiranih dokaza.': 'Scores are a simulated self-assessment; the number of assessed criteria is not the number of independently verified pieces of evidence.',
+    '02  |  Sistemski nalazi': '02  |  Systemic findings', '03  |  Direktorske odluke': '03  |  Executive decisions', '02  |  Tri prioritetne direktorske odluke': '02  |  Three priority executive decisions',
+    '04  |  KPI registar': '04  |  KPI register', '05  |  Finansijska kontrola': '05  |  Financial control', '03  |  Finansijska kontrola': '03  |  Financial control',
+    '06  |  Plan 30/60/90 dana': '06  |  30/60/90-day plan', '04  |  Narednih 30 dana': '04  |  Next 30 days', '07  |  Registar svih kriterija i dokaza': '07  |  Register of all criteria and evidence',
+    '08  |  Pitanja za konsultanta': '08  |  Questions for the consultant', '0–30 dana': 'Days 0–30', 'Status: HIPOTEZA': 'Status: HYPOTHESIS',
+    'EBITDA i godišnji P&L efekti odvojeni su od jednokratnog oslobađanja obrtnog kapitala. Nema automatski odobrenih efekata.': 'EBITDA and annual P&L effects are kept separate from the one-off working capital release. No effects are approved automatically.',
+    'Nezavisno potvrđeni i konsultantski odobreni efekti: 0 KM godišnje; 0 KM jednokratno.': 'Independently confirmed and consultant-approved effects: 0 KM per year; 0 KM one-off.',
+    'Hipotetični scenarij': 'Hypothetical scenario', 'Godišnje KM': 'Annual KM', 'Jednokratno KM': 'One-off KM', 'Svi prikazani scenariji su neodobreni i isključeni iz potvrđenih efekata.': 'All scenarios shown are unapproved and excluded from confirmed effects.',
+    'Indeks i finansijski iznosi preuzeti su iz determinističkog analitičkog mehanizma. Uzroci su hipoteze. Izvještaj nije validiran niti odobren.': 'The index and financial amounts come from the deterministic analytical mechanism. Causes are hypotheses. The report is not validated or approved.',
+    'Kriteriji:': 'Criteria:', 'Mehanizam:': 'Mechanism:', 'Konkurentska hipoteza o uzroku:': 'Competing cause hypothesis:', 'Provjera:': 'Verification:', 'Zašto:': 'Why:', 'Vlasnik:': 'Owner:',
+    'Prvih 7 dana:': 'First 7 days:', 'Pilot 30 dana:': '30-day pilot:', 'Uslov / stop:': 'Gate / stop:', 'Kako utvrditi početno stanje:': 'How to establish the baseline:', 'Formula:': 'Formula:',
+    'Početna vrijednost:': 'Baseline value:', 'Metod određivanja cilja:': 'Target-setting method:', 'Prag za odluku:': 'Decision threshold:', 'Odgovoran:': 'Responsible:', 'Isporuka:': 'Deliverable:',
+    'Dokaz završetka:': 'Evidence of completion:', 'Upozorenje:': 'Warning:', 'Dokaz:': 'Evidence:', 'Nalaz:': 'Finding:', 'Datum:': 'Date:',
+})
+PATTERNS[:0] = [
+    (r'^Datum: (.+?)   \|   Verzija: (.+?)   \|   (.+)$', 'Date: $1   |   Version: $2   |   $3'),
+    (r'^(\d+) / (\d+) primjenjivih kriterija$', '$1 / $2 applicable criteria'),
+    (r'^(\d+)\. Provjeriti (\S+) – (.+?): (.+)\. Odluka tek nakon provjere dokaza, uzroka, troška i odgovorne osobe\.$',
+     '$1. Review $2 – $3: $4. Decide only after checking the evidence, cause, cost and owner.'),
+    (r'^Status analize: (.+)$', 'Analysis status: $1'),
+]
+
 def lang_of(request):
     value = request.cookies.get(COOKIE, '')
     return value if value in LANGS else DEFAULT
@@ -290,4 +345,8 @@ def client_script(lang):
     """Jezik, rječnik i obrasci za zajedničku skriptu. Na bosanskom se ne šalju."""
     words = json.dumps(EN if lang == 'en' else {}, ensure_ascii=False).replace('</', '<\\/')
     patterns = json.dumps(PATTERNS if lang == 'en' else [], ensure_ascii=False).replace('</', '<\\/')
-    return f'<script id="mevan-i18n">window.MV_LANG={json.dumps(lang)};window.MV_I18N={words};window.MV_I18N_PATTERNS={patterns};</script>'
+    catalogue = ''
+    if lang == 'en':
+        from mevan_criteria_en import CRITERIA_EN
+        catalogue = 'window.MV_CRITERIA_EN=' + json.dumps(CRITERIA_EN, ensure_ascii=False).replace('</', '<\\/') + ';'
+    return f'<script id="mevan-i18n">window.MV_LANG={json.dumps(lang)};window.MV_I18N={words};window.MV_I18N_PATTERNS={patterns};{catalogue}</script>'
