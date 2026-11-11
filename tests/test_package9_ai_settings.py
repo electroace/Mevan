@@ -239,3 +239,26 @@ def test_ai_calls_do_not_block_the_server_loop():
     assert source.count('await asyncio.to_thread(mevan_ai.chat,')==3
     assert 'return await asyncio.to_thread(_v3_analysis,data,rules)' in source
     assert source.count('mevan_ai.chat(ai,')==1  # jedini direktni poziv je unutar _v3_analysis, koja uvijek radi u niti
+
+
+def test_finished_analysis_is_stored_in_the_diagnostic_and_resumed_after_leaving():
+    from pathlib import Path
+    html=(Path(mevan_ai.__file__).parent/'index.html').read_text(encoding='utf-8')
+    # Rezultat se upisuje u dijagnostiku (ide u lokalnu kopiju i na server), ne samo u memoriju stranice.
+    assert "target.v3={result:obj,source:ticket.signature,saved_at:new Date().toISOString()};" in html
+    assert html.index("target.v3={result:obj")<html.index("save();",html.index("target.v3={result:obj"))<html.index("async function v3Wait(")
+    # Oznaka pokrenutog posla se pamti, pa se rezultat preuzima i nakon zatvaranja stranice.
+    assert "localStorage.setItem(V3_TICKET,JSON.stringify(ticket));" in html and "const pending=!v3Busy&&v3Ticket();if(pending){setTimeout(()=>v3Wait(pending),0)}" in html
+    # Svaka dijagnostika prikazuje samo svoju analizu.
+    assert "if(v3Owner===diagnostic.id&&!force)return;" in html and html.count("syncV3();")>=3
+    assert "Podaci su od tada promijenjeni; pokrenite analizu ponovo da bude ažurna." in html
+
+
+def test_workspace_with_a_stored_analysis_is_accepted_by_the_server(fx):
+    stored={'result':{'analysis':{'executive_summary':'Sažetak'},'facts':{'index':36.4},'criteria':[]},'source':'potpis','saved_at':'2026-11-11T12:00:00.000Z'}
+    workspace={'companies':[{'id':'c1','company':{'name':'QA'},'diagnostics':[{'id':'d1','name':'Dijagnostika','assess':{},'effects':[],'v3':stored}]}],
+               'activeCompanyId':'c1','activeDiagnosticId':'d1'}
+    version=fx.client.get('/api/workspace').json()['version']
+    saved=fx.client.put('/api/workspace',json=workspace,headers={**fx.headers,'If-Match':version})
+    assert saved.status_code==200,saved.text
+    assert fx.client.get('/api/workspace').json()['workspace']['companies'][0]['diagnostics'][0]['v3']==stored

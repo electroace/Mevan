@@ -179,7 +179,8 @@ EN.update({
     'Nema unesenih scenarija.': 'No scenarios entered.', 'Iznosi su isključivo simulirani ili nepotvrđeni scenariji. Nisu ostvarene koristi, nisu odobreni i ne sabiraju se.': 'The amounts are simulated or unconfirmed scenarios only. They are not realised benefits, are not approved and are not added up.',
     'Prvo završite integrisanu dijagnostiku.': 'Complete the integrated diagnostic first.', 'Nije odabrana kompanija ili dijagnostika.': 'No company or diagnostic is selected.',
     'Prijenos nije uspio. Provjerite dozvole preglednika.': 'The transfer failed. Check the browser permissions.', 'Prvo pokrenite kompletnu dijagnostiku.': 'Run the full diagnostic first.',
-    'Podaci su promijenjeni tokom analize. Ponovo pokrenite analizu.': 'The data changed during the analysis. Run the analysis again.',
+    'Analiza traje duže od sedam minuta. Pokušajte ponovo.': 'The analysis is taking longer than seven minutes. Try again.',
+    'Dijagnostika za koju je analiza pokrenuta više ne postoji.': 'The diagnostic the analysis was started for no longer exists.',
     # podaci i sigurnost, AI servis
     'Ovaj demonstracijski prototip radi uz serversku prijavu i SQLite bazu; nije prošao produkcijsku sigurnosnu reviziju. Korisničke lozinke se ne ugrađuju u HTML. Kompanije i dijagnostike se sinhronizuju na server, a lokalna kopija ostaje u pregledniku. Nije pogodan za povjerljive podatke stvarnih klijenata.': 'This demonstration prototype runs with a server sign-in and an SQLite database; it has not passed a production security review. User passwords are not embedded in HTML. Companies and diagnostics are synced to the server, and a local copy stays in the browser. It is not suitable for confidential data of real clients.',
     'Preuzmite kopiju prije većih izmjena. Vraćanje prepisuje sve trenutno spremljene podatke i traži izričitu potvrdu.': 'Download a copy before major changes. Restoring overwrites all currently stored data and asks for explicit confirmation.',
@@ -325,6 +326,8 @@ EN.update({
     'Dokaz završetka:': 'Evidence of completion:', 'Upozorenje:': 'Warning:', 'Dokaz:': 'Evidence:', 'Nalaz:': 'Finding:', 'Datum:': 'Date:',
 })
 PATTERNS[:0] = [
+    (r'^Analiza je sačuvana (.+?)\. Podaci su od tada promijenjeni; pokrenite analizu ponovo da bude ažurna\.$', 'Analysis saved $1. The data has changed since then; run the analysis again to bring it up to date.'),
+    (r'^Analiza je sačuvana (.+?)\.$', 'Analysis saved $1.'),
     (r'^Datum: (.+?)   \|   Verzija: (.+?)   \|   (.+)$', 'Date: $1   |   Version: $2   |   $3'),
     (r'^(\d+) / (\d+) primjenjivih kriterija$', '$1 / $2 applicable criteria'),
     (r'^(\d+)\. Provjeriti (\S+) – (.+?): (.+)\. Odluka tek nakon provjere dokaza, uzroka, troška i odgovorne osobe\.$',

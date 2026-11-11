@@ -78,3 +78,18 @@ Nijedan stvarni poziv OpenAI, Anthropic ili trećem servisu nije izvršen, jer z
 **Ograničenja:** poslovi se drže u memoriji jednog procesa. Ako se server ponovo pokrene dok analiza traje, posao nestaje i analizu treba pokrenuti ponovo (aplikacija to kaže). Nacrt po modulu („AI nacrt (server)”) i dalje je jedan zahtjev, ali više ne blokira server.
 
 **Provjere:** `pytest` 245 prolaza (tri nova testa: posao u pozadini dok `/health` odgovara, zaštita novih adresa, AI pozivi izvan glavne petlje). Mobilni browser tok prolazi kroz novi način pokretanja i čitanja analize. Stvarni poziv Anthropic servisu i Render nisu testirani iz razvojnog okruženja.
+
+## Dopuna 9.4 — rezultat integrisane analize se čuva
+
+**Problem:** rezultat integrisane analize postojao je samo u memoriji otvorene stranice. Odlazak na drugi ekran, osvježavanje ili zatvaranje prozora brisali su ga.
+
+**Rješenje:**
+- Završena analiza se upisuje u dijagnostiku (`v3`: rezultat, potpis ulaznih podataka, vrijeme). Zato ide u lokalnu kopiju u pregledniku, sinhronizuje se na server kao i ostali podaci, i dio je JSON sigurnosne kopije.
+- Svaka dijagnostika ima svoju analizu; nova analiza zamjenjuje prethodnu za tu dijagnostiku.
+- Ispod dugmadi piše kada je analiza sačuvana. Ako su ocjene ili finansijski efekti od tada mijenjani, piše da analiza više nije ažurna (rezultat ostaje vidljiv).
+- Ako se stranica napusti dok analiza još traje, oznaka posla ostaje zapamćena u pregledniku. Pri povratku na „Integrisana analiza (AI)” rezultat se preuzima i čuva. Server drži rezultat 30 minuta.
+- Nedovršena analiza ne briše prethodno sačuvanu: ako novo pokretanje ne uspije, prikazuje se greška i ranija analiza.
+
+**Ograničenja:** analiza pokrenuta u jednom pregledniku preuzima se samo iz tog preglednika. Ako se server ponovo pokrene dok analiza traje, posao se gubi i treba je pokrenuti ponovo. Ako hosting nema trajni disk, serverska kopija se gubi s novim deployem kao i ostali podaci; lokalna kopija u pregledniku ostaje.
+
+**Provjere:** `pytest` 247 prolaza (dva nova testa). Browser prolaz: pokretanje analize pa odlazak na drugi ekran i povratak, puno osvježavanje, drugi preglednik (rezultat stiže sa servera), izmjena ocjene (oznaka neažurnosti), nova dijagnostika bez tuđe analize; bez JavaScript grešaka. Oba mobilna toka i Word QA 12/12 prolaze.

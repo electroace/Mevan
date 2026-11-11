@@ -376,32 +376,66 @@ function openDiagnosticReview(){
  sessionStorage.setItem('mevan-review-selection',JSON.stringify(selection));
  location.href='/diagnostic-review';
 }
-let v3Result=null,v3Busy=false,v3Error='',v3Source='';
+let v3Result=null,v3Busy=false,v3Error='',v3Source='',v3Owner=null;
+const V3_TICKET='mevan_v3_job';
+// Završena analiza se čuva u dijagnostici (state.v3), pa ostaje nakon odlaska sa stranice i sinhronizuje se na server.
+function syncV3(force){
+ const diagnostic=activeDiagnostic();
+ if(v3Owner===diagnostic.id&&!force)return;
+ if(v3Owner!==diagnostic.id)v3Error='';
+ v3Owner=diagnostic.id;
+ const saved=diagnostic.v3;
+ v3Result=saved&&saved.result&&saved.result.analysis?saved.result:null;
+ v3Source=v3Result?saved.source||'':'';
+}
+function v3Ticket(){try{const t=JSON.parse(localStorage.getItem(V3_TICKET)||'null');return t&&t.job&&Date.now()-t.at<25*60*1000?t:null}catch(e){return null}}
+function v3Diagnostic(id){for(const company of workspace.companies)for(const diagnostic of company.diagnostics)if(diagnostic.id===id)return diagnostic;return null}
+// Čeka rezultat pozadinskog posla i upisuje ga u dijagnostiku za koju je analiza pokrenuta.
+async function v3Collect(ticket){
+ const readJson=async reply=>{try{return await reply.json()}catch(e){throw Error('Server nije vratio ispravan odgovor (HTTP '+reply.status+'). Servis je zauzet ili se ponovo pokreće; pokušajte ponovo za minutu.')}};
+ let obj=null;
+ for(let attempt=0;attempt<140&&!obj;attempt++){
+  await new Promise(resolve=>setTimeout(resolve,attempt?3000:800));
+  const poll=await fetch('/api/v3/analyze/job/'+encodeURIComponent(ticket.job));
+  const state=await readJson(poll);if(!poll.ok)throw Error(state.detail||'Analiza nije dostupna');
+  if(state.status==='error')throw Error(state.detail||'Analiza nije dostupna');
+  if(state.status==='done')obj=state.result;
+ }
+ if(!obj)throw Error('Analiza traje duže od sedam minuta. Pokušajte ponovo.');
+ if(!obj.analysis||!obj.facts||!Array.isArray(obj.criteria))throw Error('Nepotpuna analiza');
+ const target=v3Diagnostic(ticket.diagnostic);
+ if(!target)throw Error('Dijagnostika za koju je analiza pokrenuta više ne postoji.');
+ target.v3={result:obj,source:ticket.signature,saved_at:new Date().toISOString()};
+ save();
+}
+async function v3Wait(ticket){
+ v3Busy=true;v3Error='';render();
+ try{await v3Collect(ticket)}catch(e){v3Error=e.message}
+ finally{localStorage.removeItem(V3_TICKET);v3Busy=false;syncV3(true);render()}
+}
 async function runV3(){
  v3Busy=true;v3Error='';v3Result=null;page='v2';render();
+ let ticket=null;
  try{
   const body=analysisInput(),signature=analysisSignature(body);
   // Analiza ide kao pozadinski posao: AI poziv može trajati duže nego što mreža drži jedan zahtjev otvorenim.
-  const readJson=async reply=>{try{return await reply.json()}catch(e){throw Error('Server nije vratio ispravan odgovor (HTTP '+reply.status+'). Servis je zauzet ili se ponovo pokreće; pokušajte ponovo za minutu.')}};
   const started=await fetch('/api/v3/analyze/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const ticket=await readJson(started);if(!started.ok)throw Error(ticket.detail||'Analiza nije dostupna');
-  let obj=null;
-  for(let attempt=0;attempt<140&&!obj;attempt++){
-   await new Promise(resolve=>setTimeout(resolve,attempt?3000:800));
-   const poll=await fetch('/api/v3/analyze/job/'+encodeURIComponent(ticket.job));
-   const state=await readJson(poll);if(!poll.ok)throw Error(state.detail||'Analiza nije dostupna');
-   if(state.status==='error')throw Error(state.detail||'Analiza nije dostupna');
-   if(state.status==='done')obj=state.result;
-  }
-  if(!obj)throw Error('Analiza traje duže od sedam minuta. Pokušajte ponovo.');
-  if(!obj.analysis||!obj.facts||!Array.isArray(obj.criteria))throw Error('Nepotpuna analiza');
-  if(signature!==analysisSignature(analysisInput()))throw Error('Podaci su promijenjeni tokom analize. Ponovo pokrenite analizu.');
-  v3Source=signature;v3Result=obj;
- }catch(e){v3Error=e.message}finally{v3Busy=false;render()}
+  let reply;try{reply=await started.json()}catch(e){throw Error('Server nije vratio ispravan odgovor (HTTP '+started.status+'). Servis je zauzet ili se ponovo pokreće; pokušajte ponovo za minutu.')}
+  if(!started.ok)throw Error(reply.detail||'Analiza nije dostupna');
+  // Oznaka posla se pamti u pregledniku: ako se stranica zatvori, rezultat se preuzima pri povratku.
+  ticket={job:reply.job,diagnostic:activeDiagnostic().id,signature,at:Date.now()};
+  localStorage.setItem(V3_TICKET,JSON.stringify(ticket));
+ }catch(e){v3Error=e.message;v3Busy=false;syncV3(true);render();return}
+ await v3Wait(ticket);
 }
 function v3Page(){
- const r=v3Result;
- let html=`<div class="panel"><h1>Integrisana analiza (AI)</h1><button class="btn secondary" onclick="openDiagnosticReview()">Konsultantska provjera i završni izvještaji</button><p class="warning">Radni nacrt. AI zaključci nisu nezavisno verificirani. Simulirani dokazi nisu stvarne potvrde; potrebna je stručna revizija prije upotrebe kod klijenta.</p><div class="row"><button class="btn" onclick="runV3()" ${v3Busy?'disabled':''}>${v3Busy?'Analiza u toku…':'Pokreni kompletnu dijagnostiku'}</button>${r?'<button class="btn secondary" onclick="exportV3(false)">Word · Executive Summary</button><button class="btn secondary" onclick="exportV3(true)">Word · Detaljni izvještaj</button><button class="btn" onclick="openV3ProjectCandidates()">Pređi na izbor operativnog projekta</button>':''}</div>${v3Error?'<p class="warning">'+esc(v3Error)+'</p>':''}</div>`;
+ syncV3();
+ // Analiza pokrenuta prije odlaska sa stranice: rezultat se preuzima čim se ova stranica ponovo otvori.
+ const pending=!v3Busy&&v3Ticket();if(pending){setTimeout(()=>v3Wait(pending),0)}
+ const r=v3Result,saved=activeDiagnostic().v3;
+ const fresh=r&&v3Source===analysisSignature(analysisInput());
+ const savedNote=r&&saved&&saved.saved_at?`<p class="muted">${fresh?'Analiza je sačuvana '+new Date(saved.saved_at).toLocaleString('bs-BA')+'.':'Analiza je sačuvana '+new Date(saved.saved_at).toLocaleString('bs-BA')+'. Podaci su od tada promijenjeni; pokrenite analizu ponovo da bude ažurna.'}</p>`:'';
+ let html=`<div class="panel"><h1>Integrisana analiza (AI)</h1><button class="btn secondary" onclick="openDiagnosticReview()">Konsultantska provjera i završni izvještaji</button><p class="warning">Radni nacrt. AI zaključci nisu nezavisno verificirani. Simulirani dokazi nisu stvarne potvrde; potrebna je stručna revizija prije upotrebe kod klijenta.</p><div class="row"><button class="btn" onclick="runV3()" ${v3Busy?'disabled':''}>${v3Busy?'Analiza u toku…':'Pokreni kompletnu dijagnostiku'}</button>${r?'<button class="btn secondary" onclick="exportV3(false)">Word · Executive Summary</button><button class="btn secondary" onclick="exportV3(true)">Word · Detaljni izvještaj</button><button class="btn" onclick="openV3ProjectCandidates()">Pređi na izbor operativnog projekta</button>':''}</div>${v3Error?'<p class="warning">'+esc(v3Error)+'</p>':''}${savedNote}</div>`;
  if(!r)return html;
  const a=r.analysis,f=r.facts;
  html+=`<div class="panel"><h2>Jedinstveni izvršni pregled</h2><p>${esc(a.executive_summary)}</p><div class="grid"><div class="stat"><div class="muted">Indeks zrelosti</div><div class="big">${esc(f.index??'—')}/100</div></div><div class="stat"><div class="muted">Status</div><div class="big" style="font-size:17px">NEODOBRENO</div></div></div></div>`;
@@ -411,6 +445,7 @@ function v3Page(){
  return html;
 }
 function openV3ProjectCandidates(){
+ syncV3();
  if(!v3Result||!v3Result.analysis||!Array.isArray(v3Result.criteria)){
   mvNotify('Prvo završite integrisanu dijagnostiku.',true);return;
  }
@@ -424,6 +459,7 @@ function openV3ProjectCandidates(){
  catch(e){mvNotify('Prijenos nije uspio. Provjerite dozvole preglednika.',true);}
 }
 function exportV3(detailed){
+ syncV3();
  if(!v3Result)return mvNotify('Prvo pokrenite kompletnu dijagnostiku.',true);
  const r=v3Result,a=r.analysis,f=r.facts,paras=[];
  const add=(v,style)=>{if(v===null||v===undefined||v==='')return;if(typeof mvT==='function'&&typeof v==='string')v=mvT(v);const p=style?`<w:pPr><w:pStyle w:val="${style}"/></w:pPr>`:'';paras.push(`<w:p>${p}<w:r><w:t xml:space="preserve">${xmlEsc(v)}</w:t></w:r></w:p>`)};
