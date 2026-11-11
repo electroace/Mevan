@@ -217,7 +217,8 @@ def nav_html(active: str) -> str:
     body = ''.join(f'<div class="mv-group"><p class="mv-label">{escape(title)}</p>{items}</div>'
                    for title, items in groups)
     foot = ('<div class="mv-foot">' + _page('data', 'Podaci i sigurnost', diag)
-            + '<form method="post" action="/logout"><button class="mv-logout" type="submit">Odjava</button></form></div>')
+            + '<form method="post" action="/logout"><input type="hidden" name="csrf_token" value="__MEVAN_LOGOUT_TOKEN__">'
+            '<button class="mv-logout" type="submit">Odjava</button></form></div>')
     return f'<nav class="mv-nav" id="mvNav" aria-label="Glavni meni">{body}{foot}</nav>'
 
 

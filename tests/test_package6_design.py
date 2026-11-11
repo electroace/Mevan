@@ -77,3 +77,44 @@ def test_login_page_is_labelled_and_shows_error_inline(monkeypatch):
     assert '<label for="email">' in page and '<label for="password">' in page and '<main>' in page
     assert 'role="alert"' not in page
     assert 'role="alert"' in server.login_html('Pogrešna prijava.')
+
+
+# ---- 6.1: dugme „Odjava” u meniju
+
+import pytest
+import test_project_execution as project_fixture
+
+
+@pytest.fixture
+def fx():
+    fixture=project_fixture.TestProjectExecution(methodName='test_auth_origin_and_gate')
+    fixture.setUp()
+    try:
+        yield fixture
+    finally:
+        fixture.tearDown()
+
+
+def _logout_token(html):
+    form=html[html.index('action="/logout"'):]
+    return re.search(r'name="csrf_token" value="([0-9a-f]{64})"',form[:300]).group(1)
+
+
+def test_menu_logout_works_when_browser_sends_null_origin(fx):
+    # Preglednik uz Referrer-Policy: no-referrer šalje obrazac s `Origin: null`.
+    for path in ('/','/projects-ui','/dashboard-ui','/diagnostic-review'):
+        assert '__MEVAN_LOGOUT_TOKEN__' not in fx.client.get(path).text
+    token=_logout_token(fx.client.get('/').text)
+    form={'Origin':'null','Content-Type':'application/x-www-form-urlencoded'}
+    r=fx.client.post('/logout',content='csrf_token='+token,headers=form,follow_redirects=False)
+    assert r.status_code==303 and r.headers['location']=='/login'
+    assert fx.client.get('/',follow_redirects=False).status_code in (303,307)
+
+
+def test_logout_without_valid_token_or_origin_is_still_rejected(fx):
+    form={'Origin':'null','Content-Type':'application/x-www-form-urlencoded'}
+    assert fx.client.post('/logout',content='',headers=form,follow_redirects=False).status_code==403
+    assert fx.client.post('/logout',content='csrf_token='+'0'*64,headers=form,follow_redirects=False).status_code==403
+    other={'Origin':'https://evil.example','Content-Type':'application/x-www-form-urlencoded'}
+    assert fx.client.post('/logout',content='csrf_token='+'0'*64,headers=other,follow_redirects=False).status_code==403
+    assert fx.client.get('/',follow_redirects=False).status_code==200

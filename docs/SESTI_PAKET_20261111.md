@@ -33,3 +33,11 @@ Nijedna funkcija, naziv dugmeta, `id` ni `data-page` oznaka nisu uklonjeni. Teks
 ## Granice
 
 Provjereno u Chromiumu. Safari i Firefox nisu testirani. Stvarni AI, Render i udaljeni PostgreSQL nisu testirani. `browser_smoke.py` nije pokrenut jer traži Chromium na `/usr/bin/chromium`; iste rute su provjerene ručnim prolazom. Pojedinačne boje unutar stranica (oko 50 vrijednosti) nisu sve zamijenjene varijablama; zajednička pravila ih nadjačavaju tamo gdje se razlikuju.
+
+## Dopuna 6.1 — dugme „Odjava”
+
+**Greška:** klik na „Odjava” u meniju vraćao je `{"detail":"Nedozvoljen izvor"}`. Uzrok: zbog zaglavlja `Referrer-Policy: no-referrer` preglednik šalje obrazac s `Origin: null`, a server je tražio tačan izvor. Greška postoji otkako je odjava obrazac u zajedničkom meniju (četvrti paket); raniji testovi su slali ispravan `Origin` i nisu je uhvatili.
+
+**Popravka:** obrazac za odjavu nosi potpisani token vezan za trenutnu sesiju, kao obrazac za prijavu. Server prihvata odjavu ako je izvor ispravan ili ako je token ispravan. Sigurnosna zaglavlja nisu mijenjana.
+
+**Provjere:** `pytest` 196 prolaza (dva nova: odjava s `Origin: null` i tokenom uspijeva; bez tokena, s pogrešnim tokenom ili s tuđim izvorom i dalje se odbija). Odjava kliknuta u stvarnom Chromiumu vodi na prijavu. Oba mobilna toka i Word QA 12/12 prolaze.

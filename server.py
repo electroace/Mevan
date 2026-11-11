@@ -141,9 +141,22 @@ async def login(req:Request):
     resp.set_cookie('mevan_session',sign(f'{ident}|{int(time.time())+8*3600}'),httponly=True,secure=os.getenv('MEVAN_SECURE_COOKIE','1')=='1',samesite='strict',max_age=8*3600)
     return resp
 
+def logout_token(req):
+    # Vezan za trenutnu sesiju: vrijedi samo dok vrijedi isti kolačić prijave.
+    return hmac.new(SECRET.encode(),('logout|'+req.cookies.get('mevan_session','')).encode(),hashlib.sha256).hexdigest()
+
+def page_html(req,name,active):
+    return render_page((BASE/name).read_text(encoding='utf-8'),active).replace('__MEVAN_LOGOUT_TOKEN__',logout_token(req))
+
 @app.post('/logout')
-def logout(req:Request):
-    if not same_origin(req):raise HTTPException(403,'Nedozvoljen izvor')
+async def logout(req:Request):
+    # Obrazac „Odjava” preglednik šalje s `Origin: null` (zbog Referrer-Policy: no-referrer),
+    # pa se uz provjeru izvora prihvata i potpisani token iz samog obrasca, kao kod prijave.
+    if not same_origin(req):
+        from urllib.parse import parse_qs
+        token=parse_qs((await req.body()).decode(errors='replace')).get('csrf_token',[''])[0]
+        if not (logged(req) and token and hmac.compare_digest(token,logout_token(req))):
+            raise HTTPException(403,'Nedozvoljen izvor')
     if logged(req):
         with conn() as c: c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'logout','administrator'))
     resp=RedirectResponse('/login',status_code=303);resp.delete_cookie('mevan_session');return resp
@@ -151,7 +164,7 @@ def logout(req:Request):
 @app.get('/',response_class=HTMLResponse)
 def home(req:Request):
     if not logged(req):return RedirectResponse('/login')
-    html=render_page((BASE/'index.html').read_text(encoding='utf-8'),'diagnostic')
+    html=page_html(req,'index.html','diagnostic')
     return HTMLResponse(html,headers={'Cache-Control':'no-store','Content-Security-Policy':"frame-ancestors 'none'",'X-Content-Type-Options':'nosniff'})
 
 @app.get('/api/workspace')
@@ -623,13 +636,13 @@ app.include_router(project_router)
 def project_ui(req:Request):
     if not logged(req):
         return RedirectResponse('/login',status_code=303)
-    return HTMLResponse(render_page((Path(__file__).parent/'projects_ui.html').read_text(encoding='utf-8'),'projects'))
+    return HTMLResponse(page_html(req,'projects_ui.html','projects'))
 
 
 @app.get('/dashboard-ui',response_class=HTMLResponse)
 def dashboard_ui(req:Request):
     if not logged(req):return RedirectResponse('/login',status_code=303)
-    return HTMLResponse(render_page((Path(__file__).parent/'dashboard_ui.html').read_text(encoding='utf-8'),'portfolio'))
+    return HTMLResponse(page_html(req,'dashboard_ui.html','portfolio'))
 
 # This branch runs the review workflow in isolated revisioned tables.
 from mevan_test_workspace_api import create_test_router
@@ -640,4 +653,4 @@ app.include_router(create_test_router(str(DB), logged, same_origin, reviewer_id=
 def diagnostic_review(req: Request):
     if not logged(req):
         return RedirectResponse('/login', status_code=303)
-    return HTMLResponse(render_page((BASE / 'diagnostic_review.html').read_text(encoding='utf-8'),'guided'))
+    return HTMLResponse(page_html(req,'diagnostic_review.html','guided'))
