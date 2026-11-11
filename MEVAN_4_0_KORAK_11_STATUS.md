@@ -1,0 +1,1 @@
+MEVAN 4.0 Korak 11 TEST: Sedmični unos aktivnosti i KPI kroz obrasce, bez JSON unosa. KPI mjerenja zahtijevaju period i izvor. Historija prikazana čitljivo. Nije produkcijski paket.\n

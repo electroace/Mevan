@@ -1,0 +1,58 @@
+name: MEVAN isolated sync tests
+on:
+  push:
+    branches: [mevan-test-sync-bk-qg-20261110]
+  pull_request:
+    branches: [mevan-v2-test]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sync-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OPENAI_API_KEY: ''
+      MEVAN_CANDIDATE_DATABASE_URL: ''
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pripremi fontove i čitanje PDF-a
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-dejavu-core poppler-utils
+      - name: Install TEST API dependencies
+        run: python -m pip install -r requirements.txt 'httpx>=0.27,<1' pytest playwright
+      - name: Compile isolated sync module
+        run: python -m py_compile mevan_sync_guard.py mevan_test_workspace_api.py mevan_test_backup.py mevan_test_approval.py mevan_test_report_manifest.py tests/test_report_manifest.py tests/test_approval.py mevan_report_gate.py tests/test_report_gate.py tests/test_sync_guard.py tests/test_workspace_api.py tests/test_backup_snapshot.py
+      - name: Run isolated unit and API tests
+        env:
+          MEVAN_DB: ${{ runner.temp }}/mevan-ci.db
+        run: python -m pytest -q
+      - name: Provjeri svih 12 Word izvještaja
+        env:
+          MEVAN_WORD_QA_DIR: ${{ runner.temp }}/mevan-word-qa
+        run: |
+          node qa_word_reports.js
+          python qa_word_reports.py
+      - name: Pripremi Chromium za mobilni tok
+        run: python -m playwright install --with-deps chromium
+      - name: Verify mobile approval and downloads
+        env:
+          MEVAN_ADMIN_EMAIL: qa@example.test
+          MEVAN_ADMIN_PASSWORD: qa-local-only-test
+          MEVAN_SESSION_SECRET: qa-local-session-12345678901234567890
+          MEVAN_SECURE_COOKIE: '0'
+          MEVAN_DB: ${{ runner.temp }}/mevan-ui.db
+        run: |
+          python -m uvicorn server:app --port 8382 >/tmp/mevan-test.log 2>&1 &
+          trap 'kill $!' EXIT
+          curl --retry 12 --retry-connrefused --retry-delay 1 --max-time 5 -fsS http://127.0.0.1:8382/login >/dev/null
+          python browser_approved_smoke.py

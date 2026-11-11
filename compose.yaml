@@ -1,0 +1,18 @@
+services:
+  mevan:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MEVAN_DB: /data/mevan.sqlite3
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - mevan_data:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  mevan_data:

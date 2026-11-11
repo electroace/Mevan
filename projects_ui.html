@@ -1,0 +1,218 @@
+<!doctype html><html lang="bs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MEVAN 4.0 · Projekti TEST</title><style>
+:root{font-family:system-ui,Arial;color:#173047;background:#f2f5f8}*{box-sizing:border-box}body{margin:0}header{background:#173f5d;color:white;padding:18px 5%}header a{color:white}main{max-width:1440px;margin:22px auto;padding:0 16px}.layout{display:grid;grid-template-columns:minmax(390px, 480px) minmax(0, 1fr);gap:16px}.panel{background:white;border:1px solid #dce4ec;border-radius:12px;padding:18px;margin-bottom:14px}h1{font-size:24px}h2{font-size:19px;margin-top:0}h3{font-size:16px}label{display:block;font-weight:600;font-size:13px;margin:12px 0 5px}input,textarea,select{width:100%;padding:10px;border:1px solid #b9c9d7;border-radius:7px;font:inherit}textarea{min-height:76px}button{padding:10px 14px;border:0;border-radius:7px;background:#17658d;color:white;cursor:pointer;margin:6px 5px 6px 0}button.secondary{background:#e6eef3;color:#173f5d}button:disabled{opacity:.45;cursor:not-allowed}.muted{color:#637789;font-size:13px}.warn{background:#fff4d8;border:1px solid #e8c778;border-radius:9px;padding:10px;margin:12px 0}.good{background:#e8f6ee;padding:10px;border-radius:8px}.error{color:#a42121;white-space:pre-wrap}.item{display:block;width:100%;text-align:left;background:#edf3f7;color:#183a51}.item.active{background:#d3e7f2}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.tag{font-size:12px;background:#e5edf4;padding:4px 8px;border-radius:5px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}pre{white-space:pre-wrap;word-break:break-word;background:#f4f6f8;padding:10px}details{margin:10px 0;border-top:1px solid #e4eaf0;padding-top:10px}@media(max-width:900px){.layout,.grid{display:block}}
+</style></head><body><header><strong>MEVAN 4.0 · Project Execution TEST</strong><div class="muted" style="color:#c9dce8">Nacrti zahtijevaju odobrenje konsultanta · simulirani podaci nisu potvrđeni</div><a href="/">← Dijagnostika</a> · <a href="/dashboard-ui">Portfolio dashboard</a></header><main><div class="warn"><strong>TEST / DEMO.</strong> Ovaj ekran ne potvrđuje finansijske efekte niti verifikuje dokaze. Označavanje kontrolnih polja je izjava konsultanta, ne nezavisna verifikacija.</div><div id="notice" role="status"></div><div class="layout"><aside><section class="panel"><h2>Projekti</h2><button onclick="refresh()">Osvježi</button><div id="projects"></div></section><section class="panel"><h3>Iz dijagnostike u projekat</h3><p class="muted">Nakon završene v3 dijagnostike kliknite „Pređi na izbor operativnog projekta“. Nalazi se prenose automatski. Ručni JSON ostaje samo za naprednu provjeru.</p><details><summary>Napredno: ručni JSON unos</summary><label>Analiza v3 (JSON)</label><textarea id="analysisJson" style="min-height:115px" placeholder='{"ai":{"decisions":[{"title":"...","why":"..."}]}}'></textarea><button onclick="loadCandidates()">Prikaži kandidate iz JSON-a</button></details><div id="candidateList"></div><div class="row"><button type="button" class="secondary" onclick="saveCandidateDraftServer()">Sačuvaj ocjene na server</button><button type="button" class="secondary" onclick="restoreCandidateDraftServer()">Učitaj ocjene sa servera</button></div><p class="muted" id="candidateServerStatus">Serversko čuvanje je ručno. Lokalna kopija ostaje sačuvana u pregledniku. Učitavanje sa servera traži potvrdu.</p><button type="button" id="showRanking" class="secondary" onclick="showCandidateRanking()" disabled>Prikaži rangiranje C1–C3</button><div id="rankingResults" role="status" aria-live="polite"></div><button id="generatePack" onclick="generatePack()" disabled>Generiši AI nacrt</button><p class="muted">AI zahtijeva konfigurisan OPENAI_API_KEY. Bez ključa koristite preliminarni nacrt.</p><button id="generateBasic" class="secondary" onclick="generatePack(true)" disabled>Preliminarni nacrt bez AI</button></section><section class="panel"><h3>Novi nacrt</h3><label>Identifikator kompanije</label><input id="newCompany" placeholder="npr. METALPRO-DEMO"><label>Identifikator dijagnostike</label><input id="newDiagnostic" placeholder="npr. demo-2026"><label>Naziv projekta</label><input id="newTitle" placeholder="Naziv prioritetnog projekta"><label>Problem</label><textarea id="newProblem" placeholder="Najmanje 10 znakova"></textarea><button onclick="createDraft()">Kreiraj nacrt</button><p class="muted">Automatski AI paket generiše se kroz postojeći API. Ovaj ekran omogućava pregled i uređivanje spremljenih nacrta.</p></section></aside><div><section class="panel" id="empty"><h2>Odaberite projekat</h2><p class="muted">Kreirajte novi nacrt ili otvorite postojeći.</p></section><section class="panel" id="editor" hidden><div class="row"><h2 id="heading"></h2><span id="status" class="tag"></span></div><p id="metadata" class="muted"></p><div class="row"><button type="button" class="secondary" onclick="downloadReport('docx')">Izvezi Word</button><button type="button" class="secondary" onclick="downloadReport('pdf')">Izvezi PDF</button></div><p class="muted">Izvještaj uključuje samo sačuvane podatke. Prije izvoza sačuvajte promjene.</p><div class="grid"><div><label>Problem</label><textarea id="problem"></textarea></div><div><label>Cilj</label><textarea id="objective"></textarea></div><div><label>Obim</label><textarea id="scope"></textarea></div><div><label>Metodologija</label><textarea id="methodology"></textarea></div></div><label>Pretpostavke (jedna po redu)</label><textarea id="assumptions"></textarea><label>Obavezne provjere (jedna po redu)</label><textarea id="required_checks"></textarea><section class="structured"><h3>Projektne aktivnosti</h3><p class="muted">Uredite aktivnosti u obrascu. Dodatna AI polja se čuvaju bez brisanja.</p><div id="activityRows"></div><button type="button" class="secondary" id="addActivity" onclick="addStructured('activities')">+ Dodaj aktivnost</button></section><section class="structured"><h3>KPI registar</h3><p class="muted">Cilj se ne smatra odobrenim dok ga konsultant ne potvrdi.</p><div id="kpiRows"></div><button type="button" class="secondary" id="addKpi" onclick="addStructured('kpis')">+ Dodaj KPI</button></section><details><summary>Finansijski efekti — JSON lista (nepotvrđeni)</summary><textarea id="financial_effects" style="min-height:120px"></textarea></details><section class="structured" id="financePanel"><h3>Finansijski scenariji · procjene</h3><p class="muted">Tri scenarija. Godišnje koristi i jednokratno oslobađanje obrtnog kapitala računaju se odvojeno. Nema potvrđenih efekata.</p><div class="row"><button type="button" class="secondary" onclick="addBenefitRow()" id="financeAddBenefit">+ Dodaj korist u svaki scenarij</button><button type="button" onclick="previewFinance()" id="financePreview">Izračunaj</button><button type="button" onclick="saveFinance()" id="financeSave">Sačuvaj scenarije</button></div><div id="financeRows"></div><div id="financeResults" aria-live="polite"></div></section><h3>Kontrolne potvrde konsultanta</h3><label><input style="width:auto" type="checkbox" id="baseline_verified"> Početno stanje provjereno</label><label><input style="width:auto" type="checkbox" id="targets_approved"> KPI ciljevi odobreni</label><label><input style="width:auto" type="checkbox" id="checks_completed"> Obavezne provjere završene</label><div class="row"><button id="save" onclick="save()">Sačuvaj nacrt</button><button id="validation" class="secondary" onclick="transition('approve-validation')">Odobri fazu validacije</button><button id="implementation" onclick="transition('approve-implementation')">Odobri implementaciju</button></div><p class="muted">Implementacija se ne može odobriti bez sve tri potvrde. Odobreni projekat nije moguće uređivati bez nove verzije.</p></section><section class="panel" id="actualPanel" hidden><h2>Ostvareni finansijski efekti · evidencija</h2><p class="muted">Unos je izjava konsultanta na osnovu navedenog dokaza. Nije nezavisna verifikacija. Periodi se ne godišnje preračunavaju niti automatski sabiraju bez provjere preklapanja.</p><div class="grid"><div><label>Period (npr. 2026-11)</label><input id="actualPeriod" placeholder="2026-11"></div><div><label>Naziv efekta</label><input id="actualName" placeholder="Smanjenje škarta"></div><div><label>Kategorija</label><select id="actualCategory"><option value="operating_saving">Operativna ušteda</option><option value="contribution_margin">Kontribucijska marža</option><option value="avoided_cost">Izbjegnuti trošak</option><option value="working_capital_release">Jednokratni obrtni kapital</option></select></div><div><label>Iznos (KM)</label><input id="actualAmount" type="number" min="0" step="0.01"></div><div><label>Referenca dokaza</label><input id="actualEvidence" placeholder="Dokument / izvještaj / oznaka"></div><div><label>Vlasnik izvornog podatka</label><input id="actualOwner" placeholder="Odgovorna osoba"></div></div><label>Metoda obračuna i period (najmanje 10 znakova)</label><textarea id="actualCalculation"></textarea><label><input id="actualConfirmed" type="checkbox" style="width:auto"> Konsultant je provjerio izvor i obračun (nije nezavisna verifikacija)</label><label for="actualEvent">Oznaka zasebnog događaja (opcionalno)</label><input id="actualEvent" maxlength="128" pattern="[A-Za-z0-9._:-]{1,128}" placeholder="npr. racun-2026-11-001"><p class="muted">Isti podaci se ne upisuju ponovo. Za stvarno različite događaje s jednakim podacima unesite različite oznake. Pri ponavljanju zahtjeva zadržite istu oznaku. Dozvoljena su slova bez dijakritike, cifre i znakovi . _ : -</p><button type="button" id="actualSubmit" onclick="addActual()">Evidentiraj efekat</button><h3>Registar efekata</h3><div id="actualSummary"></div><div id="actualEntries"></div></section><section class="panel" id="weekly" hidden><h2>Sedmični pregled projekta</h2><p class="muted">Sedmična evidencija je izvještaj konsultanta; ne predstavlja nezavisno potvrđene finansijske efekte.</p><label>Sedmica (ISO format)</label><input type="week" id="week"><h3>Aktivnosti</h3><p class="muted">Odaberite status i unesite rezultat za svaku projektnu aktivnost.</p><div id="weekActivityRows"></div><h3>KPI mjerenja</h3><p class="muted">Unesite izmjerene vrijednosti, period i izvor. Prazna vrijednost se ne prikazuje kao ostvarenje.</p><div id="weekKpiRows"></div><label>Prepreke (jedna po redu)</label><textarea id="blockers"></textarea><label>Odluke (jedna po redu)</label><textarea id="decisions"></textarea><label>Napomena</label><textarea id="weekNote"></textarea><button onclick="addWeek()">Sačuvaj sedmični pregled</button><h3>Historija sedmica</h3><div id="reviews"></div></section></div></div></main><script>
+let selected=null,loaded=null,analysisData=null,candidateData=[];
+const FACTOR_GUIDANCE={profit:'0 = bez očekivanog uticaja; 3 = umjeren potencijal uz pretpostavke; 5 = vrlo visok potencijal, uz mjerljiv poslovni slučaj. Ocjena je procjena, ne potvrđena ušteda.',liquidity:'0 = bez uticaja na novčani tok; 3 = umjereno oslobađanje kapitala; 5 = vrlo snažan uticaj na likvidnost. Ne izjednačavati oslobađanje kapitala s prihodom.',delivery:'0 = bez uticaja na rokove; 3 = umjereno poboljšanje; 5 = presudan uticaj na pouzdanost isporuke. Navedite očekivani KPI.',risk:'0 = ne smanjuje rizik; 3 = djelimično smanjuje ključni rizik; 5 = značajno smanjuje kritični rizik. Navedite koji rizik.',feasibility:'0 = trenutno neizvodivo; 3 = izvedivo uz dodatne resurse; 5 = brzo izvedivo s dostupnim resursima. Navedite prepreke.'};
+let structured={activities:[],kpis:[]},editable=true;
+const FORM_FIELDS={activities:[['title','Naziv aktivnosti'],['owner','Odgovorna osoba'],['deadline','Rok / sedmica'],['deliverable','Očekivani rezultat'],['acceptance_criteria','Kriterij prihvatanja']],kpis:[['name','Naziv KPI'],['formula','Formula'],['source','Izvor podataka'],['baseline','Početno stanje'],['target','Predloženi cilj'],['owner','Odgovorna osoba'],['frequency','Učestalost']]};
+function renderStructured(type){const root=el(type==='activities'?'activityRows':'kpiRows');root.replaceChildren();structured[type].forEach((obj,index)=>{const section=document.createElement('div');section.className='panel';const h=document.createElement('strong');h.textContent=(type==='activities'?'Aktivnost ':'KPI ')+(index+1);section.append(h);const grid=document.createElement('div');grid.className='grid';for(const [field,label] of FORM_FIELDS[type]){const wrap=document.createElement('div'),l=document.createElement('label'),input=document.createElement('input');l.textContent=label;input.value=obj[field]===undefined||obj[field]===null?'':String(obj[field]);input.disabled=!editable;input.addEventListener('input',()=>{obj[field]=input.value});wrap.append(l,input);grid.append(wrap)}section.append(grid);const del=document.createElement('button');del.type='button';del.className='secondary';del.textContent='Ukloni';del.disabled=!editable;del.onclick=()=>{structured[type].splice(index,1);renderStructured(type)};section.append(del);root.append(section)})}
+function addStructured(type){if(!editable)return;structured[type].push({});renderStructured(type)}
+const FIN_NAMES=['pesimistični','realni','optimistični'];
+const FIN_CATEGORIES=[['operating_saving','Operativna ušteda'],['contribution_margin','Kontribucijska marža'],['avoided_cost','Izbjegnuti trošak'],['working_capital_release','Obrtni kapital — jednokratno']];
+let financeModel=null;
+function blankBenefit(){return {name:'',category:'operating_saving',amount_km:'',source:'',assumption:'',evidence_status:'estimated'}}
+function newFinanceModel(){return {currency:'KM',scenarios:FIN_NAMES.map(name=>({name,implementation_cost_km:'',annual_running_cost_km:'',benefits:[blankBenefit()]}))}}
+function financeField(label,value,change,type='text'){const wrap=document.createElement('div'),l=document.createElement('label'),inp=document.createElement('input');l.textContent=label;inp.type=type;if(type==='number'){inp.min='0';inp.step='0.01'}inp.value=value??'';inp.disabled=!editable;inp.addEventListener('input',()=>change(inp.value));wrap.append(l,inp);return wrap}
+function renderFinance(){const root=el('financeRows');root.replaceChildren();if(!financeModel)financeModel=newFinanceModel();financeModel.scenarios.forEach((s,si)=>{const section=document.createElement('section');section.className='panel';const title=document.createElement('h4');title.textContent=s.name.charAt(0).toUpperCase()+s.name.slice(1)+' scenarij';section.append(title);const costs=document.createElement('div');costs.className='grid';costs.append(financeField('Trošak implementacije (KM)',s.implementation_cost_km,v=>s.implementation_cost_km=v,'number'),financeField('Godišnji trošak rada (KM)',s.annual_running_cost_km,v=>s.annual_running_cost_km=v,'number'));section.append(costs);s.benefits.forEach((b,bi)=>{const wrap=document.createElement('div');wrap.className='panel';const h=document.createElement('strong');h.textContent='Korist '+(bi+1);wrap.append(h);const g=document.createElement('div');g.className='grid';g.append(financeField('Naziv koristi',b.name,v=>b.name=v));const selWrap=document.createElement('div'),l=document.createElement('label'),sel=document.createElement('select');l.textContent='Kategorija';FIN_CATEGORIES.forEach(([value,text])=>{const opt=document.createElement('option');opt.value=value;opt.textContent=text;sel.append(opt)});sel.value=b.category;sel.disabled=!editable;sel.addEventListener('change',()=>b.category=sel.value);selWrap.append(l,sel);g.append(selWrap,financeField('Iznos (KM)',b.amount_km,v=>b.amount_km=v,'number'),financeField('Izvor',b.source,v=>b.source=v),financeField('Pretpostavka',b.assumption,v=>b.assumption=v));wrap.append(g);const del=document.createElement('button');del.type='button';del.className='secondary';del.textContent='Ukloni korist';del.disabled=!editable||s.benefits.length===1;del.onclick=()=>{s.benefits.splice(bi,1);renderFinance()};wrap.append(del);section.append(wrap)});root.append(section)});for(const id of ['financeAddBenefit','financeSave'])el(id).disabled=!editable;}
+function addBenefitRow(){if(!editable)return;financeModel.scenarios.forEach(s=>s.benefits.push(blankBenefit()));renderFinance()}
+function getFinancePayload(){if(!financeModel)throw Error('Finansijski model nije učitan');return {currency:'KM',scenarios:financeModel.scenarios.map(s=>({name:s.name,implementation_cost_km:s.implementation_cost_km,annual_running_cost_km:s.annual_running_cost_km,benefits:s.benefits.map(b=>({...b,evidence_status:'estimated'}))}))}}
+function renderFinanceResult(result){const root=el('financeResults');root.replaceChildren();const warn=document.createElement('p');warn.className='warn';warn.textContent=result.warning;root.append(warn);const t=document.createElement('table');t.style.width='100%';t.style.borderCollapse='collapse';const header=document.createElement('tr');['Scenarij','Neto godišnje KM','Obrtni kapital KM','ROI %','Povrat mj.'].forEach(x=>{const th=document.createElement('th');th.textContent=x;th.style.textAlign='left';th.style.padding='8px';header.append(th)});t.append(header);for(const s of result.scenarios){const tr=document.createElement('tr');[s.name,s.annual_net_benefit_km,s.one_time_working_capital_release_km,s.simple_annual_roi_percent??'Nije moguće izračunati',s.simple_payback_months??'Nije moguće izračunati'].forEach(v=>{const td=document.createElement('td');td.textContent=String(v);td.style.padding='8px';td.style.borderTop='1px solid #ddd';tr.append(td)});t.append(tr)}root.append(t)}
+async function loadFinance(id){const r=await api('/projects/'+encodeURIComponent(id)+'/financial-model');financeModel=r.model||newFinanceModel();renderFinance();el('financeResults').replaceChildren();if(r.calculation)renderFinanceResult(r.calculation)}
+async function previewFinance(){try{const r=await api('/financial-scenarios/calculate','POST',getFinancePayload());renderFinanceResult(r);notify('Scenariji izračunati — sve su procjene, ništa nije potvrđeno.')}catch(e){notify(e.message,true)}}
+async function saveFinance(){try{if(!selected)throw Error('Prvo odaberite projekat');const r=await api('/projects/'+encodeURIComponent(selected)+'/financial-model','PUT',getFinancePayload());renderFinanceResult(r.calculation);notify('Finansijski scenariji sačuvani kao procjene.')}catch(e){notify(e.message,true)}}
+const FACTOR_NAMES={profit:'Profit',liquidity:'Likvidnost',delivery:'Isporuka',risk:'Rizik',feasibility:'Izvedivost'};
+async function loadCandidates(){try{analysisData=JSON.parse(val('analysisJson'));if(!analysisData||typeof analysisData!=='object'||Array.isArray(analysisData))throw Error('Analiza mora biti JSON objekat');let d=await api('/project-candidates','POST',{analysis:analysisData});candidateData=d.candidates||[];const box=el('candidateList');box.replaceChildren();for(const c of candidateData){const section=document.createElement('section');section.className='panel';const h=document.createElement('h4');h.textContent=c.id+' · '+c.title;section.append(h);const p=document.createElement('p');p.className='muted';p.textContent=c.why||'Uzrok nije potvrđen';section.append(p);for(const [key,label] of Object.entries(FACTOR_NAMES)){const l=document.createElement('label');l.textContent=label+' (0–5)';const inp=document.createElement('select');inp.id='factor_'+c.id+'_'+key;for(const [value,text] of [['','Nije ocijenjeno'],...Array.from({length:6},(_,i)=>[String(i),String(i)])]){const o=document.createElement('option');o.value=value;o.textContent=text;inp.append(o)}const why=document.createElement('textarea');why.rows=2;why.style.minHeight='64px';why.id='why_'+c.id+'_'+key;why.placeholder='Objasnite očekivani uticaj, pretpostavke i izvor procjene (najmanje 15 znakova)';const evidence=document.createElement('input');evidence.id='evidence_'+c.id+'_'+key;evidence.placeholder='ID dokaza (opcionalno, odvojeni zarezom)';const hint=document.createElement('p');hint.className='muted';hint.textContent=FACTOR_GUIDANCE[key]||'';section.append(l,hint,inp,why,evidence)}box.append(section)}el('showRanking').disabled=!candidateData.length;el('generatePack').disabled=!candidateData.length;el('generateBasic').disabled=!candidateData.length;notify(candidateData.length?'Kandidati učitani. Ocijenite pet faktora najmanje jednog kandidata. Procjene se automatski čuvaju samo u ovom pregledniku.':'Analiza ne sadrži projektne kandidate.')}catch(e){notify(e.message,true)}}
+function ratingPayload(){const ratings=[];for(const c of candidateData){const keys=Object.keys(FACTOR_NAMES),filled=keys.filter(k=>val('factor_'+c.id+'_'+k)!=='');if(!filled.length)continue;if(filled.length!==keys.length)throw Error('Za '+c.id+' ocijenite svih pet faktora ili nijedan.');for(const k of keys){if(val('why_'+c.id+'_'+k).trim().length<15)throw Error('Za '+c.id+' / '+FACTOR_NAMES[k]+' unesite obrazloženje od najmanje 15 znakova.');}const values={};for(const k of keys){values[k]={value:Number(val('factor_'+c.id+'_'+k)),rationale:val('why_'+c.id+'_'+k).trim(),evidence_ids:val('evidence_'+c.id+'_'+k).split(',').map(x=>x.trim()).filter(Boolean)}}ratings.push({candidate_id:c.id,ratings:values})}if(!ratings.length)throw Error('Ocijenite najmanje jednog kandidata.');return {analysis:analysisData,ratings,company_id:val('newCompany').trim(),diagnostic_id:val('newDiagnostic').trim()}}
+async function showCandidateRanking(){
+ const target=el('rankingResults');target.replaceChildren();
+ try{
+  const payload=ratingPayload();
+  const result=await api('/rank-projects','POST',{analysis:payload.analysis,ratings:payload.ratings});
+  const heading=document.createElement('h3');heading.textContent='Rangiranje projektnih kandidata';target.append(heading);
+  const note=document.createElement('p');note.className='warn';note.textContent=result.ranking_note||'Procjene nisu nezavisno verificirane.';target.append(note);
+  const weights=document.createElement('p');weights.className='muted';
+  weights.textContent='Težine: '+Object.entries(result.weights||{}).map(([k,v])=>(FACTOR_NAMES[k]||k)+' '+v+'%').join(' · ');
+  target.append(weights);
+  for(const c of result.candidates||[]){
+   const section=document.createElement('section');section.className='panel';
+   const title=document.createElement('h4');title.textContent=(c.rank===null?'—':c.rank+'.')+' '+c.id+' · '+c.title+' — '+(c.score===null?'Nije potpuno ocijenjen':c.score+'/100');section.append(title);
+   if(c.factor_assessments){
+    for(const [key,rating] of Object.entries(c.factor_assessments)){
+     const p=document.createElement('p');p.className='muted';
+     p.textContent=(FACTOR_NAMES[key]||key)+': '+rating.value+'/5 — '+rating.rationale+(rating.evidence_ids?.length?' | Dokazi: '+rating.evidence_ids.join(', '):' | Dokaz nije naveden');
+     section.append(p);
+    }
+   }
+   target.append(section);
+  }
+ }catch(e){const p=document.createElement('p');p.className='error';p.textContent=e.message;target.append(p)}
+}
+async function generatePack(basic=false){try{const payload=ratingPayload();if(!payload.company_id||!payload.diagnostic_id)throw Error('Unesite identifikatore kompanije i dijagnostike u obrascu Novi nacrt.');const ranked=await api('/rank-projects','POST',{analysis:payload.analysis,ratings:payload.ratings});const eligible=ranked.candidates.filter(c=>c.score!==null);if(!eligible.length)throw Error('Nema ocijenjenih kandidata.');const chosen=eligible[0];if(!confirm('Prvi rangirani kandidat: '+chosen.title+' ('+chosen.score+'/100). Nastaviti s generisanjem neodobrenog nacrta?'))return;const draft=await api(basic?'/project-draft':'/project-ai-pack','POST',payload);const created=await api('/projects','POST',{company_id:draft.company_id,diagnostic_id:draft.diagnostic_id,title:draft.title,charter:draft.charter});notify('Projektni nacrt je sačuvan. Izbor i finansijski efekti nisu potvrđeni.');await refresh();await openProject(created.id)}catch(e){notify(e.message,true)}}
+const el=id=>document.getElementById(id), val=id=>el(id).value, lines=id=>val(id).split('\n').map(x=>x.trim()).filter(Boolean);
+function notify(message,error=false){const n=el('notice');n.className=error?'panel error':'panel good';n.textContent=message}
+async function api(path,method='GET',body,headers={}){let r=await fetch('/api/v4'+path,{method,credentials:'same-origin',headers:{'Content-Type':'application/json',...headers},body:body===undefined?undefined:JSON.stringify(body)});let data=await r.json().catch(()=>({}));if(!r.ok)throw Error(typeof data.detail==='string'?data.detail:'Greška '+r.status);return data}
+async function refresh(){try{let data=await api('/projects');const box=el('projects');box.replaceChildren();for(const p of data.projects){let b=document.createElement('button');b.className='item'+(p.id===selected?' active':'');b.textContent=p.title+' · '+p.status;b.onclick=()=>openProject(p.id);box.append(b)}if(!data.projects.length){let p=document.createElement('p');p.className='muted';p.textContent='Još nema projekata';box.append(p)}}catch(e){notify(e.message,true)}}
+async function createDraft(){try{const payload={company_id:val('newCompany').trim(),diagnostic_id:val('newDiagnostic').trim(),title:val('newTitle').trim(),charter:{problem:val('newProblem').trim(),objective:'Validirati problem, potvrditi početno stanje i odobriti mjerljiv cilj.',scope:'Faza validacije i priprema ograničenog pilota.',methodology:'DMAIC — Define / Measure',assumptions:['Nacrt nije nezavisno verificiran'],required_checks:['Provjeriti izvorne podatke','Odobriti početno stanje i KPI ciljeve'],activities:[],kpis:[],financial_effects:[]}};let p=await api('/projects','POST',payload);notify('Nacrt je kreiran; nije odobren za implementaciju.');await refresh();await openProject(p.id)}catch(e){notify(e.message,true)}}
+async function downloadReport(fmt){
+ if(!selected)return notify('Odaberite projekat',true);
+ const id=selected;
+ try{
+  const response=await fetch('/api/v4/projects/'+encodeURIComponent(id)+'/report/'+fmt);
+  if(!response.ok)throw Error('Izvoz nije uspio (HTTP '+response.status+'). Nacrt je sačuvan.');
+  const link=document.createElement('a'),url=URL.createObjectURL(await response.blob());
+  link.href=url;link.download='MEVAN_project_'+id.slice(0,8)+'.'+fmt;
+  document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+ }catch(error){notify(error.message,true)}
+}
+async function openProject(id){try{loaded=await api('/projects/'+encodeURIComponent(id));selected=id;el('empty').hidden=true;el('editor').hidden=false;el('heading').textContent=loaded.title;el('status').textContent=loaded.status;el('metadata').textContent='Kompanija: '+loaded.company_id+' · Dijagnostika: '+loaded.diagnostic_id;let c=loaded.charter;for(let k of ['problem','objective','scope','methodology'])el(k).value=c[k]||'';for(let k of ['assumptions','required_checks'])el(k).value=(c[k]||[]).join('\n');for(let k of ['activities','kpis']){structured[k]=(c[k]||[]).map(x=>({...x}));}el('financial_effects').value=JSON.stringify(c.financial_effects||[],null,2);for(let k of ['baseline_verified','targets_approved','checks_completed'])el(k).checked=!!c[k];let edit=['draft','validation'].includes(loaded.status);editable=edit;for(const k of ['activities','kpis'])renderStructured(k);el('addActivity').disabled=!edit;el('addKpi').disabled=!edit;for(let e of el('editor').querySelectorAll('textarea,input'))e.disabled=!edit;el('save').disabled=!edit;el('validation').disabled=loaded.status!=='draft';el('implementation').disabled=!edit;el('weekly').hidden=loaded.status!=='implementation';el('actualPanel').hidden=loaded.status!=='implementation';if(loaded.status==='implementation')renderWeeklyForms();const rev=el('reviews');rev.replaceChildren();for(let w of loaded.weekly_reviews||[]){let d=document.createElement('details'),s=document.createElement('summary'),p=document.createElement('pre');s.textContent=w.week;p.textContent='Aktivnosti: '+(w.activities||[]).map(a=>(a.title||'Aktivnost')+' — '+(a.status||'bez statusa')).join('; ')+'\nKPI: '+(w.kpi_measurements||[]).map(k=>k.name+': '+k.value+' ('+k.period+')').join('; ')+'\nPrepreke: '+(w.blockers||[]).join('; ')+'\nOdluke: '+(w.decisions||[]).join('; ')+'\nNapomena: '+(w.note||'');d.append(s,p);rev.append(d)}await loadFinance(id);if(loaded.status==='implementation')await loadActuals(id);await refresh()}catch(e){notify(e.message,true)}}
+function getCharter(){let c={report_mode:loaded?.charter?.report_mode||'real'};for(let k of ['problem','objective','scope','methodology'])c[k]=val(k).trim();for(let k of ['assumptions','required_checks'])c[k]=lines(k);for(let k of ['baseline_verified','targets_approved','checks_completed'])c[k]=el(k).checked;for(let k of ['activities','kpis'])c[k]=structured[k].map(x=>({...x}));c.financial_effects=JSON.parse(val('financial_effects'));if(!Array.isArray(c.financial_effects))throw Error('Finansijski efekti moraju biti JSON lista');return c}
+async function save(){try{await api('/projects/'+encodeURIComponent(selected)+'/charter','PUT',getCharter());notify('Nacrt je sačuvan.');await openProject(selected)}catch(e){notify(e.message,true)}}
+async function transition(action){try{if(action==='approve-implementation'){await save();if(!confirm('Potvrđujete da su početno stanje, KPI ciljevi i obavezne provjere stvarno provjereni?'))return}let d=await api('/projects/'+encodeURIComponent(selected)+'/'+action,'POST',{});notify('Novi status: '+d.status);await openProject(selected)}catch(e){notify(e.message,true)}}
+function weeklyField(label,value='',kind='text'){const w=document.createElement('label');w.textContent=label;const x=document.createElement(kind==='select'?'select':'input');if(kind==='select'){for(const [v,t] of [['not_started','Nije započeto'],['in_progress','U toku'],['done','Završeno'],['blocked','Blokirano']]){const o=document.createElement('option');o.value=v;o.textContent=t;x.append(o)}x.value=value||'not_started'}else{x.type='text';x.value=value??''}w.append(x);return {w,x}}
+function renderWeeklyForms(){const a=el('weekActivityRows'),k=el('weekKpiRows');a.replaceChildren();k.replaceChildren();const ch=loaded?.charter||{};(ch.activities||[]).forEach((activity,i)=>{const d=document.createElement('div');d.className='panel';const h=document.createElement('strong');h.textContent=activity.title||'Aktivnost '+(i+1);d.append(h);const status=weeklyField('Status','not_started','select'),result=weeklyField('Rezultat / dokaz');status.x.dataset.weekStatus=String(i);result.x.dataset.weekResult=String(i);d.append(status.w,result.w);a.append(d)});(ch.kpis||[]).forEach((kpi,i)=>{const d=document.createElement('div');d.className='panel';const h=document.createElement('strong');h.textContent=kpi.name||'KPI '+(i+1);d.append(h);const value=weeklyField('Izmjerena vrijednost'),period=weeklyField('Period mjerenja'),source=weeklyField('Izvor / referenca dokaza');value.x.dataset.kpiValue=String(i);period.x.dataset.kpiPeriod=String(i);source.x.dataset.kpiSource=String(i);d.append(value.w,period.w,source.w);k.append(d)});if(!(ch.activities||[]).length)a.textContent='Nema projektnih aktivnosti u Charteru.';if(!(ch.kpis||[]).length)k.textContent='Nema KPI u Charteru.'}
+function weeklyPayload(){if(!loaded||loaded.status!=='implementation')throw Error('Projekat mora biti u implementaciji');const week=val('week');if(!/^\d{4}-W\d{2}$/.test(week))throw Error('Odaberite sedmicu');const activities=(loaded.charter.activities||[]).map((a,i)=>({title:a.title||'Aktivnost '+(i+1),status:document.querySelector('[data-week-status="'+i+'"]').value,result:document.querySelector('[data-week-result="'+i+'"]').value.trim()}));const kpi_measurements=(loaded.charter.kpis||[]).flatMap((k,i)=>{const value=document.querySelector('[data-kpi-value="'+i+'"]').value.trim(),period=document.querySelector('[data-kpi-period="'+i+'"]').value.trim(),source=document.querySelector('[data-kpi-source="'+i+'"]').value.trim();if(!value){if(period||source)throw Error('KPI '+(k.name||i+1)+': nedostaje vrijednost');return []}if(!period||!source)throw Error('KPI '+(k.name||i+1)+': unesite period i izvor');return [{name:k.name||'KPI '+(i+1),value,period,source,verification_status:'consultant_entered'}]});return {week,activities,kpi_measurements,blockers:lines('blockers'),decisions:lines('decisions'),note:val('weekNote')}}
+async function addWeek(){try{const payload=weeklyPayload();await api('/projects/'+encodeURIComponent(selected)+'/weekly-reviews','POST',payload);notify('Sedmični pregled sačuvan kao evidencija konsultanta.');await openProject(selected)}catch(e){notify(e.message,true)}}
+// Browser-local recovery for unfinished candidate assessments. This is not server persistence.
+const CANDIDATE_DRAFT_PREFIX='mevan_v4_candidate_draft_v1:';
+const CANDIDATE_LAST_KEY='mevan_v4_candidate_last_v1';
+function candidateDraftKey(company,diagnostic){return CANDIDATE_DRAFT_PREFIX+encodeURIComponent(company)+'::'+encodeURIComponent(diagnostic)}
+function saveCandidateDraft(){
+ if(!analysisData||!candidateData.length)return;
+ const company=val('newCompany').trim(),diagnostic=val('newDiagnostic').trim();
+ if(!company||!diagnostic)return;
+ const ratings={};
+ for(const c of candidateData){ratings[c.id]={};for(const k of Object.keys(FACTOR_NAMES)){
+  ratings[c.id][k]={value:val('factor_'+c.id+'_'+k),rationale:val('why_'+c.id+'_'+k),evidence:val('evidence_'+c.id+'_'+k)};
+ }}
+ try{const key=candidateDraftKey(company,diagnostic);localStorage.setItem(key,JSON.stringify({version:1,company_id:company,diagnostic_id:diagnostic,analysis:analysisData,ratings,saved_at:Date.now()}));localStorage.setItem(CANDIDATE_LAST_KEY,key)}
+ catch(e){notify('Lokalno čuvanje nije dostupno. Sačuvajte podatke prije napuštanja stranice.',true)}
+}
+// Server synchronization is deliberately opt-in: never overwrite a browser draft silently.
+const candidateServerRevisions=new Map();
+function currentCandidateDraft(){
+ if(!analysisData||!candidateData.length)throw Error('Prvo učitajte kandidate.');
+ const company_id=val('newCompany').trim(),diagnostic_id=val('newDiagnostic').trim();
+ if(!company_id||!diagnostic_id)throw Error('Unesite identifikatore kompanije i dijagnostike.');
+ const ratings={};
+ for(const c of candidateData){ratings[c.id]={};for(const k of Object.keys(FACTOR_NAMES)){
+  ratings[c.id][k]={value:val('factor_'+c.id+'_'+k),rationale:val('why_'+c.id+'_'+k),evidence:val('evidence_'+c.id+'_'+k)};
+ }}
+ return {version:1,company_id,diagnostic_id,analysis:analysisData,ratings};
+}
+function candidateServerKey(d){return candidateDraftKey(d.company_id,d.diagnostic_id)}
+function displaySavedRanking(rows){
+ const box=el('rankingResults');box.replaceChildren();
+ if(!Array.isArray(rows)||!rows.length)return;
+ const header=document.createElement('h3');header.textContent='Sačuvani poredak · procjena konsultanta';box.append(header);
+ const list=document.createElement('ol');
+ for(const row of rows){const item=document.createElement('li');item.textContent=row.id+' · '+row.score+'/100';list.append(item)}
+ box.append(list);
+}
+function candidateServerStatus(msg){el('candidateServerStatus').textContent=msg}
+async function fetchCandidateDraftServer(company,diagnostic){
+ const url='/candidate-drafts?company_id='+encodeURIComponent(company)+'&diagnostic_id='+encodeURIComponent(diagnostic);
+ const response=await fetch('/api/v4'+url,{credentials:'same-origin'});
+ if(response.status===404)return null;
+ const data=await response.json().catch(()=>({}));
+ if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:'Greška '+response.status);
+ return data;
+}
+async function saveCandidateDraftServer(){
+ try{
+  saveCandidateDraft();
+  const d=currentCandidateDraft(),key=candidateServerKey(d);
+  let revision=candidateServerRevisions.get(key);
+  if(revision===undefined){
+   const existing=await fetchCandidateDraftServer(d.company_id,d.diagnostic_id);
+   if(existing){
+    candidateServerStatus('Serverska verzija već postoji. Prvo je pregledajte pomoću "Učitaj ocjene sa servera". Lokalna kopija nije promijenjena.');
+    return;
+   }
+   revision=0;
+  }
+  const saved=await api('/candidate-drafts','PUT',{...d,expected_revision:revision});
+  candidateServerRevisions.set(key,saved.revision);
+  displaySavedRanking(saved.ranking);
+  candidateServerStatus('Ocjene sačuvane na serveru. Revizija: '+saved.revision+'. Lokalna kopija je zadržana.');
+ }catch(e){candidateServerStatus('Serversko čuvanje nije uspjelo: '+e.message+'. Lokalna kopija nije obrisana.')}
+}
+async function restoreCandidateDraftServer(){
+ try{
+  const company=val('newCompany').trim(),diagnostic=val('newDiagnostic').trim();
+  if(!company||!diagnostic)throw Error('Unesite identifikatore kompanije i dijagnostike.');
+  const remote=await fetchCandidateDraftServer(company,diagnostic);
+  if(!remote)throw Error('Serverski nacrt nije pronađen.');
+  const d=remote.draft;
+  if(d.company_id!==company||d.diagnostic_id!==diagnostic||d.version!==1||!d.analysis||!d.ratings)throw Error('Serverski nacrt nije ispravan.');
+  if(!confirm('Učitati serversku reviziju '+remote.revision+'? Trenutne ocjene na ekranu će biti zamijenjene. Lokalna kopija ostaje u pregledniku do sljedećeg unosa.'))return;
+  // Do not delete or overwrite existing browser-local backup during import.
+  el('analysisJson').value=JSON.stringify(d.analysis);
+  await loadCandidates();
+  for(const c of candidateData)for(const k of Object.keys(FACTOR_NAMES)){
+   const item=d.ratings?.[c.id]?.[k];if(!item)continue;
+   el('factor_'+c.id+'_'+k).value=item.value??'';
+   el('why_'+c.id+'_'+k).value=item.rationale??'';
+   el('evidence_'+c.id+'_'+k).value=item.evidence??'';
+  }
+  candidateServerRevisions.set(candidateServerKey(d),remote.revision);
+  displaySavedRanking(d.ranking);
+  candidateServerStatus('Serverska revizija '+remote.revision+' učitana. Ranija lokalna kopija nije obrisana.');
+ }catch(e){candidateServerStatus('Učitavanje nije uspjelo: '+e.message)}
+}
+async function restoreCandidateDraft(key,expectedCompany='',expectedDiagnostic=''){
+ try{const raw=localStorage.getItem(key);if(!raw)return false;const d=JSON.parse(raw);
+  if(d.version!==1||!d.analysis||!d.company_id||!d.diagnostic_id||
+    key!==candidateDraftKey(d.company_id,d.diagnostic_id)||
+    (expectedCompany&&d.company_id!==expectedCompany)||(expectedDiagnostic&&d.diagnostic_id!==expectedDiagnostic))return false;
+  el('analysisJson').value=JSON.stringify(d.analysis);el('newCompany').value=d.company_id;el('newDiagnostic').value=d.diagnostic_id;
+  await loadCandidates();
+  for(const c of candidateData){for(const k of Object.keys(FACTOR_NAMES)){
+   const saved=d.ratings?.[c.id]?.[k];if(!saved)continue;
+   const prefix=c.id+'_'+k;
+   el('factor_'+prefix).value=saved.value??'';
+   el('why_'+prefix).value=saved.rationale??'';
+   el('evidence_'+prefix).value=saved.evidence??'';
+  }}
+  notify('Nedovršene procjene vraćene iz lokalne kopije ovog preglednika. Nisu sačuvane na serveru niti verificirane.');
+  return true;
+ }catch(e){notify('Lokalni nacrt nije moguće vratiti: '+e.message,true);return false}
+}
+function installCandidateDraftAutosave(){
+ const list=el('candidateList');
+ for(const event of ['input','change'])list.addEventListener(event,saveCandidateDraft);
+}
+async function receiveDiagnosticTransfer(){
+ const raw=sessionStorage.getItem('mevan_v4_diagnostic_transfer');
+ if(!raw)return;
+ // Single-use, same-tab transfer. Never silently reuse stale analysis.
+ sessionStorage.removeItem('mevan_v4_diagnostic_transfer');
+ try{
+  const data=JSON.parse(raw);
+  if(data.version!==1||!data.analysis||!data.company_id||!data.diagnostic_id||
+     !Number.isFinite(data.created_at)||Date.now()-data.created_at>15*60*1000||
+     data.created_at>Date.now()+60000)throw Error('Nevažeći ili zastarjeli prijenos dijagnostike');
+  el('analysisJson').value=JSON.stringify(data.analysis);
+  el('newCompany').value=data.company_id;
+  el('newDiagnostic').value=data.diagnostic_id;
+  await loadCandidates();
+  const existingKey=candidateDraftKey(data.company_id,data.diagnostic_id);
+  if(localStorage.getItem(existingKey)){
+   let previous=null;try{previous=JSON.parse(localStorage.getItem(existingKey))}catch(e){}
+   if(previous&&JSON.stringify(previous.analysis)===JSON.stringify(data.analysis))await restoreCandidateDraft(existingKey,data.company_id,data.diagnostic_id);
+   else saveCandidateDraft();
+  }else saveCandidateDraft();
+  notify('Dijagnostika je preuzeta direktno. Ocijenite pet faktora prije generisanja nacrta. Podaci nisu nezavisno verificirani.');
+ }catch(e){notify('Prijenos nije uspio: '+e.message,true)}
+}
+refresh();
+installCandidateDraftAutosave();
+(async()=>{
+ const hasTransfer=!!sessionStorage.getItem('mevan_v4_diagnostic_transfer');
+ if(hasTransfer)await receiveDiagnosticTransfer();
+ else {const key=localStorage.getItem(CANDIDATE_LAST_KEY);if(key)await restoreCandidateDraft(key)}
+})();
+
+async function loadActuals(id){const data=await api('/projects/'+encodeURIComponent(id)+'/actual-effects');const sm=data.summary;el('actualSummary').textContent='Konsultantski potvrđeno po unesenim periodima: operativni efekti '+sm.consultant_confirmed_recurring_km+' KM; jednokratni obrtni kapital '+sm.consultant_confirmed_one_time_working_capital_km+' KM. Nezavisno verificirano: 0 KM. Nepotvrđenih unosa: '+sm.pending_count+'. '+sm.warning;const out=el('actualEntries');out.replaceChildren();for(const e of data.entries){const d=document.createElement('div');d.className='panel';d.textContent=e.period+' · '+e.name+' · '+e.amount_km+' KM · '+(e.consultant_confirmed?'Konsultant potvrdio':'Čeka potvrdu')+' · Dokaz: '+e.evidence_reference+' · Obračun: '+e.calculation_note;out.append(d)}}
+let actualBusy=false;
+async function addActual(){if(actualBusy)return;actualBusy=true;el('actualSubmit').disabled=true;try{if(!selected||loaded.status!=='implementation')throw Error('Odaberite projekat u implementaciji');const p={period:val('actualPeriod').trim(),name:val('actualName').trim(),category:val('actualCategory'),amount_km:val('actualAmount'),evidence_reference:val('actualEvidence').trim(),calculation_note:val('actualCalculation').trim(),source_owner:val('actualOwner').trim(),consultant_confirmed:el('actualConfirmed').checked,independent_verification:false};const project=selected,event=val('actualEvent').trim();const result=await api('/projects/'+encodeURIComponent(project)+'/actual-effects','POST',p,event?{'Idempotency-Key':event}:{});notify(result.replayed?'Ovaj zahtjev je već evidentiran. Novi efekat nije dodan.':'Finansijski efekat evidentiran. Nezavisna verifikacija nije provedena.');if(selected===project)await loadActuals(project)}catch(e){notify(e.message,true)}finally{actualBusy=false;el('actualSubmit').disabled=false}}
+</script></body></html>
