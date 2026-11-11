@@ -318,7 +318,7 @@ def ai_settings_clear(req:Request):
 
 @app.post('/api/ai/test')
 def ai_settings_test(req:Request):
-    """Najmanji poziv odabranom servisu. Poruka o grešci sadrži samo HTTP kod, nikad ključ ni odgovor servisa."""
+    """Kratak poziv odabranom servisu. Poruka o grešci sadrži HTTP kod i kratko objašnjenje servisa, nikad ključ."""
     if not logged(req):raise HTTPException(401)
     if not same_origin(req):raise HTTPException(403)
     ai=mevan_ai.active_config(DB)
@@ -326,8 +326,9 @@ def ai_settings_test(req:Request):
     try:
         mevan_ai.test_connection(ai)
     except urllib.error.HTTPError as e:
-        hint={401:'Ključ nije prihvaćen.',403:'Ključ nema pristup ovom modelu ili servisu.',404:'Model ili adresa servisa nisu pronađeni.',429:'Prekoračen je limit ili nema sredstava na računu.'}.get(e.code,'Provjerite model, adresu i račun kod servisa.')
-        raise HTTPException(502,f'Servis je odbio zahtjev (HTTP {e.code}). {hint}')
+        hint={400:'Servis ne prihvata ovaj zahtjev za odabrani model ili račun.',401:'Ključ nije prihvaćen.',403:'Ključ nema pristup ovom modelu ili servisu.',404:'Model ili adresa servisa nisu pronađeni.',429:'Prekoračen je limit ili nema sredstava na računu.'}.get(e.code,'Provjerite model, adresu i račun kod servisa.')
+        detail=mevan_ai.error_detail(e,ai['key'])
+        raise HTTPException(502,f'Servis je odbio zahtjev (HTTP {e.code}). {hint}'+(f' Poruka servisa: {detail}' if detail else ''))
     except (urllib.error.URLError,KeyError,ValueError,TimeoutError,OSError):
         raise HTTPException(502,'Servis nije dostupan ili nije vratio ispravan odgovor. Provjerite adresu i model.')
     return {'ok':True,'provider':ai['provider'],'model':ai['model']}

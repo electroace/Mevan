@@ -26,6 +26,8 @@ PROVIDERS = {
 }
 DEFAULT_OPENAI_MODEL = 'gpt-4.1-mini'
 ANTHROPIC_VERSION = '2023-06-01'
+# Noviji Claude modeli razmišljaju prije odgovora i to troše iz max_tokens; rezerva čuva prostor za sam odgovor.
+ANTHROPIC_THINKING_HEADROOM = 4096
 JSON_ONLY = ' Odgovori isključivo jednim JSON objektom, bez teksta prije ili poslije i bez oznaka koda.'
 
 
@@ -144,7 +146,8 @@ def chat(config, body, timeout=60, limit=200000):
     wants_json = (body.get('response_format') or {}).get('type') == 'json_object'
     if config['provider'] == 'anthropic':
         system = '\n\n'.join(m['content'] for m in body['messages'] if m['role'] == 'system')
-        payload = {'model': config['model'], 'max_tokens': body.get('max_tokens', 1024), 'temperature': body.get('temperature', 0.2),
+        # Bez temperature: noviji Claude modeli odbijaju svaku vrijednost osim zadane (HTTP 400).
+        payload = {'model': config['model'], 'max_tokens': body.get('max_tokens', 1024) + ANTHROPIC_THINKING_HEADROOM,
                    'messages': [{'role': m['role'], 'content': m['content']} for m in body['messages'] if m['role'] != 'system']}
         if system or wants_json:
             payload['system'] = system + (JSON_ONLY if wants_json else '')
@@ -168,6 +171,21 @@ def chat(config, body, timeout=60, limit=200000):
 
 
 def test_connection(config):
-    """Najmanji mogući poziv; troši nekoliko tokena kod odabranog servisa."""
-    reply = chat(config, {'messages': [{'role': 'user', 'content': 'Odgovori samo riječju: OK'}], 'max_tokens': 8, 'temperature': 0}, timeout=25, limit=20000)
-    return bool(reply.strip())
+    """Kratak poziv odabranom servisu; uspjeh znači da servis prihvata ključ, model i oblik zahtjeva."""
+    chat(config, {'messages': [{'role': 'user', 'content': 'Odgovori samo riječju: OK'}], 'max_tokens': 16}, timeout=40, limit=50000)
+    return True
+
+
+def error_detail(error, key=''):
+    """Kratko objašnjenje iz odgovora servisa (polje error.message), bez ključa. Prazno ako ga nema."""
+    try:
+        body = json.loads(error.read(20000))
+        message = body['error']['message'] if isinstance(body.get('error'), dict) else ''
+    except Exception:
+        return ''
+    if not isinstance(message, str):
+        return ''
+    message = ' '.join(message.split())
+    if key:
+        message = message.replace(key, '[ključ]')
+    return message[:240]

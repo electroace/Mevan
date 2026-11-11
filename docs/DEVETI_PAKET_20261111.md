@@ -38,3 +38,16 @@ Dodan je paket `cryptography` (`requirements.txt` i `requirements.lock`, s `cffi
 ## Šta nije testirano
 
 Nijedan stvarni poziv OpenAI, Anthropic ili trećem servisu nije izvršen, jer za to treba stvarni ključ. Provjeren je samo oblik zahtjeva i obrada odgovora. Prvi stvarni test je dugme „Provjeri vezu” nakon unosa ključa.
+
+## Dopuna 9.1 — Claude vraća HTTP 400 na „Provjeri vezu”
+
+**Greška:** uz servis Claude (Anthropic) provjera veze i svi AI pozivi vraćali su HTTP 400. Uzrok: aplikacija je slala parametar `temperature`, a noviji Claude modeli odbijaju svaku vrijednost osim zadane.
+
+**Popravka:**
+- Za Claude se `temperature` više ne šalje. Za OpenAI i kompatibilne servise zahtjev je isti kao prije.
+- Noviji Claude modeli razmišljaju prije odgovora i to troše iz `max_tokens`, pa Claude zahtjev dobija rezervu od 4096 tokena da odgovor ne bude odsječen. Odgovor se i dalje čita po vrsti bloka, pa blok razmišljanja ispred teksta ne smeta.
+- „Provjeri vezu” sada uz HTTP kod prikazuje i kratko objašnjenje samog servisa (npr. nedovoljno kredita ili nepodržan parametar). Ključ se iz te poruke uklanja.
+
+**Posljedica:** bez niske temperature Claude odgovori mogu biti nešto manje ujednačeni između dva pokretanja nego ranije zamišljeno. Stručni pregled nacrta ostaje obavezan kao i dosad.
+
+**Provjere:** `pytest` 240 prolaza (dva nova testa i dopunjen test oblika Claude zahtjeva). Stvarni poziv Anthropic servisu i dalje nije izvršen iz razvojnog okruženja.

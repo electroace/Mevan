@@ -116,7 +116,9 @@ def test_claude_request_is_translated_and_json_fences_are_removed(monkeypatch):
     request=seen[0];sent=json.loads(request.data)
     assert request.full_url=='https://api.anthropic.com/v1/messages'
     assert request.get_header('X-api-key')==KEY and request.get_header('Anthropic-version')=='2023-06-01' and request.get_header('Authorization') is None
-    assert sent['model']=='claude-sonnet-5-5' and sent['max_tokens']==77 and sent['messages']==[{'role':'user','content':'Pitanje'}]
+    assert sent['model']=='claude-sonnet-5-5' and sent['messages']==[{'role':'user','content':'Pitanje'}]
+    # Noviji Claude modeli odbijaju temperature (HTTP 400) i razmišljaju prije odgovora, pa max_tokens ima rezervu.
+    assert 'temperature' not in sent and 'top_p' not in sent and sent['max_tokens']==77+mevan_ai.ANTHROPIC_THINKING_HEADROOM
     assert sent['system'].startswith('Sistem') and 'JSON' in sent['system'] and 'response_format' not in sent
 
 
@@ -138,3 +140,23 @@ def test_ai_draft_uses_the_entered_service(fx,monkeypatch):
     r=fx.client.post('/api/ai/draft',json={'dimension':'F','criteria':[{'code':'F01','name':'Profitabilnost','score':'2','proof':'confirmed','finding':'Nalaz','evidence':'Dokaz','kpi':'','recommendation':'','applicable':'yes','financial':''}],'financial_effects':[]},headers=fx.headers)
     assert r.status_code==200,r.text
     assert r.json()['draft']=='Nacrt iz Claude servisa' and seen[0].full_url.endswith('/v1/messages')
+
+
+def test_claude_reply_with_thinking_block_before_text_is_read(monkeypatch):
+    capture(monkeypatch,{'content':[{'type':'thinking','thinking':'razmišljanje'},{'type':'text','text':'Odgovor'}]})
+    config={'provider':'anthropic','model':'claude-sonnet-5-5','base_url':'https://api.anthropic.com/v1','key':KEY}
+    assert mevan_ai.chat(config,{'messages':[{'role':'user','content':'U'}],'max_tokens':50,'temperature':0.1})=='Odgovor'
+    capture(monkeypatch,{'content':[{'type':'thinking','thinking':'samo razmišljanje'}]})
+    assert mevan_ai.test_connection(config) is True
+
+
+def test_connection_check_explains_a_rejected_request_without_the_key(fx,monkeypatch):
+    fx.client.put('/api/ai/settings',json=FORM,headers=fx.headers)
+    def refused(request,timeout=None):
+        body=json.dumps({'type':'error','error':{'type':'invalid_request_error','message':'temperature is not supported for this model; key '+KEY}}).encode()
+        raise urllib.error.HTTPError(request.full_url,400,'Bad Request',{},io.BytesIO(body))
+    monkeypatch.setattr(mevan_ai.urllib.request,'urlopen',refused)
+    r=fx.client.post('/api/ai/test',headers=fx.headers)
+    detail=r.json()['detail']
+    assert r.status_code==502 and 'HTTP 400' in detail and 'temperature is not supported for this model' in detail
+    assert KEY not in r.text and '[ključ]' in detail
