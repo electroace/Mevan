@@ -27,6 +27,9 @@ body{margin:0;max-width:none;padding:0;background:var(--mv-bg);color:var(--mv-in
 .mv-top .mv-logo span{font-size:13px;font-weight:400;letter-spacing:0}
 .mv-top .mv-sub{color:#b9c9d7;font-size:12px}
 .mv-top .mv-meta{color:#b9c9d7;font-size:12px;white-space:nowrap}
+.mv-top .mv-user{color:#fff;font-size:13px;line-height:1.25;text-align:right;min-width:0;max-width:34vw;border-left:1px solid #3d5870;padding-left:14px}
+.mv-top .mv-user small{display:block;color:#b9c9d7;font-size:11px}
+.mv-top .mv-user b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mv-top .mv-toggle{all:unset;display:none;box-sizing:border-box;cursor:pointer;color:#fff;border:1px solid #5b7890;border-radius:9px;padding:9px 14px;font:650 14px Inter,system-ui,sans-serif}
 .mv-top .mv-toggle:focus-visible{outline:3px solid #7cc4e0;outline-offset:2px}
 .mv-nav .mv-item:focus-visible,.mv-nav .mv-logout:focus-visible{outline:3px solid var(--mv-brand);outline-offset:-2px}
@@ -104,7 +107,8 @@ body{margin:0;max-width:none;padding:0;background:var(--mv-bg);color:var(--mv-in
 .mv-lead{color:#566b7c;font-size:13px;margin:0 0 14px}
 @media(max-width:1000px){
 .mv-top .mv-toggle{display:inline-block}
-.mv-top .mv-meta,.mv-top .mv-sub{display:none}
+.mv-top .mv-meta,.mv-top .mv-sub,.mv-top .mv-user small{display:none}
+.mv-top .mv-user{border-left:0;padding-left:0;max-width:40vw;font-size:12px}
 .mv-top{padding:10px 12px}
 .mv-shell{display:block;padding:14px 12px}
 .mv-nav{position:fixed;z-index:1000;top:0;left:0;bottom:0;width:min(300px,86vw);max-height:none;border-radius:0 14px 14px 0;transform:translateX(-105%);transition:transform .18s ease;visibility:hidden}
@@ -225,12 +229,14 @@ def nav_html(active: str) -> str:
     return f'<nav class="mv-nav" id="mvNav" aria-label="Glavni meni">{body}{foot}</nav>'
 
 
-def shell_start(active: str) -> str:
+def shell_start(active: str, user: str = '') -> str:
+    # Prijavljeni korisnik stoji u vrhu svakog ekrana; bez korisnika (npr. u testu izgleda) blok se izostavlja.
+    who = (f'<div class="mv-user" title="{escape(user)}"><small>Prijavljeni korisnik</small><b>{escape(user)}</b></div>' if user else '')
     return ('<header class="mv-top">'
             '<button type="button" class="mv-toggle" id="mvToggle" aria-controls="mvNav" aria-expanded="false">Meni</button>'
             '<div class="mv-brand"><div class="mv-logo">MEVAN <span>DIAGNOSTIC</span></div>'
             '<div class="mv-sub">Operational &amp; Business Performance Transformation · PRIVATE DEMO v2.0 · SIMULACIJA</div></div>'
-            '<div class="mv-meta">61 kriterij · 5 dimenzija · BS</div></header>'
+            '<div class="mv-meta">61 kriterij · 5 dimenzija · BS</div>' + who + '</header>'
             '<div class="mv-backdrop" id="mvBackdrop"></div>'
             f'<div class="mv-shell">{nav_html(active)}<div class="mv-main">')
 
@@ -244,11 +250,11 @@ OVERLAYS = ('<div class="mv-toasts" id="mvToasts" aria-live="polite"></div>'
 SHELL_END = '</div></div>' + OVERLAYS + JS
 
 
-def render_page(html: str, active: str) -> str:
+def render_page(html: str, active: str, user: str = '') -> str:
     """Ubaci zajednički meni u stranicu koja ima tri oznake mjesta."""
     for marker in ('<!--MEVAN_NAV_CSS-->', '<!--MEVAN_SHELL_START-->', '<!--MEVAN_SHELL_END-->'):
         if html.count(marker) != 1:
             raise ValueError('Stranica nema ispravnu oznaku menija: ' + marker)
     return (html.replace('<!--MEVAN_NAV_CSS-->', CSS)
-                .replace('<!--MEVAN_SHELL_START-->', shell_start(active))
+                .replace('<!--MEVAN_SHELL_START-->', shell_start(active, user))
                 .replace('<!--MEVAN_SHELL_END-->', SHELL_END))

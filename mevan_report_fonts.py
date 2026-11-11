@@ -6,10 +6,14 @@ nedostaje, koristi se raniji sistemski font, pa izvještaj i dalje nastaje.
 """
 from pathlib import Path
 
+import reportlab
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-from project_reports import FONT as FALLBACK
+FALLBACK = Path('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf')
+if not FALLBACK.is_file():
+    FALLBACK = Path(reportlab.__file__).parent / 'fonts' / 'Vera.ttf'
+FALLBACK = str(FALLBACK)
 
 DIR = Path(__file__).parent / 'fonts'
 FILES = {'body': 'SourceSans3-Regular.ttf', 'bold': 'SourceSans3-Semibold.ttf', 'display': 'SourceSerif4-Semibold.ttf'}

@@ -427,14 +427,8 @@ def _page_field(paragraph):
     return run
 
 
-def render_docx(content):
-    document = Document()
-    page = document.sections[0]
-    page.page_width, page.page_height = Mm(210), Mm(297)
-    page.left_margin = page.right_margin = Mm(22)
-    page.top_margin, page.bottom_margin = Mm(24), Mm(22)
-    text_width = page.page_width - page.left_margin - page.right_margin
-
+def docx_styles(document):
+    """Zajednički izgled Word izvještaja: pisma, veličine, boje i razmaci osnovnih stilova."""
     def restyle(name, font, size, colour, bold=False, before=0, after=6, line=1.25, keep=False):
         style = document.styles[name]
         style.font.name, style.font.size, style.font.bold, style.font.italic = font, Pt(size), bold, False
@@ -455,6 +449,17 @@ def render_docx(content):
         borders = document.styles[name].element.pPr.find(qn('w:pBdr'))
         if borders is not None:
             document.styles[name].element.pPr.remove(borders)
+
+
+def render_docx(content):
+    document = Document()
+    page = document.sections[0]
+    page.page_width, page.page_height = Mm(210), Mm(297)
+    page.left_margin = page.right_margin = Mm(22)
+    page.top_margin, page.bottom_margin = Mm(24), Mm(22)
+    text_width = page.page_width - page.left_margin - page.right_margin
+
+    docx_styles(document)
 
     def add(value, style='Body Text', size=None, colour=None, bold=None, after=None):
         paragraph = document.add_paragraph(style=style)
@@ -477,7 +482,7 @@ def render_docx(content):
     header.text = DEMO_LABEL if content['demo'] else "MEVAN  /  Dijagnostika"
     footer = page.footer.paragraphs[0]
     footer.text = DEMO_FOOTER if content['demo'] else content['company']
-    for inherited in (Inches(3), Inches(6)):  # zadani graničnici stila podnožja
+    for inherited in (Inches(3.25), Inches(6.5)):  # zadani graničnici stila podnožja
         footer.paragraph_format.tab_stops.add_tab_stop(inherited, WD_TAB_ALIGNMENT.CLEAR)
     footer.paragraph_format.tab_stops.add_tab_stop(text_width, WD_TAB_ALIGNMENT.RIGHT)
     footer.add_run('\tStrana ')

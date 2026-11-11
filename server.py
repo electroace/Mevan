@@ -146,7 +146,7 @@ def logout_token(req):
     return hmac.new(SECRET.encode(),('logout|'+req.cookies.get('mevan_session','')).encode(),hashlib.sha256).hexdigest()
 
 def page_html(req,name,active):
-    return render_page((BASE/name).read_text(encoding='utf-8'),active).replace('__MEVAN_LOGOUT_TOKEN__',logout_token(req))
+    return render_page((BASE/name).read_text(encoding='utf-8'),active,EMAIL).replace('__MEVAN_LOGOUT_TOKEN__',logout_token(req))
 
 @app.post('/logout')
 async def logout(req:Request):
