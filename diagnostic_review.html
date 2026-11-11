@@ -56,7 +56,7 @@ async function init(){
  if(diagnosticIndex<0){diagnosticIndex=company.diagnostics.length;company.diagnostics.push(selection.diagnostic)}
  diagnostic=company.diagnostics[diagnosticIndex];previousAssess=structuredClone(diagnostic.assess||{});
  if(JSON.stringify(diagnostic.assess)!==JSON.stringify(selection.diagnostic.assess)&&diagnostic.guided?.source_assess_signature!==JSON.stringify(selection.diagnostic.assess||{})){
- if(!confirm('Ulazne ocjene ili nalazi su promijenjeni. Pokrenuti novi pregled dokaza i plana? Prethodna odobrenja ostaju dostupna.')){
+ if(!await mvConfirm('Ulazne ocjene ili nalazi su promijenjeni. Pokrenuti novi pregled dokaza i plana? Prethodna odobrenja ostaju dostupna.',{title:'Novi pregled',okLabel:'Pokreni novi pregled'})){
  get('notice').textContent='Pregled je zaustavljen. Ranija odobrenja možete preuzeti ispod.';return;}
  diagnostic.assess=structuredClone(selection.diagnostic.assess);diagnostic.name=selection.diagnostic.name;sourceChanged=true;
  }
@@ -123,7 +123,7 @@ async function init(){
 }
 async function save(approve){
  if(busy)return false;
- if(approve&&!confirm(diagnostic.report_mode==='demo'?'Zaključati DEMO — simulirani podaci, bez stvarnog konsultantskog odobrenja?':'Potvrđujete pregled dokaza, tri prioriteta i 90-dnevnog plana ove dijagnostike?'))return false;
+ if(approve&&!await mvConfirm(diagnostic.report_mode==='demo'?'Zaključati DEMO — simulirani podaci, bez stvarnog konsultantskog odobrenja?':'Potvrđujete pregled dokaza, tri prioriteta i 90-dnevnog plana ove dijagnostike?',{title:'Odobri reviziju',okLabel:'Odobri'}))return false;
  busy=true;get('editor').inert=true;
  try{
  diagnostic.assess??={};
@@ -191,7 +191,7 @@ async function createGuidedProject(){
   async function projectApi(path,method='GET',body){const r=await fetch('/api/v4'+path,{method,headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});const d=await r.json();if(!r.ok)throw Error(typeof d.detail==='string'?d.detail:'Projektni nacrt nije sačuvan.');return d}
   const company=workspace.companies[companyIndex];
   const existing=(await projectApi('/projects')).projects.find(p=>p.company_id===company.id&&p.diagnostic_id===diagnostic.id&&p.status!=='closed');
-  if(existing){const linked=await projectApi('/projects/'+existing.id);if((linked.charter.report_mode||'real')!==(diagnostic.report_mode||'real'))throw Error('Postojeći projekat ima drugačiji način izvještaja. DEMO i stvarni projekat se ne povezuju.');if(!guided.project_id&&!confirm('Već postoji aktivni projekat „'+existing.title+'”. Povezati ga bez izmjene postojećeg sadržaja?'))return;guided.project_id=existing.id}
+  if(existing){const linked=await projectApi('/projects/'+existing.id);if((linked.charter.report_mode||'real')!==(diagnostic.report_mode||'real'))throw Error('Postojeći projekat ima drugačiji način izvještaja. DEMO i stvarni projekat se ne povezuju.');if(!guided.project_id&&!await mvConfirm('Već postoji aktivni projekat „'+existing.title+'”. Povezati ga bez izmjene postojećeg sadržaja?',{title:'Poveži postojeći projekat',okLabel:'Poveži'}))return;guided.project_id=existing.id}
   else{
    const demo=diagnostic.report_mode==='demo', owner=get('projectOwner').value.trim(), start=get('projectStart').value;
    const due=days=>{const d=new Date(start+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+days);return d.toISOString().slice(0,10)};

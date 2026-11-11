@@ -102,10 +102,11 @@ def test_destructive_actions_are_marked_and_still_confirmed():
     roles={re.sub(r'<[^>]+>','',text).strip():re.search(r'class="([^"]*)"',attrs).group(1).split() for attrs,text in _buttons(html)}
     for label in ('Vrati METALPRO simulaciju','Obriši lokalne podatke','Vrati','Ukloni'):
         assert 'danger' in roles[label],label
-    assert "if(!confirm('Ovo će zamijeniti sve lokalne podatke DEMO simulacijom." in html
-    assert "confirm('Obrisati sve lokalne podatke?')" in html
+    # Od šestog paketa potvrde su prozori unutar aplikacije (mvConfirm), ne sistemski confirm().
+    assert "if(!await mvConfirm('Ovo će zamijeniti sve lokalne podatke DEMO simulacijom." in html
+    assert "if(!await mvConfirm('Obrisati sve lokalne podatke?'" in html
     assert "if(confirmation!=='VRATI-PODATKE')return;" in html
-    assert "confirm('Ukloniti nalaz?')" in html
+    assert "if(!await mvConfirm('Ukloniti nalaz?'" in html
 
 
 def test_primary_actions_per_screen():

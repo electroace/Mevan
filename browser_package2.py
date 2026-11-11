@@ -23,7 +23,8 @@ with sync_playwright() as pw:
     browser=pw.chromium.launch(args=['--no-sandbox'])
     page=browser.new_page(viewport={'width':390,'height':844})
     errors=[];page.on('pageerror',lambda error:errors.append(str(error)))
-    page.on('dialog',lambda dialog:dialog.accept())
+    # Potvrde su prozori unutar aplikacije (#mvDialog); test ih prihvata kao ranije sistemske.
+    page.add_init_script("setInterval(()=>{const d=document.getElementById('mvDialog');if(d&&d.open)d.querySelector('[value=ok]').click()},50)")
     page.goto(URL+'/login')
     page.locator('[name=email]').fill('qa@example.test');page.locator('[name=password]').fill('qa-local-only-test')
     page.locator('button').first.click();page.wait_for_url(URL+'/')

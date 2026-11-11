@@ -28,7 +28,8 @@ with sync_playwright() as w:
  p.get_by_label('Korak vođenog prikupljanja').select_option('priorities');p.get_by_role('button',name='Preuzmi AI prijedlog za pregled').click()
  assert p.get_by_label('Izvršni sažetak').input_value()=='QA prijedlog'
  assert p.get_by_label('Prvi prioritet i dokaz').input_value()==review_content('QA-mobile')['priority1']
- p.on('dialog',lambda d:d.accept())
+ # Potvrde su prozori unutar aplikacije (#mvDialog); test ih prihvata kao ranije sistemske.
+ accept_dialogs="setInterval(()=>{const d=document.getElementById('mvDialog');if(d&&d.open)d.querySelector('[value=ok]').click()},50)";p.add_init_script(accept_dialogs);p.evaluate(accept_dialogs)
  labels={'summary':'Izvršni sažetak','priority1':'Prvi prioritet i dokaz','priority2':'Drugi prioritet i dokaz','priority3':'Treći prioritet i dokaz','month1':'1–30 dana · aktivnost, vlasnik, KPI i rok','month2':'31–60 dana · aktivnost, vlasnik, KPI i rok','month3':'61–90 dana · aktivnost, vlasnik, KPI i rok'}
  for key,label in labels.items():
   p.get_by_label('Korak vođenog prikupljanja').select_option('plan' if key.startswith('month') else 'priorities');p.get_by_label(label).fill('x')

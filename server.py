@@ -94,9 +94,27 @@ def valid_login_csrf(token):
         return hmac.compare_digest(mac,expected)
     except (ValueError,TypeError,AttributeError):return False
 
+LOGIN_PAGE='''<!doctype html><html lang="bs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MEVAN – prijava</title><style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;flex-direction:column;font:16px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:#f3f6fa;color:#193047}
+header{background:#142e46;color:#fff;padding:14px 18px}.logo{font-size:22px;font-weight:800;letter-spacing:2px}.logo span{font-size:13px;font-weight:400;letter-spacing:0}
+main{flex:1;display:grid;place-items:center;padding:24px 12px}
+form{background:#fff;border:1px solid #dfe7ef;border-radius:12px;padding:28px;width:min(380px,100%);box-shadow:0 4px 16px #102b4210}
+h1{font-size:25px;line-height:1.25;margin:0 0 4px}p{margin:0 0 16px;color:#566b7c;font-size:14px}
+label{display:block;font-size:13px;font-weight:650;margin:12px 0 5px}
+input{width:100%;min-height:44px;padding:10px;border:1px solid #b3c3d0;border-radius:8px;font:inherit;color:inherit}
+button{width:100%;min-height:44px;margin-top:18px;border:1px solid #0a6485;border-radius:9px;background:#0a6485;color:#fff;font:650 15px/1.2 inherit;font-family:inherit;cursor:pointer}
+button:hover{background:#085673}input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #0a6485;outline-offset:2px}
+.error{color:#a42121;background:#fdf0f0;border:1px solid #dcaaaa;border-radius:8px;padding:10px 12px;margin:0 0 4px;font-size:14px}a{color:#0a6485}
+</style></head><body><header><div class="logo">MEVAN <span>DIAGNOSTIC</span></div></header><main><form method="post" action="/login"><input type="hidden" name="csrf_token" value="__CSRF_TOKEN__"><h1>Prijava</h1><p>Privatni demonstracijski pristup</p>__ERROR__<label for="email">E-mail</label><input id="email" name="email" type="email" required autocomplete="username"><label for="password">Lozinka</label><input id="password" name="password" type="password" required autocomplete="current-password"><button>Prijavi se</button></form></main></body></html>'''
+
+def login_html(error=''):
+    # Poruka o grešci je fiksni tekst sa servera; korisnički unos se ne vraća u stranicu.
+    block=f'<div class="error" role="alert">{error}</div>' if error else ''
+    return LOGIN_PAGE.replace('__ERROR__',block).replace('__CSRF_TOKEN__',login_csrf_token())
+
 @app.get('/login',response_class=HTMLResponse)
 def login_page():
-    return '''<!doctype html><html lang="bs"><meta name="viewport" content="width=device-width,initial-scale=1"><meta charset="utf-8"><title>MEVAN – prijava</title><style>body{font:16px system-ui;background:#f3f6fa;color:#193047;display:grid;place-items:center;min-height:90vh}form{background:white;padding:32px;border-radius:16px;max-width:370px;width:90%;box-shadow:0 8px 28px #142e4618}input,button{box-sizing:border-box;width:100%;padding:13px;margin:9px 0;border-radius:9px;border:1px solid #ccd6df}button{background:#0a6485;color:white;border:0;font-weight:700}</style><form method="post" action="/login"><input type="hidden" name="csrf_token" value="__CSRF_TOKEN__"><h1>MEVAN Diagnostic</h1><p>Privatni demonstracijski pristup</p><label>E-mail<input name="email" type="email" required autocomplete="username"></label><label>Lozinka<input name="password" type="password" required autocomplete="current-password"></label><button>Prijavi se</button></form></html>'''.replace('__CSRF_TOKEN__',login_csrf_token())
+    return login_html()
 
 @app.post('/login')
 async def login(req:Request):
@@ -115,7 +133,7 @@ async def login(req:Request):
     email=data.get('email',[''])[0].strip().lower();password=data.get('password',[''])[0]
     if not (hmac.compare_digest(email,EMAIL) and hmac.compare_digest(password,PASSWORD)):
         attempts.append(now)
-        return HTMLResponse('Pogrešna prijava. <a href="/login">Pokušaj ponovo</a>.',status_code=401)
+        return HTMLResponse(login_html('Pogrešna prijava. Provjerite e-mail i lozinku pa pokušajte ponovo.'),status_code=401)
     attempts.clear()
     with conn() as c: c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'login','administrator'))
     ident=hashlib.sha256(EMAIL.encode()).hexdigest()[:16]
