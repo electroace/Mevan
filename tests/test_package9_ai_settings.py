@@ -118,7 +118,7 @@ def test_claude_request_is_translated_and_json_fences_are_removed(monkeypatch):
     assert request.get_header('X-api-key')==KEY and request.get_header('Anthropic-version')=='2023-06-01' and request.get_header('Authorization') is None
     assert sent['model']=='claude-sonnet-5-5' and sent['messages']==[{'role':'user','content':'Pitanje'}]
     # Noviji Claude modeli odbijaju temperature (HTTP 400) i razmišljaju prije odgovora, pa max_tokens ima rezervu.
-    assert 'temperature' not in sent and 'top_p' not in sent and sent['max_tokens']==77+mevan_ai.ANTHROPIC_THINKING_HEADROOM
+    assert 'temperature' not in sent and 'top_p' not in sent and sent['max_tokens']==77*2+mevan_ai.ANTHROPIC_THINKING_HEADROOM
     assert sent['system'].startswith('Sistem') and 'JSON' in sent['system'] and 'response_format' not in sent
 
 
@@ -160,3 +160,32 @@ def test_connection_check_explains_a_rejected_request_without_the_key(fx,monkeyp
     detail=r.json()['detail']
     assert r.status_code==502 and 'HTTP 400' in detail and 'temperature is not supported for this model' in detail
     assert KEY not in r.text and '[ključ]' in detail
+
+
+def test_json_reply_is_extracted_from_surrounding_text_and_truncation_is_reported(monkeypatch):
+    config={'provider':'anthropic','model':'claude-sonnet-5-5','base_url':'https://api.anthropic.com/v1','key':KEY}
+    body={'messages':[{'role':'user','content':'U'}],'response_format':{'type':'json_object'},'max_tokens':50}
+    capture(monkeypatch,{'content':[{'type':'text','text':'Evo nacrta:\n{"a": {"b": 2}}\nNadam se da pomaže.'}],'stop_reason':'end_turn'})
+    assert json.loads(mevan_ai.chat(config,body))=={'a':{'b':2}}
+    capture(monkeypatch,{'content':[{'type':'text','text':'{"a": [1, 2'}],'stop_reason':'max_tokens'})
+    with pytest.raises(ValueError,match='prekinut zbog ograničenja dužine'):
+        mevan_ai.chat(config,body)
+    openai={'provider':'openai','model':'m','base_url':'https://api.openai.com/v1','key':KEY}
+    capture(monkeypatch,{'choices':[{'message':{'content':'{"a": [1'},'finish_reason':'length'}]})
+    with pytest.raises(ValueError,match='prekinut zbog ograničenja dužine'):
+        mevan_ai.chat(openai,body)
+
+
+def test_integrated_analysis_says_why_a_draft_was_rejected(fx,monkeypatch):
+    fx.client.put('/api/ai/settings',json=FORM,headers=fx.headers)
+    request={'company':{'name':'QA'},'assess':{'F01':{'applicable':'yes','score':'2','proof':'confirmed','evidence':'Dokaz','finding':'Nalaz'}},'effects':[]}
+    capture(monkeypatch,{'content':[{'type':'text','text':'{"executive_summary": "Sažetak"}'}],'stop_reason':'end_turn'})
+    r=fx.client.post('/api/v3/analyze',json=request,headers=fx.headers)
+    assert r.status_code==502 and r.json()['detail'].endswith('Razlog: Nepotpuna AI analiza.'),r.text
+    capture(monkeypatch,{'content':[{'type':'text','text':'{"executive_summary": "S'}],'stop_reason':'max_tokens'})
+    assert 'prekinut zbog ograničenja dužine' in fx.client.post('/api/v3/analyze',json=request,headers=fx.headers).json()['detail']
+    def slow(request,timeout=None):
+        raise TimeoutError('timed out')
+    monkeypatch.setattr(mevan_ai.urllib.request,'urlopen',slow)
+    assert 'nije odgovorio na vrijeme' in fx.client.post('/api/v3/analyze',json=request,headers=fx.headers).json()['detail']
+    assert 'v3_ai_draft_rejected' in fx.client.get('/api/audit').text

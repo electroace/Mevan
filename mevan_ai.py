@@ -147,11 +147,14 @@ def chat(config, body, timeout=60, limit=200000):
     if config['provider'] == 'anthropic':
         system = '\n\n'.join(m['content'] for m in body['messages'] if m['role'] == 'system')
         # Bez temperature: noviji Claude modeli odbijaju svaku vrijednost osim zadane (HTTP 400).
-        payload = {'model': config['model'], 'max_tokens': body.get('max_tokens', 1024) + ANTHROPIC_THINKING_HEADROOM,
+        # Dvostruki prostor za odgovor: isti tekst kod Claude modela zauzima više tokena nego kod modela za koji su limiti podešeni.
+        payload = {'model': config['model'], 'max_tokens': body.get('max_tokens', 1024) * 2 + ANTHROPIC_THINKING_HEADROOM,
                    'messages': [{'role': m['role'], 'content': m['content']} for m in body['messages'] if m['role'] != 'system']}
         if system or wants_json:
             payload['system'] = system + (JSON_ONLY if wants_json else '')
         url, headers = config['base_url'] + '/messages', {'x-api-key': config['key'], 'anthropic-version': ANTHROPIC_VERSION}
+        # Razmišljanje prije odgovora produžava poziv i povećava odgovor servisa.
+        timeout, limit = max(timeout, 240), max(limit, 1_000_000)
     else:
         payload = {**body, 'model': config['model']}
         url, headers = config['base_url'] + '/chat/completions', {'Authorization': 'Bearer ' + config['key']}
@@ -161,13 +164,26 @@ def chat(config, body, timeout=60, limit=200000):
         answer = json.loads(response.read(limit))
     if config['provider'] == 'anthropic':
         text = ''.join(block['text'] for block in answer['content'] if block.get('type') == 'text')
+        cut_short = answer.get('stop_reason') == 'max_tokens'
     else:
         text = answer['choices'][0]['message']['content']
+        cut_short = answer['choices'][0].get('finish_reason') == 'length'
     if not isinstance(text, str):
         raise ValueError('Neispravan odgovor AI servisa')
     if wants_json:
-        text = re.sub(r'^\s*```(?:json)?\s*|\s*```\s*$', '', text)
+        if cut_short:
+            raise ValueError('odgovor je prekinut zbog ograničenja dužine')
+        text = json_object_text(text)
     return text
+
+
+def json_object_text(text):
+    """Izdvoji JSON objekat iz odgovora: bez oznaka koda i bez teksta prije ili poslije objekta."""
+    text = re.sub(r'^\s*```(?:json)?\s*|\s*```\s*$', '', text).strip()
+    if text.startswith('{') and text.endswith('}'):
+        return text
+    start, end = text.find('{'), text.rfind('}')
+    return text[start:end + 1] if 0 <= start < end else text
 
 
 def test_connection(config):

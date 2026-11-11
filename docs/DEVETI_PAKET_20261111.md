@@ -51,3 +51,15 @@ Nijedan stvarni poziv OpenAI, Anthropic ili trećem servisu nije izvršen, jer z
 **Posljedica:** bez niske temperature Claude odgovori mogu biti nešto manje ujednačeni između dva pokretanja nego ranije zamišljeno. Stručni pregled nacrta ostaje obavezan kao i dosad.
 
 **Provjere:** `pytest` 240 prolaza (dva nova testa i dopunjen test oblika Claude zahtjeva). Stvarni poziv Anthropic servisu i dalje nije izvršen iz razvojnog okruženja.
+
+## Dopuna 9.2 — „AI nije vratio ispravan strukturirani nacrt” uz Claude
+
+**Problem:** integrisana analiza je uz Claude servis vraćala opću poruku „AI nije vratio ispravan strukturirani nacrt; ništa nije odobreno.” bez razloga. Stroga provjera nacrta je ispravna i ostaje; nedostajali su razlog i dovoljno prostora i vremena za Claude odgovor.
+
+**Popravka:**
+- Poruka sada navodi razlog: prekinut odgovor, neispravan JSON, polje koje nedostaje ili provjera koja nije prošla (npr. „Nepotpuna KPI definicija”). Razlog se bilježi i u dnevnik kao `v3_ai_draft_rejected`.
+- Istek vremena ima svoju poruku („AI servis nije odgovorio na vrijeme”).
+- Za Claude: dvostruko veći prostor za odgovor uz rezervu za razmišljanje, čekanje do 240 sekundi i veći dozvoljeni odgovor servisa.
+- Ako servis vrati tekst oko JSON objekta, objekat se izdvaja. Ako je odgovor odsječen zbog dužine, to se prijavljuje kao razlog umjesto pokušaja čitanja nepotpunog JSON-a (za sve servise).
+
+**Provjere:** `pytest` 242 prolaza (dva nova testa). Mobilni tok s integrisanom analizom prolazi. Stvarni poziv Anthropic servisu nije izvršen iz razvojnog okruženja.

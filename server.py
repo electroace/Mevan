@@ -669,9 +669,17 @@ async def mevan_v3_analyze(req: Request):
                 'quality_gate':{'independent_verification':False,'consultant_approved':False,
                                 'finance_recalculated_by_ai':False}}
     except urllib.error.HTTPError as e:
-        raise HTTPException(502,'AI servis odbio zahtjev (HTTP '+str(e.code)+').')
-    except (urllib.error.URLError,KeyError,ValueError,TimeoutError,json.JSONDecodeError):
-        raise HTTPException(502,'AI nije vratio ispravan strukturirani nacrt; ništa nije odobreno.')
+        detail=mevan_ai.error_detail(e,ai['key'])
+        raise HTTPException(502,'AI servis odbio zahtjev (HTTP '+str(e.code)+').'+(' Poruka servisa: '+detail if detail else ''))
+    except (urllib.error.URLError,TimeoutError):
+        raise HTTPException(502,'AI servis nije odgovorio na vrijeme; ništa nije odobreno. Pokušajte ponovo.')
+    except (KeyError,ValueError) as e:
+        # Razlog je interni opis provjere (npr. „Nepotpuna KPI definicija”), ne sadržaj odgovora.
+        reason=('odgovor nije ispravan JSON' if isinstance(e,json.JSONDecodeError)
+                else 'nedostaje polje '+str(e) if isinstance(e,KeyError) else str(e))[:120]
+        with conn() as c:
+            c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'v3_ai_draft_rejected',reason))
+        raise HTTPException(502,'AI nije vratio ispravan strukturirani nacrt; ništa nije odobreno. Razlog: '+reason+'.')
 
 from project_execution import router as project_router
 app.include_router(project_router)
