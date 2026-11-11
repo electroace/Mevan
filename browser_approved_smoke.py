@@ -19,7 +19,7 @@ with sync_playwright() as w:
  headers={'Origin':url,'If-Match':get('/api/workspace').json()['version']}
  r=p.request.put(url+'/api/workspace',data=ws,headers=headers);assert r.ok,r.text()
  stale=p.request.put(url+'/api/workspace',data={'companies':[{'diagnostics':[]}]},headers=headers);assert stale.status==409
- p.reload();p.locator('[data-page=v2]').first.click()
+ p.reload();p.locator('#mvToggle').click();p.locator('[data-page=v2]').first.click()
  p.route('**/api/v3/analyze', lambda route:route.fulfill(json={'analysis':{'executive_summary':'QA prijedlog','decisions':[]},'criteria':[],'facts':{}}))
  p.get_by_role('button',name='Pokreni kompletnu dijagnostiku').click()
  p.wait_for_function('v3Result !== null')

@@ -12,6 +12,13 @@ URL='http://127.0.0.1:8382'
 OUT=Path(os.environ.get('MEVAN_QA_ARTIFACT_DIR','/tmp/mevan-package2-browser'))
 OUT.mkdir(parents=True,exist_ok=True)
 
+def open_menu(page):
+    """Na telefonu je glavni meni iza dugmeta „Meni”."""
+    toggle=page.locator('#mvToggle')
+    if toggle.is_visible() and toggle.get_attribute('aria-expanded')!='true':
+        toggle.click()
+
+
 with sync_playwright() as pw:
     browser=pw.chromium.launch(args=['--no-sandbox'])
     page=browser.new_page(viewport={'width':390,'height':844})
@@ -21,11 +28,11 @@ with sync_playwright() as pw:
     page.locator('[name=email]').fill('qa@example.test');page.locator('[name=password]').fill('qa-local-only-test')
     page.locator('button').first.click();page.wait_for_url(URL+'/')
     page.wait_for_function('typeof serverVersion==="string"')
-    page.locator('[data-page=workspace]').click()
+    open_menu(page);page.locator('[data-page=workspace]').click()
     page.get_by_role('button',name='Vrati METALPRO simulaciju',exact=True).click()
     page.wait_for_function('cloudStatus.includes("Sačuvano")')
     # Vođeni tok je dostupan i bez pozivanja AI servisa.
-    page.get_by_role('button',name='Vođeno prikupljanje i završni izvještaji',exact=True).click()
+    open_menu(page);page.get_by_role('button',name='Vođeno prikupljanje i završni izvještaji',exact=True).click()
     page.wait_for_selector('#editor:not([hidden])')
     page.get_by_label('Način izvještaja').select_option('demo')
     page.get_by_role('button',name='Pripremi METALPRO DEMO primjer',exact=True).click()
@@ -124,7 +131,7 @@ with sync_playwright() as pw:
     legacy_path=OUT/'package2_DEMO_legacy.docx';legacy_download.value.save_as(legacy_path)
     legacy_text='\n'.join(p.text for p in Document(legacy_path).paragraphs)
     assert 'DEMO — simulirani podaci' in legacy_text and 'U ovom oglednom obuhvatu' in legacy_text
-    page.get_by_role('button',name='Vođeno prikupljanje i završni izvještaji',exact=True).click()
+    open_menu(page);page.get_by_role('button',name='Vođeno prikupljanje i završni izvještaji',exact=True).click()
     page.wait_for_selector('#editor:not([hidden])')
     assert page.request.get(URL+'/api/test/v2/workspace').json()['workspace']['companies']
     assert not errors,errors

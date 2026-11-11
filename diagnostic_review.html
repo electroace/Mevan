@@ -1,9 +1,9 @@
 <!doctype html><html lang="bs"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MEVAN · Konsultantska provjera</title>
 <style>
-*{box-sizing:border-box}body{font:16px/1.55 system-ui;color:#193448;background:#f3f6f7;margin:auto;max-width:920px;padding:20px}section,details{background:white;padding:16px;margin:12px 0;border:1px solid #c9d7dd;border-radius:8px}label{display:block;margin:9px 0}input,textarea,select{display:block;width:100%;padding:7px;font:inherit}button,a{color:#07556c}button{font:inherit;padding:8px 14px;cursor:pointer}summary{cursor:pointer}#notice{position:sticky;top:0;background:#fff5cd;padding:10px}nav a{margin-right:1em}textarea{min-height:72px}
-</style>
-<a href="/">← Dijagnostika</a><h1>Konsultantska provjera</h1>
+*{box-sizing:border-box}body{font:16px/1.55 system-ui;color:#193448;background:#f3f6f7}.rv-page{max-width:920px}section,details{background:white;padding:16px;margin:12px 0;border:1px solid #c9d7dd;border-radius:8px}label{display:block;margin:9px 0}input,textarea,select{display:block;width:100%;padding:7px;font:inherit}button,a{color:#07556c}button{font:inherit;padding:8px 14px;cursor:pointer}summary{cursor:pointer}#notice{position:sticky;top:0;background:#fff5cd;padding:10px}nav a{margin-right:1em}textarea{min-height:72px}
+</style><!--MEVAN_NAV_CSS-->
+<!--MEVAN_SHELL_START--><div class="rv-page"><h1 class="mv-title">Konsultantska provjera</h1>
 <p id="notice" role="status" aria-live="polite">Učitavanje…</p>
 <main id="editor" hidden>
 <h2 id="identity"></h2>
@@ -16,6 +16,7 @@
 <button id="save">Sačuvaj radnu reviziju</button> <button id="approve">Odobri pregledanu reviziju</button>
 </main>
 <section><h2>Odobrene revizije</h2><div id="downloads"></div></section>
+</div><!--MEVAN_SHELL_END-->
 <script>
 const get=id=>document.getElementById(id);
 const base='/api/test/v2';

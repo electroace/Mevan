@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from pydantic import BaseModel
 from diagnostic_engine import analyze
+from mevan_nav import render_page
 
 BASE=Path(__file__).parent
 DB=Path(os.getenv('MEVAN_DB',str(BASE/'mevan.sqlite3')))
@@ -132,7 +133,7 @@ def logout(req:Request):
 @app.get('/',response_class=HTMLResponse)
 def home(req:Request):
     if not logged(req):return RedirectResponse('/login')
-    html=(BASE/'index.html').read_text(encoding='utf-8')
+    html=render_page((BASE/'index.html').read_text(encoding='utf-8'),'diagnostic')
     return HTMLResponse(html,headers={'Cache-Control':'no-store','Content-Security-Policy':"frame-ancestors 'none'",'X-Content-Type-Options':'nosniff'})
 
 @app.get('/api/workspace')
@@ -604,13 +605,13 @@ app.include_router(project_router)
 def project_ui(req:Request):
     if not logged(req):
         return RedirectResponse('/login',status_code=303)
-    return HTMLResponse((Path(__file__).parent/'projects_ui.html').read_text(encoding='utf-8'))
+    return HTMLResponse(render_page((Path(__file__).parent/'projects_ui.html').read_text(encoding='utf-8'),'projects'))
 
 
 @app.get('/dashboard-ui',response_class=HTMLResponse)
 def dashboard_ui(req:Request):
     if not logged(req):return RedirectResponse('/login',status_code=303)
-    return HTMLResponse((Path(__file__).parent/'dashboard_ui.html').read_text(encoding='utf-8'))
+    return HTMLResponse(render_page((Path(__file__).parent/'dashboard_ui.html').read_text(encoding='utf-8'),'portfolio'))
 
 # This branch runs the review workflow in isolated revisioned tables.
 from mevan_test_workspace_api import create_test_router
@@ -621,4 +622,4 @@ app.include_router(create_test_router(str(DB), logged, same_origin, reviewer_id=
 def diagnostic_review(req: Request):
     if not logged(req):
         return RedirectResponse('/login', status_code=303)
-    return HTMLResponse((BASE / 'diagnostic_review.html').read_text(encoding='utf-8'))
+    return HTMLResponse(render_page((BASE / 'diagnostic_review.html').read_text(encoding='utf-8'),'guided'))
