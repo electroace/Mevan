@@ -11,6 +11,7 @@ RUN apt-get update \
 COPY --chown=mevan:mevan server.py index.html diagnostic_engine.py data_quality_gate.py ./
 COPY --chown=mevan:mevan mevan_*.py approved_reports.py diagnostic_review.html ./
 COPY --chown=mevan:mevan project_*.py projects_ui.html dashboard_ui.html ./
+COPY --chown=mevan:mevan fonts ./fonts
 RUN mkdir -p /data && chown mevan:mevan /data
 USER mevan
 EXPOSE 8000

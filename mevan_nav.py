@@ -76,14 +76,14 @@ body{margin:0;max-width:none;padding:0;background:var(--mv-bg);color:var(--mv-in
 .mv-dialog button{appearance:none;box-sizing:border-box;min-height:44px;padding:9px 16px;border-radius:9px;border:1px solid var(--mv-brand);background:var(--mv-brand);color:#fff;font:650 14px/1.2 var(--mv-font);cursor:pointer}
 .mv-dialog button[value=cancel]{background:#fff;color:var(--mv-brand)}
 .mv-dialog.is-danger button[value=ok]{background:var(--mv-danger);border-color:var(--mv-danger)}
-.mv-nav{background:#fff;border:1px solid #dfe7ef;border-radius:14px;padding:12px 10px;box-shadow:0 4px 16px #102b4210;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.mv-nav{background:#fff;border:1px solid #dfe7ef;border-radius:14px;padding:12px 10px 0;box-shadow:0 4px 16px #102b4210;position:sticky;top:16px;max-height:calc(100vh - var(--mv-head,76px) - 32px);overflow:auto;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
 .mv-nav .mv-group{margin:0 0 6px}
 .mv-nav .mv-label{margin:0;padding:6px 10px 3px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#566b7c}
 .mv-nav .mv-item{all:unset;display:block;box-sizing:border-box;width:100%;cursor:pointer;border-radius:8px;padding:7px 10px;margin:1px 0;color:#29445a;font-size:14px;line-height:1.3;text-align:left}
 .mv-nav .mv-item small{color:#566b7c;font-size:11px}
 .mv-nav .mv-item:hover{background:#f1f6f9}
 .mv-nav .mv-item.active,.mv-nav .mv-item[aria-current=page]{background:#e8f2f7;color:#075f82;font-weight:700}
-.mv-nav .mv-foot{border-top:1px solid #e6edf3;margin-top:6px;padding-top:8px}
+.mv-nav .mv-foot{border-top:1px solid #e6edf3;margin-top:6px;padding:8px 0 10px;position:sticky;bottom:0;background:#fff}
 .mv-nav form{margin:0}
 .mv-nav .mv-logout{all:unset;display:block;box-sizing:border-box;width:100%;cursor:pointer;border-radius:8px;padding:7px 10px;margin:1px 0;color:#8a3b12;font-size:14px;line-height:1.3}
 .mv-nav .mv-logout:hover{background:#fdf1ea}
@@ -124,6 +124,9 @@ body{margin:0;max-width:none;padding:0;background:var(--mv-bg);color:var(--mv-in
 JS = """<script id="mevan-nav-script">
 (function(){
  var root=document.documentElement,toggle=document.getElementById('mvToggle'),nav=document.getElementById('mvNav'),backdrop=document.getElementById('mvBackdrop');
+ // Meni staje u visinu ekrana ispod zaglavlja, pa je „Odjava” vidljiva bez pomjeranja stranice.
+ function fitNav(){root.style.setProperty('--mv-head',document.querySelector('.mv-top').offsetHeight+'px')}
+ fitNav();window.addEventListener('resize',fitNav);
  function setOpen(open){root.classList.toggle('mv-open',open);toggle.setAttribute('aria-expanded',open?'true':'false')}
  toggle.addEventListener('click',function(){setOpen(!root.classList.contains('mv-open'))});
  backdrop.addEventListener('click',function(){setOpen(false)});
