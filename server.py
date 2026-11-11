@@ -8,6 +8,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Resp
 from pydantic import BaseModel
 from diagnostic_engine import analyze
 from mevan_nav import render_page
+import mevan_ai
 
 BASE=Path(__file__).parent
 DB=Path(os.getenv('MEVAN_DB',str(BASE/'mevan.sqlite3')))
@@ -269,13 +270,58 @@ async def diagnostic_v2(req:Request):
 def health():return {'status':'ok'}
 
 
+@app.get('/api/ai/settings')
+def ai_settings(req:Request):
+    if not logged(req):raise HTTPException(401)
+    return mevan_ai.public_settings(DB)
+
+@app.put('/api/ai/settings')
+async def ai_settings_save(req:Request):
+    """Administrator sam unosi servis, model i ključ. Ključ se nikada ne vraća u odgovoru."""
+    if not logged(req):raise HTTPException(401)
+    if not same_origin(req):raise HTTPException(403)
+    raw=await req.body()
+    if len(raw)>4000:raise HTTPException(413,'Prevelik zahtjev')
+    try:data=json.loads(raw)
+    except ValueError:raise HTTPException(422,'Neispravan zahtjev')
+    if not isinstance(data,dict):raise HTTPException(422,'Neispravan zahtjev')
+    try:saved=mevan_ai.save_settings(data.get('provider'),data.get('model'),data.get('base_url'),data.get('api_key'),DB)
+    except mevan_ai.SettingsError as e:raise HTTPException(422,str(e))
+    with conn() as c:
+        c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'ai_settings_saved',saved['provider']+' / '+saved['model']))
+    return saved
+
+@app.delete('/api/ai/settings')
+def ai_settings_clear(req:Request):
+    if not logged(req):raise HTTPException(401)
+    if not same_origin(req):raise HTTPException(403)
+    with conn() as c:
+        c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'ai_settings_removed','key removed'))
+    return mevan_ai.clear_settings(DB)
+
+@app.post('/api/ai/test')
+def ai_settings_test(req:Request):
+    """Najmanji poziv odabranom servisu. Poruka o grešci sadrži samo HTTP kod, nikad ključ ni odgovor servisa."""
+    if not logged(req):raise HTTPException(401)
+    if not same_origin(req):raise HTTPException(403)
+    ai=mevan_ai.active_config(DB)
+    if not ai:raise HTTPException(503,'AI servis nije podešen. Unesite servis, model i API ključ.')
+    try:
+        mevan_ai.test_connection(ai)
+    except urllib.error.HTTPError as e:
+        hint={401:'Ključ nije prihvaćen.',403:'Ključ nema pristup ovom modelu ili servisu.',404:'Model ili adresa servisa nisu pronađeni.',429:'Prekoračen je limit ili nema sredstava na računu.'}.get(e.code,'Provjerite model, adresu i račun kod servisa.')
+        raise HTTPException(502,f'Servis je odbio zahtjev (HTTP {e.code}). {hint}')
+    except (urllib.error.URLError,KeyError,ValueError,TimeoutError,OSError):
+        raise HTTPException(502,'Servis nije dostupan ili nije vratio ispravan odgovor. Provjerite adresu i model.')
+    return {'ok':True,'provider':ai['provider'],'model':ai['model']}
+
 @app.post('/api/ai/draft')
 async def ai_draft(req:Request):
     """Optional real AI. Only a draft; approval remains a separate human action."""
     if not logged(req):raise HTTPException(401)
     if not same_origin(req):raise HTTPException(403)
-    key=os.getenv('OPENAI_API_KEY','').strip()
-    if not key:raise HTTPException(503,'AI servis nije konfigurisan. Lokalna analiza po pravilima je dostupna.')
+    ai=mevan_ai.active_config(DB)
+    if not ai:raise HTTPException(503,'AI servis nije konfigurisan. Lokalna analiza po pravilima je dostupna.')
     raw=await req.body()
     if len(raw)>55000:raise HTTPException(413,'Prevelik zahtjev')
     try:data=json.loads(raw)
@@ -328,12 +374,8 @@ async def ai_draft(req:Request):
       'messages':[{'role':'system','content':prompt},
                   {'role':'user','content':json.dumps({'dimension':data['dimension'],'criteria':cleaned},ensure_ascii=False)}],
       'temperature':0.2,'max_tokens':1200}
-    request=urllib.request.Request('https://api.openai.com/v1/chat/completions',
-       data=json.dumps(payload).encode(),headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'},method='POST')
     try:
-        with urllib.request.urlopen(request,timeout=35) as response:
-            result=json.loads(response.read(100000))
-        draft=result['choices'][0]['message']['content']
+        draft=mevan_ai.chat(ai,payload,timeout=35,limit=100000)
         return {'draft':draft,'source':'generative_ai','approved':False}
     except (urllib.error.URLError,KeyError,ValueError,TimeoutError):
         raise HTTPException(502,'AI servis trenutno nije dostupan; pokušajte kasnije.')
@@ -344,8 +386,8 @@ async def ai_integrated(req:Request):
     """Integrated cross-functional AI draft; never an approved professional finding."""
     if not logged(req):raise HTTPException(401)
     if not same_origin(req):raise HTTPException(403)
-    key=os.getenv('OPENAI_API_KEY','').strip()
-    if not key:raise HTTPException(503,'AI servis nije konfigurisan.')
+    ai=mevan_ai.active_config(DB)
+    if not ai:raise HTTPException(503,'AI servis nije konfigurisan.')
     raw=await req.body()
     if len(raw)>150000:raise HTTPException(413,'Prevelik zahtjev')
     try:
@@ -392,13 +434,8 @@ async def ai_integrated(req:Request):
       'messages':[{'role':'system','content':prompt},
                   {'role':'user','content':json.dumps(context,ensure_ascii=False)}],
       'temperature':0.1,'max_tokens':3300}
-    request=urllib.request.Request('https://api.openai.com/v1/chat/completions',
-      data=json.dumps(body,ensure_ascii=False).encode('utf-8'),
-      headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'},method='POST')
     try:
-        with urllib.request.urlopen(request,timeout=85) as response:
-            answer=json.loads(response.read(150000))
-        draft=answer['choices'][0]['message']['content']
+        draft=mevan_ai.chat(ai,body,timeout=85,limit=150000)
         if not isinstance(draft,str) or not draft.strip():raise ValueError()
         with conn() as c:
             c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',
@@ -415,8 +452,8 @@ async def decision_intelligence(req:Request):
     """v2.3: auditable, unapproved decision recommendations grounded in rule output."""
     if not logged(req):raise HTTPException(401)
     if not same_origin(req):raise HTTPException(403)
-    key=os.getenv('OPENAI_API_KEY','').strip()
-    if not key:raise HTTPException(503,'AI servis nije konfigurisan.')
+    ai=mevan_ai.active_config(DB)
+    if not ai:raise HTTPException(503,'AI servis nije konfigurisan.')
     raw=await req.body()
     if len(raw)>150000:raise HTTPException(413,'Prevelik zahtjev')
     try:
@@ -457,13 +494,8 @@ async def decision_intelligence(req:Request):
           'messages':[{'role':'system','content':prompt},
                       {'role':'user','content':json.dumps(context,ensure_ascii=False)}],
           'temperature':0.1,'max_tokens':3900}
-    request=urllib.request.Request('https://api.openai.com/v1/chat/completions',
-      data=json.dumps(body,ensure_ascii=False).encode('utf-8'),
-      headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'},method='POST')
     try:
-        with urllib.request.urlopen(request,timeout=85) as response:
-            answer=json.loads(response.read(180000))
-        draft=answer['choices'][0]['message']['content']
+        draft=mevan_ai.chat(ai,body,timeout=85,limit=180000)
         if not isinstance(draft,str) or not draft.strip():raise ValueError()
         with conn() as c:
             c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',
@@ -509,8 +541,8 @@ async def mevan_v3_analyze(req: Request):
     canonical={'version':'3.4-decision-gates','status':'DRAFT_NOT_APPROVED',
                'company':company,'rules':rules,'criteria':criteria,
                'independent_evidence_verified':False}
-    key=os.getenv('OPENAI_API_KEY','').strip()
-    if not key: raise HTTPException(503,'AI servis nije konfigurisan.')
+    ai=mevan_ai.active_config(DB)
+    if not ai:raise HTTPException(503,'AI servis nije konfigurisan.')
     prompt=(
       'Ti si ekspertni COO konsultant za industrijske kompanije. Vrati SAMO valjan JSON objekat '
       'sa tacno kljucevima executive_summary, systemic_findings, decisions, kpi_register, '
@@ -537,13 +569,8 @@ async def mevan_v3_analyze(req: Request):
           'messages':[{'role':'system','content':prompt},
                       {'role':'user','content':json.dumps(canonical,ensure_ascii=False)}],
           'response_format':{'type':'json_object'},'temperature':0.1,'max_tokens':4200}
-    request=urllib.request.Request('https://api.openai.com/v1/chat/completions',
-          data=json.dumps(body,ensure_ascii=False).encode('utf-8'),
-          headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'},method='POST')
     try:
-        with urllib.request.urlopen(request,timeout=85) as response:
-            answer=json.loads(response.read(250000))
-        draft=json.loads(answer['choices'][0]['message']['content'])
+        draft=json.loads(mevan_ai.chat(ai,body,timeout=85,limit=250000))
         if not isinstance(draft,dict): raise ValueError('Neispravan AI format')
         required={'executive_summary','systemic_findings','decisions','kpi_register','plan_30_60_90','consultant_questions'}
         if not required.issubset(draft): raise ValueError('Nepotpuna AI analiza')
