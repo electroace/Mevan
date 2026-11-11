@@ -144,7 +144,19 @@ JS = """<script id="mevan-nav-script">
  if(lang==='bs')return;
  // Fiksni natpisi (dugmad, naslovi, natpisi polja) prevode se čim se pojave. Unos korisnika se ne dira.
  var SKIP={SCRIPT:1,STYLE:1,TEXTAREA:1},ATTRS=['placeholder','aria-label','title'];
- function swap(value){var key=value.trim();return key&&Object.prototype.hasOwnProperty.call(words,key)?value.replace(key,words[key]):value}
+ var has=function(key){return Object.prototype.hasOwnProperty.call(words,key)};
+ var patterns=(window.MV_I18N_PATTERNS||[]).map(function(pair){return [new RegExp(pair[0]),pair[1]]});
+ var prefixes=Object.keys(words).filter(function(key){return /:$/.test(key)});
+ // Redom: tačan natpis, obrazac s brojevima, početak poruke („…:” + detalj), pa dijelovi odvojeni znakom „ · ”.
+ function phrase(key){
+  if(has(key))return words[key];
+  for(var i=0;i<patterns.length;i++){var found=patterns[i][0].exec(key);if(found)return patterns[i][1].replace(/\\$(\\d)/g,function(_,n){var part=found[+n]||'';return has(part)?words[part]:part})}
+  for(var j=0;j<prefixes.length;j++){if(key.indexOf(prefixes[j]+' ')===0)return words[prefixes[j]]+key.slice(prefixes[j].length)}
+  if(key.indexOf(' · ')>0){var parts=key.split(' · '),changed=false,out=parts.map(function(part){if(has(part)){changed=true;return words[part]}return part});if(changed)return out.join(' · ')}
+  return null;
+ }
+ function swap(value){var key=value.trim();if(!key)return value;var next=phrase(key);return next===null?value:value.replace(key,next)}
+ window.mvT=function(text){var next=phrase(String(text).trim());return next===null?text:next};
  function textNode(node){
   var parent=node.parentNode;if(!parent||SKIP[parent.nodeName]||parent.closest('[translate=no],.mv-user'))return;
   if(parent.nodeName==='OPTION'&&!parent.hasAttribute('value'))return; // tekst je ujedno vrijednost izbora

@@ -21,6 +21,7 @@ from diagnostic_engine import DIMENSIONS, analyze
 from mevan_test_approval import ApprovalError, read_approval
 from mevan_test_report_manifest import prepare_report_manifest
 from mevan_report_model import DEMO_LABEL
+from mevan_i18n import DEFAULT as DEFAULT_LANG, t
 
 PERIODS = ("1–30 dana", "31–60 dana", "61–90 dana")
 
@@ -61,8 +62,12 @@ def validate_review(diagnostic, *, for_approval=False):
     return review
 
 
-def report_content(db, approval_id, view):
-    """Sadržaj izvještaja iz zaključanog snimka. Izgled određuju render funkcije ispod."""
+def report_content(db, approval_id, view, lang=DEFAULT_LANG):
+    """Sadržaj izvještaja iz zaključanog snimka. Izgled određuju render funkcije ispod.
+
+    Jezik mijenja samo fiksne natpise; tekst konsultanta i podaci iz snimka ostaju kako su zaključani.
+    """
+    T = lambda text: t(lang, text)
     approval = read_approval(db, approval_id)
     ci, di = approval["company_index"], approval["diagnostic_index"]
     prepare_report_manifest(db, approval_id, ci, di)
@@ -80,18 +85,18 @@ def report_content(db, approval_id, view):
     dimensions = []
     for code, name in DIMENSIONS.items():
         dim = result['dimensions'][code]
-        dimensions.append({'name': name, 'index': dim['index'],
-                           'scope': f'primjenjivo {dim["applicable"]}, N/P {dim["na"]}' if modern else ''})
+        dimensions.append({'name': T(name), 'index': dim['index'],
+                           'scope': T('primjenjivo {a}, N/P {n}').format(a=dim["applicable"], n=dim["na"]) if modern else ''})
     scenarios = []
     for item in result["finance"]["excluded"]:
-        amount = (f'{item["oneoff"]} KM jednokratno' if item["category"] == "working_capital"
-                  else f'{item["annual"]} KM godišnje')
+        amount = (T('{v} KM jednokratno').format(v=item["oneoff"]) if item["category"] == "working_capital"
+                  else T('{v} KM godišnje').format(v=item["annual"]))
         scenarios.append({'name': str(item["name"]), 'amount': amount, 'reason': str(item["reason"])})
     criteria = []
     if view == "detailed":
         for r in records:
             code = r["criterion_id"]
-            collection = [(label, r.get('collection', {}).get(source, ''))
+            collection = [(T(label), r.get('collection', {}).get(source, ''))
                           for source, label in (('interview', 'Intervju'), ('documents', 'Dokumenti'), ('visit', 'Obilazak'))]
             if modern and r['verification_status'] == 'nije_primjenjivo':
                 criteria.append({'code': code, 'name': r.get("criterion_name", ""), 'score': None,
@@ -100,30 +105,31 @@ def report_content(db, approval_id, view):
             criteria.append({
                 'code': code, 'name': r.get("criterion_name", ""), 'score': r["score"],
                 'evidence': str(r["evidence_reference"]),
-                'source': f'Izvor {r.get("source_id", "simulacija" if demo else "")} · Period {r.get("reference_period_start", "—")} – {r.get("reference_period_end", "—")}',
-                'trace': f'{"Simulirani procjenjivač" if demo else "Procijenio"} {r.get("assessor_id", "DEMO")} · Trag {r.get("verification_audit_ref", "simulirani podaci")}',
-                'collection': [(label, str(note) if note else 'Nije prikupljeno') for label, note in collection] if modern else [],
+                'source': T('Izvor {s} · Period {a} – {b}').format(s=r.get("source_id", T("simulacija") if demo else ""), a=r.get("reference_period_start", "—"), b=r.get("reference_period_end", "—")),
+                'trace': f'{T("Simulirani procjenjivač") if demo else T("Procijenio")} {r.get("assessor_id", "DEMO")} · {T("Trag")} {r.get("verification_audit_ref", T("simulirani podaci"))}',
+                'collection': [(label, str(note) if note else T('Nije prikupljeno')) for label, note in collection] if modern else [],
                 'finding': str(diagnostic.get("assess", {}).get(code, {}).get("finding") or ''),
             })
     return {
         'demo': demo, 'modern': modern, 'view': view,
-        'kind': "Direktorski izvještaj" if view == "executive" else "Detaljni stručni izvještaj",
+        'lang': lang,
+        'kind': T("Direktorski izvještaj") if view == "executive" else T("Detaljni stručni izvještaj"),
         'company': company.get("company", {}).get("name") or company.get("id", ""),
         'diagnostic': f'{diagnostic.get("name", "")} · ID {approval["diagnostic_id"]}',
-        'meta': [("DEMO snimak" if demo else "Odobrenje", str(approval_id)),
-                 ("Revizija", str(approval["workspace_revision"])),
-                 ("Pripremio" if demo else "Konsultant", str(approval["reviewer_id"]))]
-                + ([("Zaključano (UTC)", datetime.fromtimestamp(approval["approved_at"], timezone.utc).strftime('%d.%m.%Y. %H:%M'))] if modern else []),
+        'meta': [(T("DEMO snimak") if demo else T("Odobrenje"), str(approval_id)),
+                 (T("Revizija"), str(approval["workspace_revision"])),
+                 (T("Pripremio") if demo else T("Konsultant"), str(approval["reviewer_id"]))]
+                + ([(T("Zaključano (UTC)"), datetime.fromtimestamp(approval["approved_at"], timezone.utc).strftime('%d.%m.%Y. %H:%M'))] if modern else []),
         'summary': review["summary"],
         'priorities': [review[f"priority{i}"] for i in range(1, 4)],
-        'selection': f'Odabrani prioritet: {guided.get("selected_candidate", "Nije odabran")} · Projektni nacrt: {guided.get("project_id", "Nije povezan")}' if modern else '',
+        'selection': f'{T("Odabrani prioritet")}: {guided.get("selected_candidate", T("Nije odabran"))} · {T("Projektni nacrt")}: {guided.get("project_id", T("Nije povezan"))}' if modern else '',
         'selected': {'C1': 0, 'C2': 1, 'C3': 2}.get(guided.get("selected_candidate")) if modern else None,
         'index': result["index"], 'criteria_count': len(records),
-        'scope': f'Primjenjivo {61 - len(na)}/61 · N/P {len(na)}. N/P je isključen iz nazivnika; nepoznato nije ocjena nula.' if modern else '',
+        'scope': T('Primjenjivo {a}/61 · N/P {n}. N/P je isključen iz nazivnika; nepoznato nije ocjena nula.').format(a=61 - len(na), n=len(na)) if modern else '',
         'dimensions': dimensions,
-        'not_applicable': [f'{row["criterion_id"]} · N/P · {row["na_reason"]} · Potvrdio konsultant: {row["na_approved_by"]}' for row in na],
+        'not_applicable': [T('{c} · N/P · {r} · Potvrdio konsultant: {w}').format(c=row["criterion_id"], r=row["na_reason"], w=row["na_approved_by"]) for row in na],
         'scenarios': scenarios,
-        'plan': [(period, review[f"month{i}"]) for i, period in enumerate(PERIODS, 1)],
+        'plan': [(T(period), review[f"month{i}"]) for i, period in enumerate(PERIODS, 1)],
         'criteria': criteria,
         'sha256': approval["sha256"],
     }
@@ -134,14 +140,17 @@ DEMO_FOOTER = DEMO_LABEL + ' — nije stvarni provjereni nalaz'
 INK, NAVY, TEAL, MUTED, LINE, SOFT, AMBER, AMBER_BG = '#1b2a38', '#142e46', '#0a6485', '#566b7c', '#d5dde4', '#eef2f5', '#8a4d00', '#fdf3df'
 
 
-def index_text(value):
-    return 'Neocjenjivo' if value is None else str(value)
+def _T(content):
+    """Prevodilac fiksnih natpisa za jezik izvještaja (bosanski ako jezik nije naveden)."""
+    lang = content.get('lang', DEFAULT_LANG)
+    return lambda text: t(lang, text)
 
 
 def overall_text(content):
+    T = _T(content)
     if content['index'] is None:
-        return 'Neocjenjivo — nema ocijenjenih primjenjivih kriterija' + f' · {content["criteria_count"]} kriterija'
-    return f'Ukupni indeks {content["index"]}/100 · {content["criteria_count"]} kriterija'
+        return T('Neocjenjivo — nema ocijenjenih primjenjivih kriterija · {n} kriterija').format(n=content["criteria_count"])
+    return T('Ukupni indeks {i}/100 · {n} kriterija').format(i=content["index"], n=content["criteria_count"])
 
 
 def chart_png(content):
@@ -159,7 +168,7 @@ def chart_png(content):
         if dim['scope']:
             draw.text((0, top + 44), dim['scope'], fill=MUTED, font=small_font)
         if dim['index'] is None:
-            draw.text((left, top + 6), 'Neocjenjivo', fill=MUTED, font=label_font)
+            draw.text((left, top + 6), _T(content)('Neocjenjivo'), fill=MUTED, font=label_font)
             continue
         draw.rectangle((left, top + 14, left + track, top + 38), fill=SOFT)
         draw.rectangle((left, top + 14, left + track * max(0, min(100, dim['index'])) / 100, top + 38), fill=TEAL)
@@ -180,9 +189,9 @@ def chart_png(content):
 class MaturityBars(Flowable):
     """Vektorske trake zrelosti; vrijednost je uvijek ispisana i kao tekst."""
 
-    def __init__(self, dimensions, width, fonts):
+    def __init__(self, dimensions, width, fonts, empty='Neocjenjivo'):
         super().__init__()
-        self.dimensions, self.width, self.fonts = dimensions, width, fonts
+        self.dimensions, self.width, self.fonts, self.empty = dimensions, width, fonts, empty
         self.row = 9.2 * mm
         self.height = self.row * len(dimensions) + 6 * mm
 
@@ -198,7 +207,7 @@ class MaturityBars(Flowable):
                 c.drawString(0, y - 1.7 * mm, dim['scope'])
             if dim['index'] is None:
                 c.setFillColor(colors.HexColor(MUTED)); c.setFont(self.fonts['body'], 9.5)
-                c.drawString(label_w, y, 'Neocjenjivo')
+                c.drawString(label_w, y, self.empty)
                 continue
             c.setFillColor(colors.HexColor(SOFT)); c.rect(label_w, y - .2 * mm, track, 2.6 * mm, stroke=0, fill=1)
             c.setFillColor(colors.HexColor(TEAL))
@@ -216,14 +225,14 @@ class MaturityBars(Flowable):
 class ScorePips(Flowable):
     """Ocjena 0–5 kao pet polja uz ispisanu vrijednost."""
 
-    def __init__(self, score, fonts):
+    def __init__(self, score, fonts, not_applicable='N/P'):
         super().__init__()
-        self.score, self.fonts, self.width, self.height = score, fonts, 34 * mm, 4.2 * mm
+        self.score, self.fonts, self.width, self.height, self.not_applicable = score, fonts, 34 * mm, 4.2 * mm, not_applicable
 
     def draw(self):
         c = self.canv
         c.setFont(self.fonts['bold'], 9.5); c.setFillColor(colors.HexColor(INK if self.score is not None else MUTED))
-        c.drawRightString(self.width, .6 * mm, 'N/P' if self.score is None else f'{self.score}/5')
+        c.drawRightString(self.width, .6 * mm, self.not_applicable if self.score is None else f'{self.score}/5')
         if self.score is None:
             return
         try:
@@ -237,7 +246,8 @@ class ScorePips(Flowable):
 
 def _numbered_canvas(content, fonts):
     """Zaglavlje i podnožje svake strane; ukupan broj strana poznat je tek na kraju."""
-    kind = (DEMO_LABEL + ' · ' if content['demo'] else '') + content['kind']
+    T = _T(content)
+    kind = (T(DEMO_LABEL) + ' · ' if content['demo'] else '') + content['kind']
 
     class ReportCanvas(Canvas):
         def __init__(self, *args, **kwargs):
@@ -271,11 +281,11 @@ def _numbered_canvas(content, fonts):
             self.line(left, 15 * mm, right, 15 * mm)
             self.setFont(fonts['body'], 7.5)
             if content['demo']:
-                self.setFillColor(colors.HexColor(AMBER)); self.drawString(left, 10.5 * mm, DEMO_FOOTER)
+                self.setFillColor(colors.HexColor(AMBER)); self.drawString(left, 10.5 * mm, T(DEMO_FOOTER))
             else:
                 self.setFillColor(colors.HexColor(MUTED)); self.drawString(left, 10.5 * mm, content['company'][:80])
             self.setFillColor(colors.HexColor(MUTED))
-            self.drawRightString(right, 10.5 * mm, f'Strana {self._pageNumber} / {total}')
+            self.drawRightString(right, 10.5 * mm, f'{T("Strana")} {self._pageNumber} / {total}')
             self.restoreState()
 
     return ReportCanvas
@@ -283,6 +293,7 @@ def _numbered_canvas(content, fonts):
 
 def render_pdf(content):
     fonts = register_pdf_fonts()
+    T = _T(content)
     def style(name, role='body', size=10, leading=None, color=INK, **extra):
         return ParagraphStyle(name, fontName=fonts[role], fontSize=size, leading=leading or size * 1.42,
                               textColor=colors.HexColor(color), **extra)
@@ -311,7 +322,7 @@ def render_pdf(content):
         return Paragraph(escape(str(value)).replace("\n", "<br/>"), s[name])
     counter = iter(range(1, 20))
     def section(title):
-        return Paragraph(f'<font name="{fonts["bold"]}" size="8.5" color="{TEAL}">{next(counter):02d}</font>&nbsp;&nbsp;&nbsp;{escape(title)}', s['section'])
+        return Paragraph(f'<font name="{fonts["bold"]}" size="8.5" color="{TEAL}">{next(counter):02d}</font>&nbsp;&nbsp;&nbsp;{escape(T(title))}', s['section'])
     page_width = A4[0] - 40 * mm
     hairline = lambda: Table([['']], colWidths=[page_width], rowHeights=[.1], style=TableStyle([('LINEABOVE', (0, 0), (-1, 0), .4, colors.HexColor(LINE))]))
 
@@ -323,23 +334,23 @@ def render_pdf(content):
                                          ('TOPPADDING', (0, 0), (-1, 0), 7), ('BOTTOMPADDING', (0, 0), (-1, 0), 1), ('TOPPADDING', (0, 1), (-1, 1), 0),
                                          ('BOTTOMPADDING', (0, 1), (-1, 1), 7), ('LEFTPADDING', (0, 0), (-1, -1), 0), ('RIGHTPADDING', (0, 0), (-1, -1), 8), ('VALIGN', (0, 0), (-1, -1), 'TOP')])))
     if content['demo']:
-        story.append(text(DEMO_NOTICE, 'notice'))
+        story.append(text(T(DEMO_NOTICE), 'notice'))
 
     story += [section('Sažetak konsultanta'), text(content['summary'])]
 
     story.append(section('Tri prioriteta'))
     for position, priority in enumerate(content['priorities']):
         if position == content['selected']:
-            story.append(text('ODABRAN ZA PROJEKAT', 'tag'))
+            story.append(text(T('ODABRAN ZA PROJEKAT'), 'tag'))
         story.append(Paragraph(escape(priority).replace("\n", "<br/>"), s['priority'], bulletText=str(position + 1)))
     if content['selection']:
         story.append(text(content['selection'], 'small'))
 
     story.append(section('Zrelost po oblastima'))
-    left = [text(index_text(content['index']) if content['index'] is not None else '—', 'big'), Spacer(1, 4), text(overall_text(content), 'small')]
+    left = [text(str(content['index']) if content['index'] is not None else '—', 'big'), Spacer(1, 4), text(overall_text(content), 'small')]
     if content['scope']:
         left.append(text(content['scope'], 'small'))
-    story.append(Table([[left, MaturityBars(content['dimensions'], page_width - 62 * mm, fonts)]], colWidths=[62 * mm, page_width - 62 * mm],
+    story.append(Table([[left, MaturityBars(content['dimensions'], page_width - 62 * mm, fonts, T('Neocjenjivo'))]], colWidths=[62 * mm, page_width - 62 * mm],
                        style=TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP'), ('LEFTPADDING', (0, 0), (-1, -1), 0), ('RIGHTPADDING', (0, 0), (0, 0), 10),
                                          ('RIGHTPADDING', (1, 0), (1, 0), 0), ('LEFTPADDING', (1, 0), (1, 0), 0), ('TOPPADDING', (0, 0), (-1, -1), 0), ('BOTTOMPADDING', (0, 0), (-1, -1), 0)])))
 
@@ -349,14 +360,14 @@ def render_pdf(content):
 
     story.append(section('Finansijski potencijal'))
     if content['scenarios']:
-        rows = [[text('SCENARIJ', 'head'), text('PROCJENA', 'head'), text('NAPOMENA', 'head')]]
-        rows += [[text(item['name'], 'cellbold'), text('procjena ' + item['amount'], 'cell'), text(item['reason'], 'cell')] for item in content['scenarios']]
+        rows = [[text(T('SCENARIJ'), 'head'), text(T('PROCJENA'), 'head'), text(T('NAPOMENA'), 'head')]]
+        rows += [[text(item['name'], 'cellbold'), text(T('procjena') + ' ' + item['amount'], 'cell'), text(item['reason'], 'cell')] for item in content['scenarios']]
         story.append(Table(rows, colWidths=[52 * mm, 40 * mm, page_width - 92 * mm], repeatRows=1,
                            style=TableStyle([('LINEBELOW', (0, 0), (-1, 0), .7, colors.HexColor(NAVY)), ('LINEBELOW', (0, 1), (-1, -1), .4, colors.HexColor(LINE)),
                                              ('VALIGN', (0, 0), (-1, -1), 'TOP'), ('LEFTPADDING', (0, 0), (-1, -1), 0), ('RIGHTPADDING', (0, 0), (-1, -1), 8),
                                              ('TOPPADDING', (0, 0), (-1, -1), 5), ('BOTTOMPADDING', (0, 0), (-1, -1), 5)])))
     else:
-        story.append(text('Nije evidentiran finansijski scenario.'))
+        story.append(text(T('Nije evidentiran finansijski scenario.')))
 
     story.append(section('Plan za 90 dana'))
     for period, plan in content['plan']:
@@ -368,9 +379,9 @@ def render_pdf(content):
         for item in content['criteria']:
             if item['code'][:1] != group:
                 group = item['code'][:1]
-                story.append(text(DIMENSIONS.get(group, group).upper(), 'group'))
-            title = f'{item["code"]} · {item["name"]}' + (' · N/P (isključeno iz obračuna)' if item['score'] is None else '')
-            story.append(Table([[text(title, 'criterion'), ScorePips(item['score'], fonts)]], colWidths=[page_width - 36 * mm, 36 * mm],
+                story.append(text(T(DIMENSIONS.get(group, group)).upper(), 'group'))
+            title = f'{item["code"]} · {item["name"]}' + (' · ' + T('N/P (isključeno iz obračuna)') if item['score'] is None else '')
+            story.append(Table([[text(title, 'criterion'), ScorePips(item['score'], fonts, T('N/P'))]], colWidths=[page_width - 36 * mm, 36 * mm],
                                style=TableStyle([('LINEABOVE', (0, 0), (-1, 0), .4, colors.HexColor(LINE)), ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                                                  ('LEFTPADDING', (0, 0), (-1, -1), 0), ('RIGHTPADDING', (0, 0), (-1, -1), 0), ('TOPPADDING', (0, 0), (-1, -1), 7), ('BOTTOMPADDING', (0, 0), (-1, -1), 3)])))
             if item['score'] is not None:
@@ -381,11 +392,11 @@ def render_pdf(content):
                 story += [Spacer(1, 3), text(item['finding'], 'cell')]
             story.append(Spacer(1, 6))
 
-    story += [hairline(), text('SHA-256 zaključanog snimka: ' + content['sha256'], 'hash')]
+    story += [hairline(), text(T('SHA-256 zaključanog snimka:') + ' ' + content['sha256'], 'hash')]
     buffer = BytesIO()
     # Okvir strane ima 6 pt unutrašnjeg razmaka; margine ga uračunavaju da tekst i tabele stoje u istoj liniji.
     SimpleDocTemplate(buffer, pagesize=A4, leftMargin=20 * mm - 6, rightMargin=20 * mm - 6, topMargin=24 * mm - 6, bottomMargin=22 * mm - 6,
-                      title=(DEMO_LABEL + ' · ' if content['demo'] else '') + content['kind'], author='MEVAN Diagnostic').build(story, canvasmaker=_numbered_canvas(content, fonts))
+                      title=(T(DEMO_LABEL) + ' · ' if content['demo'] else '') + content['kind'], author='MEVAN Diagnostic').build(story, canvasmaker=_numbered_canvas(content, fonts))
     return buffer.getvalue()
 
 
@@ -452,6 +463,7 @@ def docx_styles(document):
 
 
 def render_docx(content):
+    T = _T(content)
     document = Document()
     page = document.sections[0]
     page.page_width, page.page_height = Mm(210), Mm(297)
@@ -474,18 +486,18 @@ def render_docx(content):
         paragraph = document.add_paragraph(style='Heading 1')
         number = paragraph.add_run(f'{next(counter):02d}   ')
         number.font.name, number.font.size, number.font.color.rgb = SANS, Pt(9), _rgb(TEAL)
-        paragraph.add_run(title)
+        paragraph.add_run(T(title))
         _border(paragraph, 'top', LINE, space=8)
         return paragraph
 
     header = page.header.paragraphs[0]
-    header.text = DEMO_LABEL if content['demo'] else "MEVAN  /  Dijagnostika"
+    header.text = T(DEMO_LABEL) if content['demo'] else T("MEVAN  /  Dijagnostika")
     footer = page.footer.paragraphs[0]
-    footer.text = DEMO_FOOTER if content['demo'] else content['company']
+    footer.text = T(DEMO_FOOTER) if content['demo'] else content['company']
     for inherited in (Inches(3.25), Inches(6.5)):  # zadani graničnici stila podnožja
         footer.paragraph_format.tab_stops.add_tab_stop(inherited, WD_TAB_ALIGNMENT.CLEAR)
     footer.paragraph_format.tab_stops.add_tab_stop(text_width, WD_TAB_ALIGNMENT.RIGHT)
-    footer.add_run('\tStrana ')
+    footer.add_run('\t' + T('Strana') + ' ')
     _page_field(footer)
     for paragraph, colour in ((header, AMBER if content['demo'] else MUTED), (footer, AMBER if content['demo'] else MUTED)):
         for run in paragraph.runs:
@@ -506,7 +518,7 @@ def render_docx(content):
         if position == 0:
             _border(paragraph, 'top', LINE, space=6)
     if content['demo']:
-        notice = add(DEMO_NOTICE, size=9.5, colour=AMBER)
+        notice = add(T(DEMO_NOTICE), size=9.5, colour=AMBER)
         notice.paragraph_format.space_before = Pt(12)
         _shade(notice, AMBER_BG); _border(notice, 'left', AMBER, size=18, space=8)
 
@@ -522,7 +534,7 @@ def render_docx(content):
         number.font.bold, number.font.color.rgb = True, _rgb(TEAL)
         paragraph.add_run(priority)
         if position == content['selected']:
-            tag = paragraph.add_run('  — odabran za projekat')
+            tag = paragraph.add_run('  — ' + T('odabran za projekat'))
             tag.font.size, tag.font.bold, tag.font.color.rgb = Pt(8.5), True, _rgb(TEAL)
     if content['selection']:
         add(content['selection'], size=9, colour=MUTED)
@@ -534,7 +546,7 @@ def render_docx(content):
     for dim in content['dimensions']:
         paragraph = document.add_paragraph(style='Body Text')
         paragraph.paragraph_format.space_after = Pt(1)
-        value = f'{dim["index"]}/100' if dim['index'] is not None else 'Neocjenjivo'
+        value = f'{dim["index"]}/100' if dim['index'] is not None else T('Neocjenjivo')
         paragraph.add_run(f'{dim["name"]} · {value}')
         if dim['scope']:
             scope = paragraph.add_run(' · ' + dim['scope'])
@@ -550,11 +562,11 @@ def render_docx(content):
 
     section('Finansijski potencijal')
     if not content['scenarios']:
-        add('Nije evidentiran finansijski scenario.')
+        add(T('Nije evidentiran finansijski scenario.'))
     for item in content['scenarios']:
         paragraph = document.add_paragraph(style='Body Text')
         paragraph.add_run(item['name']).font.bold = True
-        paragraph.add_run(f' · procjena {item["amount"]} · {item["reason"]}')
+        paragraph.add_run(f' · {T("procjena")} {item["amount"]} · {item["reason"]}')
         _border(paragraph, 'bottom', LINE, size=4, space=3)
 
     section('Plan za 90 dana')
@@ -565,7 +577,7 @@ def render_docx(content):
     if content['criteria']:
         section('Ocjene i trag provjere dokaza')
         for item in content['criteria']:
-            heading = f'{item["code"]} · {item["name"]} · ' + ('N/P (isključeno iz obračuna)' if item['score'] is None else f'{item["score"]}/5')
+            heading = f'{item["code"]} · {item["name"]} · ' + (T('N/P (isključeno iz obračuna)') if item['score'] is None else f'{item["score"]}/5')
             _border(document.add_paragraph(heading, style='Heading 3'), 'top', LINE, size=4, space=5)
             if item['score'] is not None:
                 add(item['evidence'], after=3)
@@ -579,12 +591,12 @@ def render_docx(content):
             if item.get('finding'):
                 add(item['finding']).paragraph_format.space_before = Pt(4)
 
-    add('SHA-256 zaključanog snimka: ' + content['sha256'], size=8, colour=MUTED).paragraph_format.space_before = Pt(18)
+    add(T('SHA-256 zaključanog snimka:') + ' ' + content['sha256'], size=8, colour=MUTED).paragraph_format.space_before = Pt(18)
     buffer = BytesIO()
     document.save(buffer)
     return buffer.getvalue()
 
 
-def render(db, approval_id, view, fmt):
-    content = report_content(db, approval_id, view)
+def render(db, approval_id, view, fmt, lang=DEFAULT_LANG):
+    content = report_content(db, approval_id, view, lang)
     return render_docx(content) if fmt == "docx" else render_pdf(content)

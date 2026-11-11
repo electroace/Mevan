@@ -125,6 +125,158 @@ EN = {
 }
 
 
+# ---- korak 2: objašnjenja, upozorenja i poruke
+EN.update({
+    # zajedničko
+    'DEMO — simulirani podaci. Nije stvarno konsultantsko odobrenje niti provjera dokaza.': 'DEMO — simulated data. Not a real consultant approval or evidence check.',
+    'Prvi unos – METALPRO demo': 'First entry – METALPRO demo', 'Učitana pregledana serverska revizija': 'Reviewed server revision loaded',
+    'Greška sinhronizacije – izvezi JSON kopiju': 'Sync error – export a JSON copy', 'Neocjenjivo': 'Not scorable', 'Nije procijenjeno': 'Not assessed',
+    'Planiranje': 'Planning', 'Ljudi': 'People', 'Upravljanje': 'Management',
+    # kompanije, profil, pregled
+    'Lokalni radni prostor. Svaka kompanija ima zasebne procjene i historiju. Podaci se sinhronizuju sa privatnim serverom.': 'Local workspace. Each company has its own assessments and history. Data is synced with the private server.',
+    'Privatni testni radni prostor. Dokazi i pristup stvarnim klijentima zahtijevaju zasebnu provjeru.': 'Private test workspace. Evidence and access for real clients require a separate review.',
+    'Vraća izvornu METALPRO simulaciju i zamjenjuje sve lokalne podatke. Prije toga izvezite sigurnosnu kopiju.': 'Restores the original METALPRO simulation and replaces all local data. Export a backup first.',
+    'Podaci se čuvaju na privatnom serveru i lokalno kao rezervna kopija.': 'Data is stored on the private server and locally as a backup copy.',
+    'MEVAN Performance Excellence System · pregled procjene': 'MEVAN Performance Excellence System · assessment overview',
+    # modul i kriterij
+    'Upozorenja ne mijenjaju ocjene. Status „Potvrđeno“ je oznaka unosa konsultanta, a ne nezavisna verifikacija.': 'Warnings do not change scores. The “Confirmed” status is the consultant’s entry mark, not independent verification.',
+    'kriterija bez potpune ocjene/dokaza ·': 'criteria without a complete score/evidence ·', 'N/P bez obrazloženja ·': 'N/A without a reason ·', 'mogućih neslaganja': 'possible inconsistencies',
+    'Šta mjerimo:': 'What we measure:', 'Pokazatelj:': 'Indicator:', 'Dokazi koje treba tražiti:': 'Evidence to ask for:', 'Šta procjenjujemo:': 'What we assess:',
+    'Referentni period i opseg provjere navedite uz dokaz. Skala 0–5 je opća smjernica; ocjenu potvrdite prema stvarnom stanju, ne prema pretpostavci.': 'State the reference period and review scope with the evidence. The 0–5 scale is a general guide; confirm the score against the actual situation, not an assumption.',
+    'Ocjenjujte stvarno stanje za navedeni period i opseg; ako ne znate odgovor, ostavite „Nepoznato“, ne birajte nulu. Ocjena 5 zahtijeva dokaz kontinuiranog unapređenja.': 'Score the actual situation for the stated period and scope; if you do not know the answer, leave “Unknown” and do not choose zero. A score of 5 requires evidence of continuous improvement.',
+    '0 — Proces ne postoji ili se ne provodi': '0 — The process does not exist or is not carried out', '1 — Povremena, neformalna praksa': '1 — Occasional, informal practice',
+    '2 — Djelimično uvedeno, bez dosljednog praćenja': '2 — Partly introduced, without consistent tracking', '3 — Definisan proces koji se redovno provodi': '3 — A defined process that is carried out regularly',
+    '4 — Proces se mjeri, analizira i koriguje': '4 — The process is measured, analysed and corrected', '5 — Standardizovan proces s dokazanim kontinuiranim unapređenjem': '5 — A standardised process with proven continuous improvement',
+    'N/P zahtijeva konkretan razlog i imenovanu potvrdu konsultanta.': 'N/A requires a specific reason and a named consultant confirmation.',
+    'Ocjena mora biti cijeli broj od 0 do 5.': 'The score must be a whole number from 0 to 5.', 'Za status Potvrđeno navedite izvor i period dokaza.': 'For Confirmed status, state the evidence source and period.',
+    'Potvrđen odgovor zahtijeva ocjenu.': 'A confirmed answer requires a score.',
+    'Ocjena je unesena, ali dokaz nije provjeren. Ocjena ostaje preliminarna dok se dokaz ne validira.': 'A score is entered but the evidence is not verified. The score stays preliminary until the evidence is validated.',
+    'Obavezno za potvrdu: izvor, referentni period, dokument ili zapis': 'Required for confirmation: source, reference period, document or record',
+    'Predložena intervencija:': 'Suggested intervention:',
+    # finansijski efekti
+    'Finansijski efekti su HIPOTEZE dok nisu potkrijepljeni dokumentima i stručno potvrđeni. Preklapanja se isključuju iz validiranih zbirnih iznosa. Obrtni kapital nije godišnja ušteda.': 'Financial effects are HYPOTHESES until supported by documents and expert-confirmed. Overlaps are excluded from validated totals. Working capital is not an annual saving.',
+    'Potvrđene direktne godišnje uštede': 'Confirmed direct annual savings', 'Potvrđena dodatna kontribucija': 'Confirmed additional contribution', 'Potvrđen oslobođeni obrtni kapital': 'Confirmed released working capital',
+    'Bez označenog preklapanja': 'No overlap marked', 'UPOZORENJE: potencijalno dvostruko računanje': 'WARNING: potential double counting', 'moguće dvostruko računanje': 'possible double counting',
+    'Ukloniti nalaz?': 'Remove this finding?', 'Ukloni finansijski nalaz': 'Remove financial finding', 'Novi nalaz': 'New finding',
+    # analiza i odobravanje, izvještaji, plan
+    'Analiza po pravilima radi bez AI ključa. Generativni AI nacrt dostupan je samo kada je serverski servis konfigurisan. Svaki nacrt zahtijeva stručnu provjeru; odobravanje je i dalje demonstracijsko i nije namijenjeno stvarnim klijentima.': 'Rule-based analysis works without an AI key. A generative AI draft is available only when the server service is configured. Every draft requires expert review; approval is still a demonstration and is not intended for real clients.',
+    'Tok rada: pripremi nacrt → stručno uredi → odobri simulaciju → izvezi Word. Svaka promjena ocjena, finansijskih efekata ili odobrenog teksta poništava važenje prethodnog odobrenja.': 'Workflow: prepare a draft → edit professionally → approve the simulation → export Word. Any change to scores, financial effects or the approved text invalidates the previous approval.',
+    'Nacrt / nije odobreno': 'Draft / not approved', 'Interno odobren demo': 'Internally approved demo', 'Izmijenjeni podaci – potrebno ponovno odobrenje': 'Data changed – re-approval required',
+    'Izvještaj nije odobren.': 'The report is not approved.', 'Odobreno:': 'Approved:', 'Prvo pripremite nacrt.': 'Prepare a draft first.',
+    'Prije odobravanja završite sve primjenjive kriterije.': 'Complete all applicable criteria before approving.',
+    'Odobriti isključivo INTERNI SIMULACIJSKI izvještaj? Ovo nije validacija stvarnih dokaza.': 'Approve an INTERNAL SIMULATION report only? This is not validation of real evidence.',
+    'AI nacrt je pripremljen. Provjerite sve tvrdnje i uredite tekst prije odobravanja.': 'The AI draft is ready. Check every claim and edit the text before approving.', 'AI nacrt nije kreiran:': 'The AI draft was not created:',
+    'Godišnji efekti (različite kategorije)': 'Annual effects (different categories)', 'Oslobađanje obrtnog kapitala': 'Working capital release', 'NEVALIDIRANO': 'NOT VALIDATED',
+    'Efekti su ilustrativni, različitih tipova i zahtijevaju provjeru preklapanja i finansijskih pretpostavki. Oslobađanje gotovine nije prihod ni ušteda.': 'The effects are illustrative, of different types, and require a check of overlaps and financial assumptions. A cash release is neither revenue nor a saving.',
+    'Dostupan je stvarni Word DOCX izvoz za pojedinačne module i ukupnu dijagnostiku. Demonstracijska analiza i interno odobravanje dostupni su u zasebnom modulu. Pravi AI i sigurne korisničke uloge zahtijevaju serversku aplikaciju.': 'A real Word DOCX export is available for individual modules and the overall diagnostic. Demonstration analysis and internal approval are available in a separate module. Real AI and secure user roles require the server application.',
+    'Ovo je prototip. Finansijski iznosi su prikazani samo za izvornu METALPRO simulaciju. DOCX dokumenti su radni nacrti; bez provjerenih dokaza i stručnog odobrenja nisu validirana dijagnostika.': 'This is a prototype. Financial amounts are shown only for the original METALPRO simulation. DOCX documents are working drafts; without verified evidence and expert approval they are not a validated diagnostic.',
+    'Unesite aktivnosti, odgovorne osobe, rokove i KPI.': 'Enter activities, owners, due dates and KPIs.', 'Ukloniti aktivnost iz plana?': 'Remove this activity from the plan?', 'Ukloni aktivnost': 'Remove activity',
+    'Dozvolite otvaranje novog prozora.': 'Allow the new window to open.',
+    # integrisana analiza
+    'Radni nacrt. AI zaključci nisu nezavisno verificirani. Simulirani dokazi nisu stvarne potvrde; potrebna je stručna revizija prije upotrebe kod klijenta.': 'Working draft. AI conclusions are not independently verified. Simulated evidence is not real confirmation; expert review is required before client use.',
+    'Potencijali nisu realizovane koristi. Obrtni kapital nije EBITDA. Svi iznosi i statusi dolaze iz kontrolnog mehanizma.': 'Potentials are not realised benefits. Working capital is not EBITDA. All amounts and statuses come from the control mechanism.',
+    'Nezavisno potvrđeni godišnji efekti': 'Independently confirmed annual effects', 'Potvrđeni jednokratni efekti': 'Confirmed one-off effects', 'Scenariji na provjeri': 'Scenarios under review',
+    'Nema unesenih scenarija.': 'No scenarios entered.', 'Iznosi su isključivo simulirani ili nepotvrđeni scenariji. Nisu ostvarene koristi, nisu odobreni i ne sabiraju se.': 'The amounts are simulated or unconfirmed scenarios only. They are not realised benefits, are not approved and are not added up.',
+    'Prvo završite integrisanu dijagnostiku.': 'Complete the integrated diagnostic first.', 'Nije odabrana kompanija ili dijagnostika.': 'No company or diagnostic is selected.',
+    'Prijenos nije uspio. Provjerite dozvole preglednika.': 'The transfer failed. Check the browser permissions.', 'Prvo pokrenite kompletnu dijagnostiku.': 'Run the full diagnostic first.',
+    'Podaci su promijenjeni tokom analize. Ponovo pokrenite analizu.': 'The data changed during the analysis. Run the analysis again.',
+    # podaci i sigurnost, AI servis
+    'Ovaj demonstracijski prototip radi uz serversku prijavu i SQLite bazu; nije prošao produkcijsku sigurnosnu reviziju. Korisničke lozinke se ne ugrađuju u HTML. Kompanije i dijagnostike se sinhronizuju na server, a lokalna kopija ostaje u pregledniku. Nije pogodan za povjerljive podatke stvarnih klijenata.': 'This demonstration prototype runs with a server sign-in and an SQLite database; it has not passed a production security review. User passwords are not embedded in HTML. Companies and diagnostics are synced to the server, and a local copy stays in the browser. It is not suitable for confidential data of real clients.',
+    'Preuzmite kopiju prije većih izmjena. Vraćanje prepisuje sve trenutno spremljene podatke i traži izričitu potvrdu.': 'Download a copy before major changes. Restoring overwrites all currently stored data and asks for explicit confirmation.',
+    'Odaberite servis i unesite vlastiti API ključ. Ključ se čuva šifrovan na serveru, ne prikazuje se ponovo i nije dio sigurnosnih kopija. Kada pokrenete AI nacrt, podaci dijagnostike šalju se odabranom servisu.': 'Choose a service and enter your own API key. The key is stored encrypted on the server, is never shown again and is not part of backups. When you run an AI draft, the diagnostic data is sent to the selected service.',
+    'AI servis nije podešen. Analiza po pravilima radi i bez ključa.': 'The AI service is not set up. Rule-based analysis works without a key.', 'Ostavite prazno da zadržite postojeći': 'Leave empty to keep the existing key',
+    'AI postavke su sačuvane. Provjerite vezu prije prve upotrebe.': 'AI settings saved. Test the connection before first use.', 'AI postavke nisu sačuvane:': 'AI settings were not saved:',
+    'Prvo sačuvajte postavke, pa provjerite vezu.': 'Save the settings first, then test the connection.', 'Veza radi. Model:': 'The connection works. Model:', 'Provjera veze nije uspjela:': 'The connection test failed:',
+    'Ukloniti sačuvani API ključ i postavke AI servisa?': 'Remove the stored API key and AI service settings?', 'Ključ je uklonjen.': 'The key has been removed.', 'Ključ nije uklonjen:': 'The key was not removed:',
+    'Postavke AI servisa nisu učitane:': 'AI service settings could not be loaded:', 'Odaberite JSON sigurnosnu kopiju.': 'Choose a JSON backup file.',
+    'Vraćanje će PREPISATI sve trenutno spremljene podatke. Nastaviti?': 'Restoring will OVERWRITE all currently stored data. Continue?', 'Vraćanje sigurnosne kopije': 'Restore backup',
+    'Za potvrdu upišite: VRATI-PODATKE': 'To confirm, type: VRATI-PODATKE', 'Vrati podatke': 'Restore data', 'Vraćanje nije uspjelo:': 'Restore failed:',
+    'Podaci vraćeni. Stranica će se ponovo učitati.': 'Data restored. The page will reload.', 'Obrisati sve lokalne podatke?': 'Delete all local data?',
+    'Ovo će zamijeniti sve lokalne podatke DEMO simulacijom. Prvo izvezite sigurnosnu kopiju. Nastaviti?': 'This will replace all local data with the DEMO simulation. Export a backup first. Continue?', 'Vrati simulaciju': 'Restore simulation',
+    'Uvoz će zamijeniti sve lokalne podatke. Prvo izvezite postojeću kopiju. Nastaviti?': 'The import will replace all local data. Export the existing copy first. Continue?', 'Uvoz JSON kopije': 'Import JSON copy',
+    'Sigurnosna kopija je uvezena.': 'The backup has been imported.', 'Uvoz nije uspio:': 'Import failed:',
+    'Druga sesija je izmijenila radni prostor. Izvezite svoju lokalnu JSON kopiju prije ponovnog učitavanja.': 'Another session changed the workspace. Export your local JSON copy before reloading.',
+    # projekti
+    'Nacrti zahtijevaju odobrenje konsultanta · simulirani podaci nisu potvrđeni': 'Drafts require consultant approval · simulated data is not confirmed', 'TEST / DEMO.': 'TEST / DEMO.',
+    'Ovaj ekran ne potvrđuje finansijske efekte niti verifikuje dokaze. Označavanje kontrolnih polja je izjava konsultanta, ne nezavisna verifikacija.': 'This screen does not confirm financial effects or verify evidence. Ticking the control boxes is the consultant’s statement, not independent verification.',
+    'Nakon završene v3 dijagnostike kliknite „Pređi na izbor operativnog projekta“. Nalazi se prenose automatski. Ručni JSON ostaje samo za naprednu provjeru.': 'After the v3 diagnostic is complete, click “Go to operational project selection”. Findings are transferred automatically. Manual JSON remains only for advanced checks.',
+    'Serversko čuvanje je ručno. Lokalna kopija ostaje sačuvana u pregledniku. Učitavanje sa servera traži potvrdu.': 'Saving to the server is manual. A local copy stays in the browser. Loading from the server asks for confirmation.',
+    'Tri dugmeta ispod postaju aktivna kada se učitaju kandidati iz dijagnostike.': 'The three buttons below become active once candidates are loaded from the diagnostic.',
+    'AI nacrt traži unesen API ključ (Dijagnostika → Podaci i sigurnost → AI servis). Bez ključa koristite preliminarni nacrt.': 'An AI draft needs an API key (Diagnostic → Data & security → AI service). Without a key, use the preliminary draft.',
+    'Automatski AI paket generiše se kroz postojeći API. Ovaj ekran omogućava pregled i uređivanje spremljenih nacrta.': 'The automatic AI pack is generated through the existing API. This screen lets you review and edit saved drafts.',
+    'Kreirajte novi nacrt ili otvorite postojeći.': 'Create a new draft or open an existing one.', 'Izvještaj uključuje samo sačuvane podatke. Prije izvoza sačuvajte promjene.': 'The report includes saved data only. Save your changes before exporting.',
+    'Uredite aktivnosti u obrascu. Dodatna AI polja se čuvaju bez brisanja.': 'Edit activities in the form. Additional AI fields are kept and not deleted.', 'Cilj se ne smatra odobrenim dok ga konsultant ne potvrdi.': 'A target is not considered approved until the consultant confirms it.',
+    'Tri scenarija. Godišnje koristi i jednokratno oslobađanje obrtnog kapitala računaju se odvojeno. Nema potvrđenih efekata.': 'Three scenarios. Annual benefits and the one-off working capital release are calculated separately. There are no confirmed effects.',
+    'Implementacija se ne može odobriti bez sve tri potvrde. Odobreni projekat nije moguće uređivati bez nove verzije.': 'Implementation cannot be approved without all three confirmations. An approved project cannot be edited without a new version.',
+    'Unos je izjava konsultanta na osnovu navedenog dokaza. Nije nezavisna verifikacija. Periodi se ne godišnje preračunavaju niti automatski sabiraju bez provjere preklapanja.': 'An entry is the consultant’s statement based on the stated evidence. It is not independent verification. Periods are not annualised or added up automatically without an overlap check.',
+    'Konsultant je provjerio izvor i obračun (nije nezavisna verifikacija)': 'The consultant checked the source and the calculation (not independent verification)',
+    'Odaberite status i unesite rezultat za svaku projektnu aktivnost.': 'Choose a status and enter the result for each project activity.',
+    'Unesite izmjerene vrijednosti, period i izvor. Prazna vrijednost se ne prikazuje kao ostvarenje.': 'Enter the measured values, period and source. An empty value is not shown as an achievement.',
+    'Sedmična evidencija je izvještaj konsultanta; ne predstavlja nezavisno potvrđene finansijske efekte.': 'The weekly record is the consultant’s report; it does not represent independently confirmed financial effects.',
+    'Nacrt je sačuvan.': 'The draft has been saved.', 'Nacrt je kreiran; nije odobren za implementaciju.': 'The draft has been created; it is not approved for implementation.',
+    'Potvrđujete da su početno stanje, KPI ciljevi i obavezne provjere stvarno provjereni?': 'Do you confirm that the baseline, KPI targets and required checks have actually been verified?', 'Potvrđujem': 'I confirm',
+    'Sedmični pregled sačuvan kao evidencija konsultanta.': 'Weekly review saved as the consultant’s record.', 'Odaberite projekat': 'Select a project', 'Prvo odaberite projekat': 'Select a project first',
+    'Scenariji izračunati — sve su procjene, ništa nije potvrđeno.': 'Scenarios calculated — all are estimates, nothing is confirmed.', 'Finansijski scenariji sačuvani kao procjene.': 'Financial scenarios saved as estimates.',
+    'Projektni nacrt je sačuvan. Izbor i finansijski efekti nisu potvrđeni.': 'The project draft has been saved. The selection and financial effects are not confirmed.',
+    'Ocijenite najmanje jednog kandidata.': 'Score at least one candidate.', 'Nema ocijenjenih kandidata.': 'No candidates have been scored.', 'Prvo učitajte kandidate.': 'Load the candidates first.',
+    'Unesite identifikatore kompanije i dijagnostike.': 'Enter the company and diagnostic identifiers.', 'Serverski nacrt nije pronađen.': 'No server draft was found.',
+    # portfolio i vođeno prikupljanje
+    'Pregled projekata prijavljenog konsultanta. Procjene i potvrde nisu nezavisno verificirani rezultati.': 'Projects of the signed-in consultant. Estimates and confirmations are not independently verified results.',
+    'Pregledajte izvore, period i trag provjere svakog kriterija. Ocjene se prenose iz odabrane dijagnostike.': 'Review the sources, period and audit trail of each criterion. Scores are carried over from the selected diagnostic.',
+    'Plan za 90 dana dopunite prije kreiranja projektnog nacrta. Nacrt ne odobrava implementaciju ni finansijske efekte.': 'Complete the 90-day plan before creating the project draft. A draft does not approve implementation or financial effects.',
+    'Za novo odobrenje: sažetak najmanje 80 znakova i 12 riječi, svaki prioritet 40 znakova i 6 riječi, svaki period plana 60 znakova i 10 riječi; najviše 6000 znakova po polju. Zamjenske oznake i ponavljanja nisu dovoljni. Ovo je tehnička provjera potpunosti, a stručni pregled ostaje obaveza konsultanta.': 'For a new approval: the summary needs at least 80 characters and 12 words, each priority 40 characters and 6 words, each plan period 60 characters and 10 words; at most 6000 characters per field. Placeholders and repetition are not enough. This is a technical completeness check; the expert review remains the consultant’s responsibility.',
+    'Ulazne ocjene ili nalazi su promijenjeni. Pokrenuti novi pregled dokaza i plana? Prethodna odobrenja ostaju dostupna.': 'The input scores or findings have changed. Start a new review of evidence and plan? Previous approvals remain available.',
+    'Pregled je zaustavljen. Ranija odobrenja možete preuzeti ispod.': 'The review was stopped. You can download earlier approvals below.',
+    'Zaključati DEMO — simulirani podaci, bez stvarnog konsultantskog odobrenja?': 'Lock DEMO — simulated data, without a real consultant approval?',
+    'Potvrđujete pregled dokaza, tri prioriteta i 90-dnevnog plana ove dijagnostike?': 'Do you confirm the review of evidence, the three priorities and the 90-day plan of this diagnostic?',
+    'Odobri reviziju': 'Approve revision', 'Novi pregled': 'New review', 'Pokreni novi pregled': 'Start new review',
+})
+
+# ---- zaključani izvještaji (PDF i Word): fiksni natpisi; ključevi s {…} su obrasci za str.format
+EN.update({
+    'Direktorski izvještaj': 'Executive report', 'Detaljni stručni izvještaj': 'Detailed expert report', 'DEMO snimak': 'DEMO snapshot', 'Odobrenje': 'Approval',
+    'Revizija': 'Revision', 'Pripremio': 'Prepared by', 'Konsultant': 'Consultant', 'Zaključano (UTC)': 'Locked (UTC)', 'Odabrani prioritet': 'Selected priority',
+    'Nije odabran': 'Not selected', 'Projektni nacrt': 'Project draft', 'Nije povezan': 'Not linked', 'primjenjivo {a}, N/P {n}': 'applicable {a}, N/A {n}',
+    '{v} KM jednokratno': '{v} KM one-off', '{v} KM godišnje': '{v} KM per year', 'Intervju': 'Interview', 'Dokumenti': 'Documents', 'Obilazak': 'Site visit',
+    'Nije prikupljeno': 'Not collected', 'Izvor {s} · Period {a} – {b}': 'Source {s} · Period {a} – {b}', 'simulacija': 'simulation',
+    'Simulirani procjenjivač': 'Simulated assessor', 'Procijenio': 'Assessed by', 'Trag': 'Audit trail', 'simulirani podaci': 'simulated data',
+    'Primjenjivo {a}/61 · N/P {n}. N/P je isključen iz nazivnika; nepoznato nije ocjena nula.': 'Applicable {a}/61 · N/A {n}. N/A is excluded from the denominator; unknown is not a zero score.',
+    '{c} · N/P · {r} · Potvrdio konsultant: {w}': '{c} · N/A · {r} · Confirmed by consultant: {w}',
+    '1–30 dana': 'Days 1–30', '31–60 dana': 'Days 31–60', '61–90 dana': 'Days 61–90',
+    'Neocjenjivo — nema ocijenjenih primjenjivih kriterija · {n} kriterija': 'Not scorable — no applicable criteria have been scored · {n} criteria',
+    'Ukupni indeks {i}/100 · {n} kriterija': 'Overall index {i}/100 · {n} criteria', 'Strana': 'Page',
+    'DEMO — simulirani podaci — nije stvarno konsultantsko odobrenje, provjera dokaza ili potvrda finansijskog efekta.': 'DEMO — simulated data — not a real consultant approval, evidence check or confirmation of a financial effect.',
+    'DEMO — simulirani podaci — nije stvarni provjereni nalaz': 'DEMO — simulated data — not a real verified finding',
+    'Sažetak konsultanta': 'Consultant summary', 'Tri prioriteta': 'Three priorities', 'Zrelost po oblastima': 'Maturity by area',
+    'Nije primjenjivo — obuhvat i razlozi': 'Not applicable — scope and reasons', 'Finansijski potencijal': 'Financial potential', 'Plan za 90 dana': '90-day plan',
+    'Ocjene i trag provjere dokaza': 'Scores and evidence audit trail', 'ODABRAN ZA PROJEKAT': 'SELECTED FOR THE PROJECT', 'odabran za projekat': 'selected for the project',
+    'SCENARIJ': 'SCENARIO', 'PROCJENA': 'ESTIMATE', 'NAPOMENA': 'NOTE', 'procjena': 'estimate',
+    'Nije evidentiran finansijski scenario.': 'No financial scenario has been recorded.', 'N/P (isključeno iz obračuna)': 'N/A (excluded from the calculation)', 'N/P': 'N/A',
+    'SHA-256 zaključanog snimka:': 'SHA-256 of the locked snapshot:', 'MEVAN  /  Dijagnostika': 'MEVAN  /  Diagnostic',
+})
+
+# Tekstovi s brojevima: regularni izraz izvornog teksta i engleski oblik. Uhvaćeni dijelovi ($1…) se
+# dodatno prevode ako su sami u rječniku (npr. status). Redoslijed je bitan: prvi pogodak vrijedi.
+PATTERNS = [
+    (r'^(\d+) potvrđenih / (\d+) primjenjivih kriterija$', '$1 confirmed / $2 applicable criteria'),
+    (r'^Indeks (.+)$', 'Index $1'),
+    (r'^(\d+)/(\d+) potvrđeno$', '$1/$2 confirmed'),
+    (r'^Kriterij (\d+) od (\d+)$', 'Criterion $1 of $2'),
+    (r'^(\d+)/(\d+) validiranih · indeks (.+?)\. Izvještaj se može odobriti tek kada su svi primjenjivi kriteriji potvrđeni\.$',
+     '$1/$2 validated · index $3. The report can be approved only when all applicable criteria are confirmed.'),
+    (r'^(\S+) · (\d+)/61 potvrđenih$', '$1 · $2/61 confirmed'),
+    (r'^Potvrđeno (\d+)/(\d+) · Indeks (.+)$', 'Confirmed $1/$2 · Index $3'),
+    (r'^Procijenjeno (\d+)/(\d+) · Status: (.+)$', 'Assessed $1/$2 · Status: $3'),
+    (r'^Jasna pravila ocjenjivanja za (\S+)$', 'Clear scoring rules for $1'),
+    (r'^Potvrđeni izbjegnuti budući troškovi: (.+) KM godišnje \(odvojeno\)\. Nepotvrđeni: (\d+)\. S potencijalnim preklapanjem: (\d+)\.$',
+     'Confirmed avoided future costs: $1 KM per year (separate). Unconfirmed: $2. With potential overlap: $3.'),
+    (r'^(.+) KM godišnje$', '$1 KM per year'),
+    (r'^(.+) KM jednokratno$', '$1 KM one-off'),
+    (r'^Aktivno: (.+) · model (.+) · ključ završava na …(.+)$', 'Active: $1 · model $2 · key ends in …$3'),
+    (r'^Aktivno: ključ iz postavki servera · model (.+)\. Ključ unesen ovdje ima prednost\.$', 'Active: key from server settings · model $1. A key entered here takes precedence.'),
+    (r'^Novi status: (.+)$', 'New status: $1'),
+]
+
 def lang_of(request):
     value = request.cookies.get(COOKIE, '')
     return value if value in LANGS else DEFAULT
@@ -135,6 +287,7 @@ def t(lang, text):
 
 
 def client_script(lang):
-    """Jezik i rječnik za zajedničku skriptu. Na bosanskom se rječnik ne šalje."""
+    """Jezik, rječnik i obrasci za zajedničku skriptu. Na bosanskom se ne šalju."""
     words = json.dumps(EN if lang == 'en' else {}, ensure_ascii=False).replace('</', '<\\/')
-    return f'<script id="mevan-i18n">window.MV_LANG={json.dumps(lang)};window.MV_I18N={words};</script>'
+    patterns = json.dumps(PATTERNS if lang == 'en' else [], ensure_ascii=False).replace('</', '<\\/')
+    return f'<script id="mevan-i18n">window.MV_LANG={json.dumps(lang)};window.MV_I18N={words};window.MV_I18N_PATTERNS={patterns};</script>'

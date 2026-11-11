@@ -64,7 +64,9 @@ def test_login_page_follows_the_language(fx):
 
 
 def test_dictionary_keys_exist_in_the_interface_and_have_translations():
-    sources=''.join((ROOT/name).read_text(encoding='utf-8') for name in ('index.html','projects_ui.html','dashboard_ui.html','diagnostic_review.html','mevan_nav.py','server.py'))
+    sources=''.join((ROOT/name).read_text(encoding='utf-8') for name in ('index.html','projects_ui.html','dashboard_ui.html','diagnostic_review.html','mevan_nav.py','server.py','approved_reports.py','mevan_report_model.py'))
+    import approved_reports
+    sources+=approved_reports.DEMO_NOTICE+approved_reports.DEMO_FOOTER  # sastavljeni iz DEMO oznake
     missing=[key for key in mevan_i18n.EN if key not in sources]
     assert not missing,missing
     assert all(isinstance(value,str) and value.strip() for value in mevan_i18n.EN.values())
@@ -82,3 +84,47 @@ def test_translator_leaves_user_content_alone():
     index=(ROOT/'index.html').read_text(encoding='utf-8')
     for marked in ('<h1 translate="no">${esc(state.company.name','<select id="companySelect" translate="no">','<strong translate="no">${esc(x.name)}','<span class="fx-name" translate="no">'):
         assert marked in index,marked
+
+
+# ---- korak 2: tekstovi s brojevima i zaključani izvještaji
+
+def test_number_patterns_compile_and_keep_their_groups():
+    for source,target in mevan_i18n.PATTERNS:
+        groups=re.compile(source).groups
+        used={int(n) for n in re.findall(r'\$(\d)',target)}
+        assert used and max(used)<=groups,(source,target)
+    script=mevan_i18n.client_script('en')
+    assert 'window.MV_I18N_PATTERNS=[[' in script and mevan_i18n.client_script('bs').endswith('window.MV_I18N_PATTERNS=[];</script>')
+
+
+def test_format_templates_keep_the_same_placeholders():
+    for source,target in mevan_i18n.EN.items():
+        if re.search(r'\{[a-z]\}',source):
+            assert sorted(re.findall(r'\{[a-z]\}',source))==sorted(re.findall(r'\{[a-z]\}',target)),source
+
+
+from test_package2 import api, approve, doc_text, save  # noqa: E402,F401  (postojeći pomoćnici za zaključani izvještaj)
+from test_approved_delivery import diagnostic  # noqa: E402
+
+
+@pytest.mark.parametrize('fmt',['pdf','docx'])
+def test_locked_report_labels_follow_the_language_but_content_does_not(api,fmt):
+    client,_,tmp_path=api
+    d=diagnostic('QA-jezik')
+    assert save(client,d).status_code==200
+    aid=approve(client).json()['approval_id']
+    bosnian,_,_=doc_text(client,aid,'detailed',fmt,tmp_path)
+    english,_,_=doc_text(client,aid,'detailed',fmt,tmp_path,'?lang=en')
+    flat=lambda text:' '.join(text.split())
+    for label in ('Sažetak konsultanta','Tri prioriteta','Zrelost po oblastima','Plan za 90 dana','Ocjene i trag provjere dokaza','SHA-256 zaključanog snimka:'):
+        assert label in flat(bosnian) and label not in flat(english),label
+    for label in ('Consultant summary','Three priorities','Maturity by area','90-day plan','Scores and evidence audit trail','SHA-256 of the locked snapshot:','Overall index','Days 1–30','Finance'):
+        assert label in flat(english),label
+    # Tekst konsultanta i podaci snimka su isti na oba jezika.
+    review=d['consultant_review']
+    for own in (review['summary'],review['priority1'],review['month3']):
+        assert flat(own) in flat(bosnian) and flat(own) in flat(english)
+    client.cookies.set(mevan_i18n.COOKIE,'en')
+    by_cookie,_,_=doc_text(client,aid,'detailed',fmt,tmp_path)
+    assert 'Consultant summary' in flat(by_cookie)
+    assert 'Sažetak konsultanta' in flat(doc_text(client,aid,'detailed',fmt,tmp_path,'?lang=bs')[0])

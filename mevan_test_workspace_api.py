@@ -112,12 +112,15 @@ def create_test_router(
                     for id_, rev, who, diag, mode in rows]
 
     @router.get("/approvals/{approval_id}/{view}/{fmt}")
-    def download(approval_id: int, view: Literal["executive", "detailed"], fmt: Literal["pdf", "docx"]):
+    def download(request: Request, approval_id: int, view: Literal["executive", "detailed"], fmt: Literal["pdf", "docx"], lang: str | None = None):
+        # Jezik fiksnih natpisa: parametar ?lang= ili jezik odabran u aplikaciji. Sadržaj snimka je isti.
         from approved_reports import render
+        import mevan_i18n
+        language = lang if lang in mevan_i18n.LANGS else mevan_i18n.lang_of(request)
         with closing(connect()) as db:
             init_approval_store(db)
             try:
-                content = render(db, approval_id, view, fmt)
+                content = render(db, approval_id, view, fmt, language)
                 from mevan_test_approval import read_approval
                 mode=read_approval(db,approval_id)['report_mode']
             except (ApprovalError, ReportPreparationBlocked) as exc:
