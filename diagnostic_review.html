@@ -6,7 +6,7 @@
 <!--MEVAN_SHELL_START--><div class="rv-page"><h1 class="mv-title">Konsultantska provjera</h1>
 <p id="notice" role="status" aria-live="polite">Učitavanje…</p>
 <main id="editor" hidden>
-<h2 id="identity"></h2>
+<h2 id="identity" translate="no"></h2>
 <section><label for="reportMode">Način izvještaja</label><select id="reportMode"><option value="real">Stvarni konsultantski pregled</option><option value="demo">DEMO — simulirani podaci</option></select><p id="modeNotice"></p><button id="demoExample" class="btn secondary" type="button" hidden>Pripremi METALPRO DEMO primjer</button></section>
 <section><label for="guidedStage">Korak vođenog prikupljanja</label><select id="guidedStage"><option value="interview">1. Intervju</option><option value="documents">2. Dokumenti</option><option value="visit">3. Obilazak</option><option value="evidence">4. Dokazi i ocjene</option><option value="priorities">5. Tri prioriteta</option><option value="project">6. Odabrani projekat</option><option value="plan">7. Plan za 90 dana</option></select><p id="missing" role="status"></p><button id="nextStage" class="btn" type="button">Sačuvaj i nastavi</button></section>
 <section id="evidenceSection"><h3>Dokazi za ocjene</h3><p>Pregledajte izvore, period i trag provjere svakog kriterija. Ocjene se prenose iz odabrane dijagnostike.</p><div id="records"></div></section>
@@ -15,7 +15,7 @@
 <section id="projectSection" hidden><h3>Odabrani projekat iz tri prioriteta</h3><label for="projectChoice">Prioritet za projekat</label><select id="projectChoice"><option value="C1">Prvi prioritet</option><option value="C2">Drugi prioritet</option><option value="C3">Treći prioritet</option></select><label for="projectOwner">Vlasnik aktivnosti</label><input id="projectOwner"><label for="projectStart">Početak plana</label><input id="projectStart" type="date"><label for="projectKpi">KPI i način potvrde početnog stanja</label><textarea id="projectKpi"></textarea><p>Plan za 90 dana dopunite prije kreiranja projektnog nacrta. Nacrt ne odobrava implementaciju ni finansijske efekte.</p><button id="createGuidedProject" class="btn secondary" type="button">Sačuvaj odabrani projektni nacrt</button><p id="projectLink"></p></section>
 <button id="save" class="btn secondary">Sačuvaj radnu reviziju</button> <button id="approve" class="btn">Odobri pregledanu reviziju</button>
 </main>
-<section><h2>Odobrene revizije</h2><div id="downloads"></div></section>
+<section><h2>Odobrene revizije</h2><div id="downloads" translate="no"></div></section>
 </div><!--MEVAN_SHELL_END-->
 <script>
 const get=id=>document.getElementById(id);

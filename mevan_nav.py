@@ -6,6 +6,8 @@ nazivi i izgled menija. Funkcije stranica ostaju u njihovim HTML datotekama.
 """
 from html import escape
 
+from mevan_i18n import DEFAULT as DEFAULT_LANG, client_script, t
+
 # Stavke glavnog ekrana (index.html) otvaraju se preko data-page; na ostalim
 # ekranima isti link vodi na glavni ekran s oznakom stranice u adresi (/#...).
 MODULES = (
@@ -30,6 +32,10 @@ body{margin:0;max-width:none;padding:0;background:var(--mv-bg);color:var(--mv-in
 .mv-top .mv-user{color:#fff;font-size:13px;line-height:1.25;text-align:right;min-width:0;max-width:34vw;border-left:1px solid #3d5870;padding-left:14px}
 .mv-top .mv-user small{display:block;color:#b9c9d7;font-size:11px}
 .mv-top .mv-user b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mv-top .mv-lang{display:flex;gap:2px;border:1px solid #3d5870;border-radius:9px;padding:2px;flex:none}
+.mv-top .mv-lang a{color:#b9c9d7;font:650 12px/1 Inter,system-ui,sans-serif;text-decoration:none;padding:7px 9px;border-radius:7px}
+.mv-top .mv-lang a[aria-current=true]{background:#fff;color:#142e46}
+.mv-top .mv-lang a:focus-visible{outline:3px solid #7cc4e0;outline-offset:2px}
 .mv-top .mv-toggle{all:unset;display:none;box-sizing:border-box;cursor:pointer;color:#fff;border:1px solid #5b7890;border-radius:9px;padding:9px 14px;font:650 14px Inter,system-ui,sans-serif}
 .mv-top .mv-toggle:focus-visible{outline:3px solid #7cc4e0;outline-offset:2px}
 .mv-nav .mv-item:focus-visible,.mv-nav .mv-logout:focus-visible{outline:3px solid var(--mv-brand);outline-offset:-2px}
@@ -108,7 +114,9 @@ body{margin:0;max-width:none;padding:0;background:var(--mv-bg);color:var(--mv-in
 @media(max-width:1000px){
 .mv-top .mv-toggle{display:inline-block}
 .mv-top .mv-meta,.mv-top .mv-sub,.mv-top .mv-user small{display:none}
-.mv-top .mv-user{border-left:0;padding-left:0;max-width:40vw;font-size:12px}
+.mv-top .mv-user{border-left:0;padding-left:0;max-width:26vw;font-size:12px}
+.mv-top .mv-logo span{display:none}
+.mv-top{gap:10px}
 .mv-top{padding:10px 12px}
 .mv-shell{display:block;padding:14px 12px}
 .mv-nav{position:fixed;z-index:1000;top:0;left:0;bottom:0;width:min(300px,86vw);max-height:none;border-radius:0 14px 14px 0;transform:translateX(-105%);transition:transform .18s ease;visibility:hidden}
@@ -126,6 +134,32 @@ body{margin:0;max-width:none;padding:0;background:var(--mv-bg);color:var(--mv-in
 </style>"""
 
 JS = """<script id="mevan-nav-script">
+// Jezik: mvT vraća prevod izvornog (bosanskog) teksta ako postoji; inače isti tekst.
+(function(){
+ var lang=window.MV_LANG||'bs',words=window.MV_I18N||{};
+ window.mvT=function(text){return (lang!=='bs'&&Object.prototype.hasOwnProperty.call(words,text))?words[text]:text};
+ document.querySelectorAll('.mv-lang a').forEach(function(link){link.addEventListener('click',function(e){
+  e.preventDefault();document.cookie='mevan_lang='+link.dataset.lang+';path=/;max-age=31536000;samesite=lax';location.reload();
+ })});
+ if(lang==='bs')return;
+ // Fiksni natpisi (dugmad, naslovi, natpisi polja) prevode se čim se pojave. Unos korisnika se ne dira.
+ var SKIP={SCRIPT:1,STYLE:1,TEXTAREA:1},ATTRS=['placeholder','aria-label','title'];
+ function swap(value){var key=value.trim();return key&&Object.prototype.hasOwnProperty.call(words,key)?value.replace(key,words[key]):value}
+ function textNode(node){
+  var parent=node.parentNode;if(!parent||SKIP[parent.nodeName]||parent.closest('[translate=no],.mv-user'))return;
+  if(parent.nodeName==='OPTION'&&!parent.hasAttribute('value'))return; // tekst je ujedno vrijednost izbora
+  var next=swap(node.nodeValue);if(next!==node.nodeValue)node.nodeValue=next;
+ }
+ function attributes(element){ATTRS.forEach(function(name){var value=element.getAttribute(name);if(value){var next=swap(value);if(next!==value)element.setAttribute(name,next)}})}
+ function translate(root){
+  if(root.nodeType===3)return textNode(root);
+  if(root.nodeType!==1)return;
+  var walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),node;while((node=walker.nextNode()))textNode(node);
+  attributes(root);root.querySelectorAll('[placeholder],[aria-label],[title]').forEach(attributes);
+ }
+ translate(document.body);
+ new MutationObserver(function(changes){changes.forEach(function(change){change.addedNodes.forEach(translate)})}).observe(document.body,{childList:true,subtree:true});
+})();
 (function(){
  var root=document.documentElement,toggle=document.getElementById('mvToggle'),nav=document.getElementById('mvNav'),backdrop=document.getElementById('mvBackdrop');
  // Meni staje u visinu ekrana ispod zaglavlja, pa je „Odjava” vidljiva bez pomjeranja stranice.
@@ -150,18 +184,18 @@ JS = """<script id="mevan-nav-script">
  window.mvNotify=function(message,isError){
   var item=document.createElement('div'),text=document.createElement('span'),close=document.createElement('button');
   item.className='mv-toast'+(isError?' is-error':'');if(isError)item.setAttribute('role','alert');
-  text.textContent=String(message);close.type='button';close.textContent='×';close.setAttribute('aria-label','Zatvori poruku');
+  text.textContent=mvT(String(message));close.type='button';close.textContent='×';close.setAttribute('aria-label',mvT('Zatvori poruku'));
   close.onclick=function(){item.remove()};item.append(text,close);toasts.append(item);
   if(!isError)setTimeout(function(){item.remove()},7000);
  };
  function ask(options){
   return new Promise(function(resolve){
    var input=dialog.querySelector('input'),label=dialog.querySelector('label'),ok=dialog.querySelector('[value=ok]');
-   dialog.querySelector('h2').textContent=options.title||'Potvrda';
-   dialog.querySelector('p').textContent=options.message||'';dialog.querySelector('p').hidden=!options.message;
+   dialog.querySelector('h2').textContent=mvT(options.title||'Potvrda');
+   dialog.querySelector('p').textContent=mvT(options.message||'');dialog.querySelector('p').hidden=!options.message;
    var wantsText=options.label!==undefined;label.hidden=input.hidden=!wantsText;
-   label.textContent=options.label||'';input.value=options.value||'';
-   ok.textContent=options.okLabel||'Potvrdi';dialog.classList.toggle('is-danger',!!options.danger);
+   label.textContent=mvT(options.label||'');input.value=options.value||'';
+   ok.textContent=mvT(options.okLabel||'Potvrdi');dialog.classList.toggle('is-danger',!!options.danger);
    dialog.returnValue='cancel';
    dialog.onclose=function(){var yes=dialog.returnValue==='ok';resolve(wantsText?(yes?input.value:null):yes)};
    dialog.showModal();(wantsText?input:dialog.querySelector('[value=cancel]')).focus();if(wantsText)input.select();
@@ -192,7 +226,11 @@ JS = """<script id="mevan-nav-script">
 </script>"""
 
 
-def _page(key, label, on_diagnostic):
+SCREEN_PATHS = {'diagnostic': '/', 'guided': '/diagnostic-review', 'projects': '/projects-ui', 'portfolio': '/dashboard-ui'}
+LANG_NAMES = (('bs', 'BS', 'Bosanski'), ('en', 'EN', 'English'))
+
+
+def _page(key, label):
     # Na glavnom ekranu stavku aktivira postojeći render(); drugdje je običan link.
     return f'<a class="mv-item" href="/#{escape(key)}" data-page="{escape(key)}">{escape(label)}</a>'
 
@@ -202,59 +240,72 @@ def _screen(href, label, active):
     return f'<a class="mv-item" href="{href}"{current}>{escape(label)}</a>'
 
 
-def nav_html(active: str) -> str:
+def nav_html(active: str, lang: str = DEFAULT_LANG) -> str:
     if active not in SCREENS:
         raise ValueError('Nepoznat ekran za meni')
-    diag = active == 'diagnostic'
-    modules = ''.join(_page('m:' + key, label, diag) for key, label in MODULES)
+    T = lambda text: t(lang, text)
+    modules = ''.join(_page('m:' + key, T(label)) for key, label in MODULES)
     guided_current = ' aria-current="page"' if active == 'guided' else ''
     guided = ('<button type="button" class="mv-item" data-mv-guided'
-              ' aria-label="Vođeno prikupljanje i završni izvještaji"'
-              f'{guided_current}>Vođeno prikupljanje</button>')
+              f' aria-label="{escape(T("Vođeno prikupljanje i završni izvještaji"))}"'
+              f'{guided_current}>{escape(T("Vođeno prikupljanje"))}</button>')
     groups = (
-        ('Kompanija', _page('workspace', 'Kompanije i dijagnostike', diag) + _page('company', 'Profil kompanije', diag)),
-        ('Procjena', _page('overview', 'Pregled', diag) + f'<div id="navModules">{modules}</div>'
-         + _page('finance', 'Finansijski efekti', diag)),
-        ('Analiza i izvještaji', guided + _page('v2', 'Integrisana analiza (AI)', diag)
-         + _page('review', 'Analiza i odobravanje', diag) + _page('report', 'Izvještaji', diag)
-         + _page('plan', 'Plan 90 dana', diag)),
-        ('Projekti', _screen('/projects-ui', 'Projekti', active == 'projects')
-         + _screen('/dashboard-ui', 'Pregled portfolija', active == 'portfolio')),
+        ('Kompanija', _page('workspace', T('Kompanije i dijagnostike')) + _page('company', T('Profil kompanije'))),
+        ('Procjena', _page('overview', T('Pregled')) + f'<div id="navModules">{modules}</div>'
+         + _page('finance', T('Finansijski efekti'))),
+        ('Analiza i izvještaji', guided + _page('v2', T('Integrisana analiza (AI)'))
+         + _page('review', T('Analiza i odobravanje')) + _page('report', T('Izvještaji'))
+         + _page('plan', T('Plan 90 dana'))),
+        ('Projekti', _screen('/projects-ui', T('Projekti'), active == 'projects')
+         + _screen('/dashboard-ui', T('Pregled portfolija'), active == 'portfolio')),
     )
-    body = ''.join(f'<div class="mv-group"><p class="mv-label">{escape(title)}</p>{items}</div>'
+    body = ''.join(f'<div class="mv-group"><p class="mv-label">{escape(T(title))}</p>{items}</div>'
                    for title, items in groups)
-    foot = ('<div class="mv-foot">' + _page('data', 'Podaci i sigurnost', diag)
+    foot = ('<div class="mv-foot">' + _page('data', T('Podaci i sigurnost'))
             + '<form method="post" action="/logout"><input type="hidden" name="csrf_token" value="__MEVAN_LOGOUT_TOKEN__">'
-            '<button class="mv-logout" type="submit">Odjava</button></form></div>')
-    return f'<nav class="mv-nav" id="mvNav" aria-label="Glavni meni">{body}{foot}</nav>'
+            f'<button class="mv-logout" type="submit">{escape(T("Odjava"))}</button></form></div>')
+    return f'<nav class="mv-nav" id="mvNav" aria-label="{escape(T("Glavni meni"))}">{body}{foot}</nav>'
 
 
-def shell_start(active: str, user: str = '') -> str:
-    # Prijavljeni korisnik stoji u vrhu svakog ekrana; bez korisnika (npr. u testu izgleda) blok se izostavlja.
-    who = (f'<div class="mv-user" title="{escape(user)}"><small>Prijavljeni korisnik</small><b>{escape(user)}</b></div>' if user else '')
+def language_switch(lang: str, path: str) -> str:
+    """Izbor jezika. Link radi i bez skripte; sa skriptom ostaje na istoj stranici i oznaci (#)."""
+    items = ''.join(f'<a href="/lang/{code}?next={escape(path)}" data-lang="{code}" lang="{code}" title="{name}"'
+                    f'{" aria-current=\"true\"" if code == lang else ""}>{short}</a>' for code, short, name in LANG_NAMES)
+    return f'<div class="mv-lang" role="group" aria-label="Jezik / Language">{items}</div>'
+
+
+def shell_start(active: str, user: str = '', lang: str = DEFAULT_LANG) -> str:
+    # Prijavljeni korisnik i izbor jezika stoje u vrhu svakog ekrana; bez korisnika (npr. u testu izgleda) blok se izostavlja.
+    T = lambda text: t(lang, text)
+    who = (f'<div class="mv-user" title="{escape(user)}"><small>{escape(T("Prijavljeni korisnik"))}</small><b>{escape(user)}</b></div>' if user else '')
     return ('<header class="mv-top">'
-            '<button type="button" class="mv-toggle" id="mvToggle" aria-controls="mvNav" aria-expanded="false">Meni</button>'
+            f'<button type="button" class="mv-toggle" id="mvToggle" aria-controls="mvNav" aria-expanded="false">{escape(T("Meni"))}</button>'
             '<div class="mv-brand"><div class="mv-logo">MEVAN <span>DIAGNOSTIC</span></div>'
             '<div class="mv-sub">Operational &amp; Business Performance Transformation · PRIVATE DEMO v2.0 · SIMULACIJA</div></div>'
-            '<div class="mv-meta">61 kriterij · 5 dimenzija · BS</div>' + who + '</header>'
+            f'<div class="mv-meta">{escape(T("61 kriterij · 5 dimenzija"))}</div>' + who + language_switch(lang, SCREEN_PATHS[active]) + '</header>'
             '<div class="mv-backdrop" id="mvBackdrop"></div>'
-            f'<div class="mv-shell">{nav_html(active)}<div class="mv-main">')
+            f'<div class="mv-shell">{nav_html(active, lang)}<div class="mv-main">')
 
 
-OVERLAYS = ('<div class="mv-toasts" id="mvToasts" aria-live="polite"></div>'
+def overlays(lang: str = DEFAULT_LANG) -> str:
+    return ('<div class="mv-toasts" id="mvToasts" aria-live="polite"></div>'
             '<dialog class="mv-dialog" id="mvDialog" aria-labelledby="mvDialogTitle"><form method="dialog">'
             '<h2 id="mvDialogTitle"></h2><p></p><label for="mvDialogInput"></label><input id="mvDialogInput" autocomplete="off">'
-            '<div class="mv-actions"><button value="ok">Potvrdi</button><button value="cancel" formnovalidate>Odustani</button></div>'
+            f'<div class="mv-actions"><button value="ok">{escape(t(lang, "Potvrdi"))}</button>'
+            f'<button value="cancel" formnovalidate>{escape(t(lang, "Odustani"))}</button></div>'
             '</form></dialog>')
 
+
+OVERLAYS = overlays()
 SHELL_END = '</div></div>' + OVERLAYS + JS
 
 
-def render_page(html: str, active: str, user: str = '') -> str:
+def render_page(html: str, active: str, user: str = '', lang: str = DEFAULT_LANG) -> str:
     """Ubaci zajednički meni u stranicu koja ima tri oznake mjesta."""
     for marker in ('<!--MEVAN_NAV_CSS-->', '<!--MEVAN_SHELL_START-->', '<!--MEVAN_SHELL_END-->'):
         if html.count(marker) != 1:
             raise ValueError('Stranica nema ispravnu oznaku menija: ' + marker)
-    return (html.replace('<!--MEVAN_NAV_CSS-->', CSS)
-                .replace('<!--MEVAN_SHELL_START-->', shell_start(active, user))
-                .replace('<!--MEVAN_SHELL_END-->', SHELL_END))
+    return (html.replace('<html lang="bs">', f'<html lang="{lang}">', 1)
+                .replace('<!--MEVAN_NAV_CSS-->', CSS + client_script(lang))
+                .replace('<!--MEVAN_SHELL_START-->', shell_start(active, user, lang))
+                .replace('<!--MEVAN_SHELL_END-->', '</div></div>' + overlays(lang) + JS))

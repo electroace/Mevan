@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from diagnostic_engine import analyze
 from mevan_nav import render_page
 import mevan_ai
+import mevan_i18n
 
 BASE=Path(__file__).parent
 DB=Path(os.getenv('MEVAN_DB',str(BASE/'mevan.sqlite3')))
@@ -105,17 +106,33 @@ label{display:block;font-size:13px;font-weight:650;margin:12px 0 5px}
 input{width:100%;min-height:44px;padding:10px;border:1px solid #b3c3d0;border-radius:8px;font:inherit;color:inherit}
 button{width:100%;min-height:44px;margin-top:18px;border:1px solid #0a6485;border-radius:9px;background:#0a6485;color:#fff;font:650 15px/1.2 inherit;font-family:inherit;cursor:pointer}
 button:hover{background:#085673}input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #0a6485;outline-offset:2px}
-.error{color:#a42121;background:#fdf0f0;border:1px solid #dcaaaa;border-radius:8px;padding:10px 12px;margin:0 0 4px;font-size:14px}a{color:#0a6485}
-</style></head><body><header><div class="logo">MEVAN <span>DIAGNOSTIC</span></div></header><main><form method="post" action="/login"><input type="hidden" name="csrf_token" value="__CSRF_TOKEN__"><h1>Prijava</h1><p>Privatni demonstracijski pristup</p>__ERROR__<label for="email">E-mail</label><input id="email" name="email" type="email" required autocomplete="username"><label for="password">Lozinka</label><input id="password" name="password" type="password" required autocomplete="current-password"><button>Prijavi se</button></form></main></body></html>'''
+.lang{margin:16px 0 0;text-align:center;font-size:13px}.error{color:#a42121;background:#fdf0f0;border:1px solid #dcaaaa;border-radius:8px;padding:10px 12px;margin:0 0 4px;font-size:14px}a{color:#0a6485}
+</style></head><body><header><div class="logo">MEVAN <span>DIAGNOSTIC</span></div></header><main><form method="post" action="/login"><input type="hidden" name="csrf_token" value="__CSRF_TOKEN__"><h1>Prijava</h1><p>Privatni demonstracijski pristup</p>__ERROR__<label for="email">E-mail</label><input id="email" name="email" type="email" required autocomplete="username"><label for="password">Lozinka</label><input id="password" name="password" type="password" required autocomplete="current-password"><button>Prijavi se</button><p class="lang"><a href="/lang/bs?next=/login" lang="bs">Bosanski</a> · <a href="/lang/en?next=/login" lang="en">English</a></p></form></main></body></html>'''
 
-def login_html(error=''):
+def login_html(error='',lang=mevan_i18n.DEFAULT):
     # Poruka o grešci je fiksni tekst sa servera; korisnički unos se ne vraća u stranicu.
-    block=f'<div class="error" role="alert">{error}</div>' if error else ''
-    return LOGIN_PAGE.replace('__ERROR__',block).replace('__CSRF_TOKEN__',login_csrf_token())
+    T=lambda text:mevan_i18n.t(lang,text)
+    block=f'<div class="error" role="alert">{T(error)}</div>' if error else ''
+    page=LOGIN_PAGE.replace('<html lang="bs">',f'<html lang="{lang}">')
+    for before,after in (('<title>MEVAN – prijava</title>','<title>%s</title>'),('<h1>Prijava</h1>','<h1>%s</h1>'),('<p>Privatni demonstracijski pristup</p>','<p>%s</p>'),
+                         ('>E-mail</label>','>%s</label>'),('>Lozinka</label>','>%s</label>'),('<button>Prijavi se</button>','<button>%s</button>')):
+        source=before[before.index('>')+1:before.rindex('<')]
+        assert before in page,before
+        page=page.replace(before,after%T(source))
+    return page.replace('__ERROR__',block).replace('__CSRF_TOKEN__',login_csrf_token())
 
 @app.get('/login',response_class=HTMLResponse)
-def login_page():
-    return login_html()
+def login_page(req:Request):
+    return login_html(lang=mevan_i18n.lang_of(req))
+
+@app.get('/lang/{code}')
+def choose_language(code:str,next:str='/'):
+    """Izbor jezika interfejsa (kolačić, godinu dana). Povratak samo na vlastite stranice."""
+    if code not in mevan_i18n.LANGS:raise HTTPException(404,'Nepoznat jezik')
+    target=next if next in ('/','/login','/projects-ui','/dashboard-ui','/diagnostic-review') else '/'
+    resp=RedirectResponse(target,status_code=303)
+    resp.set_cookie(mevan_i18n.COOKIE,code,max_age=365*24*3600,samesite='lax',secure=os.getenv('MEVAN_SECURE_COOKIE','1')=='1')
+    return resp
 
 @app.post('/login')
 async def login(req:Request):
@@ -134,7 +151,7 @@ async def login(req:Request):
     email=data.get('email',[''])[0].strip().lower();password=data.get('password',[''])[0]
     if not (hmac.compare_digest(email,EMAIL) and hmac.compare_digest(password,PASSWORD)):
         attempts.append(now)
-        return HTMLResponse(login_html('Pogrešna prijava. Provjerite e-mail i lozinku pa pokušajte ponovo.'),status_code=401)
+        return HTMLResponse(login_html('Pogrešna prijava. Provjerite e-mail i lozinku pa pokušajte ponovo.',mevan_i18n.lang_of(req)),status_code=401)
     attempts.clear()
     with conn() as c: c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'login','administrator'))
     ident=hashlib.sha256(EMAIL.encode()).hexdigest()[:16]
@@ -147,7 +164,7 @@ def logout_token(req):
     return hmac.new(SECRET.encode(),('logout|'+req.cookies.get('mevan_session','')).encode(),hashlib.sha256).hexdigest()
 
 def page_html(req,name,active):
-    return render_page((BASE/name).read_text(encoding='utf-8'),active,EMAIL).replace('__MEVAN_LOGOUT_TOKEN__',logout_token(req))
+    return render_page((BASE/name).read_text(encoding='utf-8'),active,EMAIL,mevan_i18n.lang_of(req)).replace('__MEVAN_LOGOUT_TOKEN__',logout_token(req))
 
 @app.post('/logout')
 async def logout(req:Request):
