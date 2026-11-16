@@ -265,7 +265,8 @@ PATTERNS = [
     (r'^Kriterij (\d+) od (\d+)$', 'Criterion $1 of $2'),
     (r'^(\d+)/(\d+) validiranih · indeks (.+?)\. Izvještaj se može odobriti tek kada su svi primjenjivi kriteriji potvrđeni\.$',
      '$1/$2 validated · index $3. The report can be approved only when all applicable criteria are confirmed.'),
-    (r'^(\S+) · (\d+)/61 potvrđenih$', '$1 · $2/61 confirmed'),
+    (r'^(\S+) · (\d+)/(\d+) potvrđenih · model 65/6 \(nacrt\)$', '$1 · $2/$3 confirmed · model 65/6 (draft)'),
+    (r'^(\S+) · (\d+)/(\d+) potvrđenih$', '$1 · $2/$3 confirmed'),
     (r'^Potvrđeno (\d+)/(\d+) · Indeks (.+)$', 'Confirmed $1/$2 · Index $3'),
     (r'^Procijenjeno (\d+)/(\d+) · Status: (.+)$', 'Assessed $1/$2 · Status: $3'),
     (r'^Jasna pravila ocjenjivanja za (\S+)$', 'Clear scoring rules for $1'),
@@ -353,6 +354,18 @@ PATTERNS[:0] = [
     (r'^Ovaj mjesec kroz MEVAN: (\S+) od (\S+) dozvoljenih AI poziva · (\S+) ulaznih i (\S+) izlaznih tokena\.$', 'This month through MEVAN: $1 of $2 allowed AI calls · $3 input and $4 output tokens.'),
     (r'^Ovaj mjesec kroz MEVAN: (\S+) AI poziva · (\S+) ulaznih i (\S+) izlaznih tokena\.$', 'This month through MEVAN: $1 AI calls · $2 input and $3 output tokens.'),
 ]
+
+# ---- model 65/6 (nacrt metodologije)
+EN.update({
+    '+ Nova dijagnostika 65/6 (nacrt)': '+ New diagnostic 65/6 (draft)', 'Nova dijagnostika 65/6 (nacrt metodologije)': 'New diagnostic 65/6 (draft methodology)',
+    'Model 65/6 je nacrt metodologije: mapiranja kriterija čekaju stručnu potvrdu. Rezultati nisu za klijenta.': 'Model 65/6 is a draft methodology: the criterion mappings await expert sign-off. Results are not for the client.',
+    'Još nije dostupno za model 65/6': 'Not yet available for model 65/6',
+    'Integrisana analiza, analiza i odobravanje te izvještaji za model 65/6 dolaze u narednim fazama. Za ovu dijagnostiku su dostupni pregled, moduli s ocjenjivanjem, profil kompanije, finansijski efekti i plan 90 dana.': 'Integrated analysis, analysis and approval, and reports for model 65/6 come in later phases. For this diagnostic the overview, modules with scoring, company profile, financial effects and 90-day plan are available.',
+    'Model 65/6 nije dostupan': 'Model 65/6 is not available',
+    'Ova dijagnostika koristi model 65/6, koji na ovom serveru nije uključen. Podaci su sačuvani i nisu mijenjani. Otvorite drugu dijagnostiku ili uključite model na serveru.': 'This diagnostic uses model 65/6, which is not enabled on this server. The data is stored and unchanged. Open another diagnostic or enable the model on the server.',
+    'Učitavanje metodologije…': 'Loading methodology…', 'Model 65/6 nije uključen na ovom serveru.': 'Model 65/6 is not enabled on this server.',
+    'Vođeno prikupljanje još nije dostupno za model 65/6.': 'Guided collection is not yet available for model 65/6.',
+})
 
 def lang_of(request):
     value = request.cookies.get(COOKIE, '')

@@ -118,3 +118,59 @@ def test_api_hides_v2_until_the_server_setting_is_on(fx,monkeypatch):
 def test_methodology_data_is_shipped_with_the_container():
     assert 'COPY --chown=mevan:mevan methodology ./methodology' in (ROOT/'Dockerfile').read_text(encoding='utf-8')
     assert (ROOT/'methodology'/'v1_61.json').is_file() and (ROOT/'methodology'/'v2_65.json').is_file()
+
+
+# ---- faza 1b: stranica prati metodologiju aktivne dijagnostike
+
+def test_page_keeps_v1_catalogue_embedded_and_swaps_content_for_v2():
+    html=(ROOT/'index.html').read_text(encoding='utf-8')
+    # Ugrađeni katalog v1 i njegove liste ostaju iste; mijenja se samo njihov sadržaj.
+    assert html.count('const CRITERIA=[')==1 and 'const DIMS=[...new Set(CRITERIA.map(c=>c.dim))];' in html
+    assert "const METHOD={active:'v1',booted:false,missing:false,v1:{criteria:CRITERIA.map(c=>c),dims:[...DIMS]},v2:null};" in html
+    assert "function methodologyOf(diagnostic){return diagnostic&&diagnostic.methodology==='v2'?'v2':'v1'}" in html
+    assert 'CRITERIA.length=0;CRITERIA.push(...METHOD[use].criteria);' in html and 'DIMS.length=0;DIMS.push(...METHOD[use].dims);' in html
+    assert 'approved:d.approved};applyMethodology(d);};' in html
+
+
+def test_new_v1_diagnostic_gets_no_version_mark_and_v2_is_explicit():
+    html=(ROOT/'index.html').read_text(encoding='utf-8')
+    assert "...(methodology==='v2'?{methodology:'v2'}:{})});" in html
+    assert "async function addDiagnostic(methodology='v1'){if(methodology==='v2'&&!METHOD.v2)return mvNotify(" in html
+    # Dugme za 65/6 postoji samo kad je katalog stigao sa servera.
+    assert "${METHOD.v2?'<button class=\"btn secondary\" onclick=\"addDiagnostic(\\'v2\\')\">+ Nova dijagnostika 65/6 (nacrt)</button>':''}" in html
+
+
+def test_counts_follow_the_active_model_instead_of_fixed_61_and_5():
+    html=(ROOT/'index.html').read_text(encoding='utf-8')
+    assert '${s.valid}/61<' not in html and '.length}/5<' not in html
+    assert '<div class="big">${s.valid}/${CRITERIA.length}</div>' in html and '.done).length}/${DIMS.length}</div>' in html
+    assert "${validCount}/${x.methodology==='v2'?65:61} potvrđenih" in html
+
+
+def test_v2_shows_criterion_anchors_and_blocks_unfinished_screens():
+    html=(ROOT/'index.html').read_text(encoding='utf-8')
+    assert "(c.anchors?c.anchors.map((text,level)=>level+' — '+text):SCORE_GUIDE)" in html
+    assert "const V2_BLOCKED_PAGES=['v2','review','report'];" in html
+    assert "else if(METHOD.active==='v2'&&V2_BLOCKED_PAGES.includes(page)){" in html
+    assert "if(METHOD.missing&&!['workspace','data'].includes(page)){" in html
+    assert "if(methodologyOf(diagnostic)==='v2')return mvNotify('Vođeno prikupljanje još nije dostupno za model 65/6.',true);" in html
+    assert 'Model 65/6 je nacrt metodologije: mapiranja kriterija čekaju stručnu potvrdu.' in html
+
+
+def test_catalogue_v2_is_loaded_from_the_server_before_first_render():
+    html=(ROOT/'index.html').read_text(encoding='utf-8')
+    boot=html[html.index('async function cloudBoot(){'):html.index("page=hashPage()||page;render();")]
+    assert "fetch('/api/methodologies')" in boot and "fetch('/api/methodologies/v2')" in boot and 'METHOD.booted=true;syncState();' in boot
+
+
+def test_workspace_with_a_v2_diagnostic_round_trips_through_the_server(fx):
+    workspace={'companies':[{'id':'c1','company':{'name':'QA'},'diagnostics':[
+        {'id':'d1','name':'Stara','assess':{'F05':{'score':3,'proof':'confirmed','evidence':'Dokaz'}},'effects':[]},
+        {'id':'d2','name':'Nova 65/6','methodology':'v2','assess':{'S01':{'score':4,'proof':'confirmed','evidence':'Dokaz'}},'effects':[]}]}],
+        'activeCompanyId':'c1','activeDiagnosticId':'d2'}
+    version=fx.client.get('/api/workspace').json()['version']
+    assert fx.client.put('/api/workspace',json=workspace,headers={**fx.headers,'If-Match':version}).status_code==200
+    stored=fx.client.get('/api/workspace').json()['workspace']['companies'][0]['diagnostics']
+    assert 'methodology' not in stored[0] and stored[1]['methodology']=='v2' and stored[1]['assess']['S01']['score']==4
+    assert registry.maturity(registry.version_of(stored[1]),stored[1]['assess'])['index']==80.0
+    assert registry.maturity(registry.version_of(stored[0]),stored[0]['assess'])['index']==60.0
