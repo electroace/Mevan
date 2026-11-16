@@ -15,6 +15,7 @@ import mevan_i18n
 import mevan_methodology
 import mevan_findings
 import mevan_finance_v2
+import mevan_confidence
 
 BASE=Path(__file__).parent
 DB=Path(os.getenv('MEVAN_DB',str(BASE/'mevan.sqlite3')))
@@ -325,6 +326,20 @@ async def v2_findings(req:Request):
     with conn() as c:
         c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'v2_findings_built',json.dumps({'counts':result['counts'],'simulated':result['simulated']},ensure_ascii=False)[:400]))
     return result
+
+@app.post('/api/v2/confidence')
+async def v2_confidence(req:Request):
+    """Indeks pouzdanosti nalaza 65/6: pet komponenti s izvornim brojevima; odvojen od indeksa zrelosti."""
+    if not logged(req):raise HTTPException(401)
+    if not same_origin(req):raise HTTPException(403)
+    if 'v2' not in mevan_methodology.available():raise HTTPException(404,'Model 65/6 nije uključen na ovom serveru')
+    raw=await req.body()
+    if len(raw)>800000:raise HTTPException(413,'Prevelik zahtjev')
+    try:
+        data=json.loads(raw)
+        return mevan_confidence.build(data['assess'],data.get('effects'),simulated=data.get('simulated') is True)
+    except (ValueError,KeyError,TypeError):
+        raise HTTPException(400,'Neispravan ulaz')
 
 @app.get('/api/v2/finance/models')
 def v2_finance_models(req:Request):

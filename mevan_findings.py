@@ -11,7 +11,7 @@ Tekst hipoteze posljedice, preporuke, vlasnika i uslova dolazi iz kataloga metod
 import mevan_methodology
 
 EVIDENCE_STATUS = {'confirmed': 'POTVRDIO_KONSULTANT', 'review': 'U_PROVJERI', 'missing': 'DOKAZ_NEDOSTUPAN'}
-TRACKED_FIELDS = ('score', 'proof', 'applicable', 'cause_status')
+TRACKED_FIELDS = ('score', 'proof', 'applicable', 'cause_status', 'source_grade', 'reconciled')
 
 
 def _text(value, limit=1200):
