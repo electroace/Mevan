@@ -12,6 +12,7 @@ import asyncio
 import threading
 import mevan_ai
 import mevan_i18n
+import mevan_methodology
 
 BASE=Path(__file__).parent
 DB=Path(os.getenv('MEVAN_DB',str(BASE/'mevan.sqlite3')))
@@ -288,6 +289,18 @@ async def diagnostic_v2(req:Request):
 @app.get('/health')
 def health():return {'status':'ok'}
 
+
+@app.get('/api/methodologies')
+def methodologies(req:Request):
+    """Verzije metodologije dostupne na ovom serveru. v2 (65/6) se vidi samo uz MEVAN_METHODOLOGY_V2=1."""
+    if not logged(req):raise HTTPException(401)
+    return {'default':mevan_methodology.DEFAULT,'versions':[mevan_methodology.summary(v) for v in mevan_methodology.available()]}
+
+@app.get('/api/methodologies/{version}')
+def methodology(version:str,req:Request):
+    if not logged(req):raise HTTPException(401)
+    if version not in mevan_methodology.available():raise HTTPException(404,'Verzija metodologije nije dostupna')
+    return mevan_methodology.load(version)
 
 @app.exception_handler(mevan_ai.AllowanceExceeded)
 async def ai_allowance_exceeded(request:Request,error:mevan_ai.AllowanceExceeded):

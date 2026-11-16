@@ -12,6 +12,7 @@ COPY --chown=mevan:mevan server.py index.html diagnostic_engine.py data_quality_
 COPY --chown=mevan:mevan mevan_*.py approved_reports.py diagnostic_review.html ./
 COPY --chown=mevan:mevan project_*.py projects_ui.html dashboard_ui.html ./
 COPY --chown=mevan:mevan fonts ./fonts
+COPY --chown=mevan:mevan methodology ./methodology
 RUN mkdir -p /data && chown mevan:mevan /data
 USER mevan
 EXPOSE 8000

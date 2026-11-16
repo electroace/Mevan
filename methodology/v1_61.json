@@ -1,0 +1,639 @@
+{
+ "id": "v1",
+ "label": "61 kriterij / 5 modula",
+ "status": "active",
+ "modules": [
+  {
+   "code": "F",
+   "name": "Finansije"
+  },
+  {
+   "code": "O",
+   "name": "Operacije"
+  },
+  {
+   "code": "P",
+   "name": "Planiranje i Supply Chain"
+  },
+  {
+   "code": "L",
+   "name": "Ljudi i liderstvo"
+  },
+  {
+   "code": "M",
+   "name": "Sistem upravljanja"
+  }
+ ],
+ "criteria": [
+  {
+   "code": "F01",
+   "module": "F",
+   "name": "Profitabilnost",
+   "question": "Da li su EBITDA i marža pouzdano obračunati i analizirani po periodima?",
+   "evidence": "P&L 12–24 mj; usklađenje EBITDA",
+   "kpi": "EBITDA %; trend",
+   "financial": "Analiza marži i profitnih pokretača",
+   "recommendation": "Analiza marži i profitnih pokretača"
+  },
+  {
+   "code": "F02",
+   "module": "F",
+   "name": "Kontribucijska marža",
+   "question": "Da li je poznata kontribucija po proizvodu, kupcu i narudžbi?",
+   "evidence": "Prodaja; varijabilni troškovi; kalkulacije",
+   "kpi": "Kontribucija KM/%",
+   "financial": "Profitabilnost portfolija",
+   "recommendation": "Profitabilnost portfolija"
+  },
+  {
+   "code": "F03",
+   "module": "F",
+   "name": "Struktura troškova",
+   "question": "Da li se odstupanja materijala, rada, energije i režije objašnjavaju?",
+   "evidence": "Glavna knjiga; centri troška; trend",
+   "kpi": "Trošak po jedinici",
+   "financial": "Cost-driver analiza",
+   "recommendation": "Cost-driver analiza"
+  },
+  {
+   "code": "F04",
+   "module": "F",
+   "name": "Standardni troškovi",
+   "question": "Jesu li BOM, normativi i standardi ažurni i upoređeni sa stvarnim?",
+   "evidence": "BOM; radni normativi; variance izvještaji",
+   "kpi": "Odstupanje standard/stvarno",
+   "financial": "Standard costing",
+   "recommendation": "Standard costing"
+  },
+  {
+   "code": "F05",
+   "module": "F",
+   "name": "Produktivnost rada",
+   "question": "Da li se produktivnost povezuje s troškom i iskorištenjem rada?",
+   "evidence": "Sati rada; učinak; obračun plata",
+   "kpi": "KM/jedinica; jedinica/sat",
+   "financial": "Analiza radnog kapaciteta",
+   "recommendation": "Analiza radnog kapaciteta"
+  },
+  {
+   "code": "F06",
+   "module": "F",
+   "name": "Škart i dorada",
+   "question": "Da li se trošak škarta i dorade mjeri po uzroku?",
+   "evidence": "NCR; škart; dorade; vrijednosti materijala",
+   "kpi": "COPQ KM; škart %",
+   "financial": "Root cause / kvaliteta",
+   "recommendation": "Root cause / kvaliteta"
+  },
+  {
+   "code": "F07",
+   "module": "F",
+   "name": "Zalihe",
+   "question": "Da li su zalihe kontrolisane po obrtnosti, starosti i riziku?",
+   "evidence": "Stanje i starosna struktura zaliha",
+   "kpi": "DIO; zastarjele zalihe",
+   "financial": "ABC/XYZ i politika zaliha",
+   "recommendation": "ABC/XYZ i politika zaliha"
+  },
+  {
+   "code": "F08",
+   "module": "F",
+   "name": "Obrtni kapital",
+   "question": "Da li se potraživanja, obaveze i gotovina aktivno planiraju?",
+   "evidence": "AR/AP aging; cash flow",
+   "kpi": "DSO; DPO; CCC",
+   "financial": "Working capital program",
+   "recommendation": "Working capital program"
+  },
+  {
+   "code": "F09",
+   "module": "F",
+   "name": "Budžet i odstupanja",
+   "question": "Da li se budžet i forecast redovno porede s realizacijom?",
+   "evidence": "Budžet; forecast; mjesečna odstupanja",
+   "kpi": "Forecast error %",
+   "financial": "Rolling forecast",
+   "recommendation": "Rolling forecast"
+  },
+  {
+   "code": "F10",
+   "module": "F",
+   "name": "Finansijsko izvještavanje",
+   "question": "Jesu li podaci tačni, pravovremeni i usklađeni s operativom?",
+   "evidence": "Close kalendar; ERP; reconciliations",
+   "kpi": "Dani do izvještaja",
+   "financial": "Management reporting",
+   "recommendation": "Management reporting"
+  },
+  {
+   "code": "F11",
+   "module": "F",
+   "name": "Investicije",
+   "question": "Da li CAPEX ima business case i post-investicionu provjeru?",
+   "evidence": "CAPEX zahtjevi; ROI/NPV; realizacija",
+   "kpi": "ROI; payback",
+   "financial": "CAPEX governance",
+   "recommendation": "CAPEX governance"
+  },
+  {
+   "code": "F12",
+   "module": "F",
+   "name": "Finansijsko odlučivanje",
+   "question": "Da li se operativne odluke donose uz finansijske scenarije?",
+   "evidence": "Zapisnici; odluke; KPI izvještaji",
+   "kpi": "% odluka s analizom",
+   "financial": "Performance governance",
+   "recommendation": "Performance governance"
+  },
+  {
+   "code": "O01",
+   "module": "O",
+   "name": "Produktivnost rada",
+   "question": "Komadi ili standardni sati po efektivnom satu rada",
+   "evidence": "Radni nalozi; evidencija sati; normativi",
+   "kpi": "Učinak / efektivni sati",
+   "financial": "Trošak rada; dodatna kontribucija",
+   "recommendation": "Poboljšanje prema potvrđenom uzroku"
+  },
+  {
+   "code": "O02",
+   "module": "O",
+   "name": "Iskorištenost kapaciteta",
+   "question": "Usklađenost opterećenja i raspoloživih kapaciteta",
+   "evidence": "Plan kapaciteta; smjene; stvarna proizvodnja",
+   "kpi": "Opterećenje / raspoloživi kapacitet",
+   "financial": "Izgubljena marža ili nepotreban trošak",
+   "recommendation": "Poboljšanje prema potvrđenom uzroku"
+  },
+  {
+   "code": "O03",
+   "module": "O",
+   "name": "OEE / efikasnost opreme",
+   "question": "Dostupnost, performanse i kvalitet kritične opreme",
+   "evidence": "Dnevnik mašina; zastoji; kvalitet",
+   "kpi": "OEE = A × P × Q",
+   "financial": "Zastoji; izgubljeni kapacitet",
+   "recommendation": "Poboljšanje prema potvrđenom uzroku"
+  },
+  {
+   "code": "O04",
+   "module": "O",
+   "name": "Neplanirani zastoji",
+   "question": "Trajanje, učestalost i uzroci prekida",
+   "evidence": "Dnevnik zastoja; CMMS; smjenski izvještaji",
+   "kpi": "Min zastoja / planirani sati",
+   "financial": "Trošak zastoja; izgubljena marža",
+   "recommendation": "Poboljšanje prema potvrđenom uzroku"
+  },
+  {
+   "code": "O05",
+   "module": "O",
+   "name": "Škart i dorada",
+   "question": "Gubici kvaliteta po proizvodu i uzroku",
+   "evidence": "Kontrola kvaliteta; reklamacije; radni nalozi",
+   "kpi": "Škart %; FPY; sati dorade",
+   "financial": "Materijal, rad i reklamacije",
+   "recommendation": "Poboljšanje prema potvrđenom uzroku"
+  },
+  {
+   "code": "O06",
+   "module": "O",
+   "name": "Protočno vrijeme",
+   "question": "Vrijeme od naloga do završetka proizvodnje",
+   "evidence": "ERP vremenske oznake; VSM; nalozi",
+   "kpi": "Lead time; WIP",
+   "financial": "Vezana gotovina; kašnjenja",
+   "recommendation": "Poboljšanje prema potvrđenom uzroku"
+  },
+  {
+   "code": "O07",
+   "module": "O",
+   "name": "Promjene alata / serija",
+   "question": "Trajanje i standardizacija setupa",
+   "evidence": "Setup evidencije; video analiza; plan",
+   "kpi": "Prosječan setup (min)",
+   "financial": "Izgubljen kapacitet; veličina serije",
+   "recommendation": "Poboljšanje prema potvrđenom uzroku"
+  },
+  {
+   "code": "O08",
+   "module": "O",
+   "name": "Standardizovani rad",
+   "question": "Postojanje i primjena standardnih postupaka",
+   "evidence": "Radne instrukcije; audit; Gemba",
+   "kpi": "Usklađenost sa standardom %",
+   "financial": "Varijacije; kvalitet; produktivnost",
+   "recommendation": "Poboljšanje prema potvrđenom uzroku"
+  },
+  {
+   "code": "O09",
+   "module": "O",
+   "name": "Tok materijala i WIP",
+   "question": "Transport, čekanje i međufazne zalihe",
+   "evidence": "Spaghetti mapa; VSM; WIP izvještaji",
+   "kpi": "WIP dani; udaljenost toka",
+   "financial": "Vezana gotovina; manipulacija",
+   "recommendation": "Poboljšanje prema potvrđenom uzroku"
+  },
+  {
+   "code": "O10",
+   "module": "O",
+   "name": "Preventivno održavanje",
+   "question": "Planiranje i izvršenje održavanja",
+   "evidence": "CMMS; planovi; evidencija kvarova",
+   "kpi": "PM compliance %; MTBF; MTTR",
+   "financial": "Kvarovi; rezervni dijelovi",
+   "recommendation": "Poboljšanje prema potvrđenom uzroku"
+  },
+  {
+   "code": "O11",
+   "module": "O",
+   "name": "Isporuka iz proizvodnje",
+   "question": "Poštovanje proizvodnih rokova i količina",
+   "evidence": "Plan i realizacija; ERP; otpremnice",
+   "kpi": "Plan attainment %; OTD %",
+   "financial": "Penali; hitne smjene; izgubljena prodaja",
+   "recommendation": "Poboljšanje prema potvrđenom uzroku"
+  },
+  {
+   "code": "O12",
+   "module": "O",
+   "name": "Balansiranje linije",
+   "question": "Raspodjela rada i ograničenja toka",
+   "evidence": "Mjerenje ciklusa; takt; layout",
+   "kpi": "Line balance %; takt vs cycle",
+   "financial": "Neiskorišten rad; čekanja",
+   "recommendation": "Poboljšanje prema potvrđenom uzroku"
+  },
+  {
+   "code": "O13",
+   "module": "O",
+   "name": "Energetska efikasnost",
+   "question": "Potrošnja energije po jedinici učinka",
+   "evidence": "Računi; mjerenja; evidencija proizvodnje",
+   "kpi": "kWh / jedinici",
+   "financial": "Energija; emisije",
+   "recommendation": "Poboljšanje prema potvrđenom uzroku"
+  },
+  {
+   "code": "O14",
+   "module": "O",
+   "name": "Sigurnost i ergonomija",
+   "question": "Kontrola operativnih rizika i ergonomskih opterećenja",
+   "evidence": "Procjene rizika; incidenti; Gemba",
+   "kpi": "Incidenti; zatvorene mjere %",
+   "financial": "Povrede; zastoji; rizik",
+   "recommendation": "Poboljšanje prema potvrđenom uzroku"
+  },
+  {
+   "code": "O15",
+   "module": "O",
+   "name": "Kontinuirano poboljšavanje",
+   "question": "Sistem prijedloga, kaizen i održivost mjera",
+   "evidence": "Kaizen registar; audit; KPI trend",
+   "kpi": "Realizovane mjere / mjesec",
+   "financial": "Zbir verifikovanih koristi",
+   "recommendation": "Poboljšanje prema potvrđenom uzroku"
+  },
+  {
+   "code": "P01",
+   "module": "P",
+   "name": "Prognoza potražnje",
+   "question": "Da li se prognoza zasniva na podacima i redovno mjeri njena tačnost?",
+   "evidence": "Prognoza, narudžbe, istorija prodaje",
+   "kpi": "WAPE, bias",
+   "financial": "Neadekvatna proizvodnja; višak/manjak zaliha",
+   "recommendation": "Segmentirati prognoze; pratiti WAPE i bias"
+  },
+  {
+   "code": "P02",
+   "module": "P",
+   "name": "S&OP / IBP",
+   "question": "Postoji li redovan proces usaglašavanja prodaje, operacija i finansija?",
+   "evidence": "Zapisnici S&OP, scenariji, odobren plan",
+   "kpi": "Usklađenost plana; broj eskalacija",
+   "financial": "Nerealni planovi, izgubljena marža",
+   "recommendation": "Uvesti mjesečni S&OP i sedmično izvršno usklađivanje"
+  },
+  {
+   "code": "P03",
+   "module": "P",
+   "name": "Glavni plan proizvodnje",
+   "question": "Postoji li realan, zamrznut i rolling plan proizvodnje?",
+   "evidence": "MPS, sedmični plan, promjene verzija",
+   "kpi": "Plan attainment; schedule adherence",
+   "financial": "Prekovremeni rad, hitne izmjene",
+   "recommendation": "Rolling plan 6+ sedmica; pravila zamrzavanja"
+  },
+  {
+   "code": "P04",
+   "module": "P",
+   "name": "Planiranje kapaciteta",
+   "question": "Da li se plan provjerava prema ljudima, mašinama i uskim grlima?",
+   "evidence": "RCCP, kapaciteti, smjene, takti",
+   "kpi": "Opterećenje kritičnog resursa",
+   "financial": "Čekanja, gubitak prodaje",
+   "recommendation": "RCCP i TOC analiza ograničenja"
+  },
+  {
+   "code": "P05",
+   "module": "P",
+   "name": "MRP i materijalne potrebe",
+   "question": "Jesu li materijalni zahtjevi vezani za tačan BOM i plan?",
+   "evidence": "BOM, MRP izuzeci, rezervacije",
+   "kpi": "Stockout; planirani vs stvarni utrošak",
+   "financial": "Prekidi rada, višak nabavke",
+   "recommendation": "Urediti BOM i MRP parametre"
+  },
+  {
+   "code": "P06",
+   "module": "P",
+   "name": "Pouzdanost dobavljača",
+   "question": "Da li se prate rok, kvalitet i rizik dobavljača?",
+   "evidence": "Narudžbenice, prijemi, reklamacije",
+   "kpi": "Supplier OTD; PPM",
+   "financial": "Hitni transport, zastoji",
+   "recommendation": "Segmentacija dobavljača i scorecard"
+  },
+  {
+   "code": "P07",
+   "module": "P",
+   "name": "Politika zaliha",
+   "question": "Jesu li sigurnosne zalihe, ABC/XYZ i obrt definisani?",
+   "evidence": "Stanje zaliha, starost, inventure",
+   "kpi": "DIO; obrt; obsolete %",
+   "financial": "Vezana gotovina, otpis",
+   "recommendation": "ABC/XYZ i parametri dopune"
+  },
+  {
+   "code": "P08",
+   "module": "P",
+   "name": "Tačnost ERP podataka",
+   "question": "Jesu li stanja, rokovi, BOM i rute pouzdani i ažurni?",
+   "evidence": "ERP transakcije, inventure, master data",
+   "kpi": "Inventory accuracy; BOM accuracy",
+   "financial": "Pogrešne odluke, zastoji",
+   "recommendation": "Master-data governance i dnevno knjiženje"
+  },
+  {
+   "code": "P09",
+   "module": "P",
+   "name": "Realizacija proizvodnog plana",
+   "question": "Da li se dnevno mjeri izvršenje i analiziraju odstupanja?",
+   "evidence": "Dnevni plan/realizacija, razlozi",
+   "kpi": "Plan attainment %",
+   "financial": "Kašnjenja, neplanirani rad",
+   "recommendation": "Dnevni tier sastanci i Pareto odstupanja"
+  },
+  {
+   "code": "P10",
+   "module": "P",
+   "name": "Pouzdanost isporuka",
+   "question": "Da li su rokovi kupcima realni i mjerljivo ispunjeni?",
+   "evidence": "Narudžbe, otpremnice, reklamacije",
+   "kpi": "OTIF; OTD",
+   "financial": "Penali, izgubljeni kupci",
+   "recommendation": "ATP/CTP i kontrola obećanih rokova"
+  },
+  {
+   "code": "P11",
+   "module": "P",
+   "name": "Interna i izlazna logistika",
+   "question": "Da li su tokovi materijala i otpreme stabilni?",
+   "evidence": "Tok materijala, skladišne lokacije",
+   "kpi": "Vrijeme manipulacije; trošak transporta",
+   "financial": "Čekanje, dodatna manipulacija",
+   "recommendation": "VSM, milk-run, standard skladišta"
+  },
+  {
+   "code": "P12",
+   "module": "P",
+   "name": "Upravljanje odstupanjima",
+   "question": "Postoje li vlasnici, rokovi i zatvaranje uzroka odstupanja?",
+   "evidence": "Action log, eskalacije, zapisnici",
+   "kpi": "On-time action closure %",
+   "financial": "Ponavljanje problema",
+   "recommendation": "PDCA, vlasnik akcije i sedmični review"
+  },
+  {
+   "code": "L01",
+   "module": "L",
+   "name": "Organizaciona struktura",
+   "question": "Jesu li funkcije, linije izvještavanja i zamjene jasno definisane?",
+   "evidence": "Organigram, opisi poslova, intervjui",
+   "kpi": "Udio ključnih uloga s dokumentovanom odgovornošću",
+   "financial": "Nejasne odluke, čekanja",
+   "recommendation": "Definisati RACI i organizacionu mapu"
+  },
+  {
+   "code": "L02",
+   "module": "L",
+   "name": "Odgovornost za rezultate",
+   "question": "Ima li svaki KPI imenovanog vlasnika i ritam praćenja?",
+   "evidence": "KPI izvještaji, zapisnici, RACI",
+   "kpi": "Udio KPI s vlasnikom i akcijom",
+   "financial": "Nepreuzeta odstupanja",
+   "recommendation": "KPI ownership i sedmični review"
+  },
+  {
+   "code": "L03",
+   "module": "L",
+   "name": "Kompetencije rukovodilaca",
+   "question": "Mogu li rukovodioci planirati, voditi i rješavati probleme?",
+   "evidence": "Intervjui, simulacije, evaluacije",
+   "kpi": "Udio procijenjenih rukovodilaca",
+   "financial": "Loše odluke i eskalacije",
+   "recommendation": "Individualni razvojni planovi"
+  },
+  {
+   "code": "L04",
+   "module": "L",
+   "name": "Matrica vještina",
+   "question": "Jesu li ključne operativne vještine evidentirane i pokrivene?",
+   "evidence": "Matrice vještina, certifikati, provjera na radnom mjestu",
+   "kpi": "Pokrivenost kritičnih operacija (%)",
+   "financial": "Zastoji zbog odsustva",
+   "recommendation": "Uvesti skill matrix i cross-training"
+  },
+  {
+   "code": "L05",
+   "module": "L",
+   "name": "Uvođenje i obuka",
+   "question": "Postoji li standardan onboarding i provjera osposobljenosti?",
+   "evidence": "Planovi obuke, testovi, evidencije",
+   "kpi": "Vrijeme do samostalnosti (dani)",
+   "financial": "Škart i duži onboarding",
+   "recommendation": "Standardizovati onboarding"
+  },
+  {
+   "code": "L06",
+   "module": "L",
+   "name": "Upravljanje učinkom",
+   "question": "Postoje li jasni ciljevi, feedback i korektivne aktivnosti?",
+   "evidence": "Ciljevi, evaluacije, sastanci",
+   "kpi": "Udio realizovanih razvojnih mjera",
+   "financial": "Slaba produktivnost",
+   "recommendation": "Mjesečni performance review"
+  },
+  {
+   "code": "L07",
+   "module": "L",
+   "name": "Komunikacija i eskalacija",
+   "question": "Da li problemi brzo dolaze do osobe koja ih može riješiti?",
+   "evidence": "Zapisnici smjena, eskalacijske procedure",
+   "kpi": "Prosječno vrijeme eskalacije (h)",
+   "financial": "Čekanja i kašnjenja",
+   "recommendation": "Daily management i eskalacijska matrica"
+  },
+  {
+   "code": "L08",
+   "module": "L",
+   "name": "Angažovanost i zadržavanje",
+   "question": "Znamo li uzroke odlazaka i prepreke angažmanu?",
+   "evidence": "Fluktuacija, exit intervjui, ankete",
+   "kpi": "Dobrovoljna fluktuacija (%)",
+   "financial": "Trošak zamjene i obuke",
+   "recommendation": "Analiza uzroka i plan zadržavanja"
+  },
+  {
+   "code": "L09",
+   "module": "L",
+   "name": "Sigurnost i kultura odgovornosti",
+   "question": "Prijavljuju li se rizici i provode preventivne mjere?",
+   "evidence": "Evidencije incidenata, obuke, obilazak",
+   "kpi": "Zatvorene preventivne mjere (%)",
+   "financial": "Povrede i prekidi rada",
+   "recommendation": "Preventivni safety review"
+  },
+  {
+   "code": "L10",
+   "module": "L",
+   "name": "Nasljeđivanje i održivost",
+   "question": "Može li sistem funkcionisati bez ključnog pojedinca ili konsultanta?",
+   "evidence": "Plan nasljeđivanja, zamjene, audit",
+   "kpi": "Udio kritičnih funkcija s obučenom zamjenom",
+   "financial": "Zavisnost od pojedinca",
+   "recommendation": "Mentorstvo i plan sukcesije"
+  },
+  {
+   "code": "M01",
+   "module": "M",
+   "name": "Strategija i ciljevi",
+   "question": "Da li su godišnji i kvartalni ciljevi mjerljivi i povezani s proizvodnjom?",
+   "evidence": "Strateški plan, godišnji ciljevi, KPI stablo",
+   "kpi": "Udio ciljeva sa vlasnikom i mjerom",
+   "financial": "Upravljanje učinkom",
+   "recommendation": "Hoshin Kanri / KPI cascade"
+  },
+  {
+   "code": "M02",
+   "module": "M",
+   "name": "Uloge i prava odlučivanja",
+   "question": "Jesu li vlasnici procesa, ovlaštenja i eskalacije jasno određeni?",
+   "evidence": "RACI, sistematizacija, matrica ovlaštenja",
+   "kpi": "Udio procesa s jasnim vlasnikom",
+   "financial": "Upravljanje učinkom",
+   "recommendation": "RACI i governance"
+  },
+  {
+   "code": "M03",
+   "module": "M",
+   "name": "Dnevno upravljanje",
+   "question": "Postoje li dnevni sastanci s odstupanjima, akcijama i odgovornima?",
+   "evidence": "Dnevne table, zapisnici, dnevni izvještaji",
+   "kpi": "Udio zatvorenih dnevnih akcija",
+   "financial": "Upravljanje učinkom",
+   "recommendation": "Daily Management System"
+  },
+  {
+   "code": "M04",
+   "module": "M",
+   "name": "KPI arhitektura",
+   "question": "Jesu li KPI definisani, tačni i povezani s poslovnim rezultatom?",
+   "evidence": "KPI katalog, definicije, izvori podataka",
+   "kpi": "Udio KPI s definicijom i izvorom",
+   "financial": "Upravljanje učinkom",
+   "recommendation": "KPI dictionary / tier meetings"
+  },
+  {
+   "code": "M05",
+   "module": "M",
+   "name": "Ritam poslovnih pregleda",
+   "question": "Održavaju li se sedmični i mjesečni pregledi rezultata?",
+   "evidence": "Agende, zapisnici, odluke",
+   "kpi": "Pravovremenost i realizacija odluka",
+   "financial": "Upravljanje učinkom",
+   "recommendation": "Management review cadence"
+  },
+  {
+   "code": "M06",
+   "module": "M",
+   "name": "Upravljanje odstupanjima",
+   "question": "Istražuju li se sistemski uzroci ponovljenih odstupanja?",
+   "evidence": "A3, 5 Why, CAPA evidencije",
+   "kpi": "Udio ponovljenih problema",
+   "financial": "Upravljanje učinkom",
+   "recommendation": "A3 / DMAIC / CAPA"
+  },
+  {
+   "code": "M07",
+   "module": "M",
+   "name": "Izvršenje akcionih planova",
+   "question": "Postoji li jedinstvena evidencija mjera, rokova i statusa?",
+   "evidence": "Akcioni planovi, historija zatvaranja",
+   "kpi": "On-time action closure %",
+   "financial": "Upravljanje učinkom",
+   "recommendation": "Action tracking / escalation"
+  },
+  {
+   "code": "M08",
+   "module": "M",
+   "name": "Upravljanje rizicima",
+   "question": "Prepoznaju li se operativni, finansijski i kontinuitetni rizici?",
+   "evidence": "Registar rizika, FMEA, plan kontinuiteta",
+   "kpi": "Udio visokih rizika s mjerama",
+   "financial": "Upravljanje učinkom",
+   "recommendation": "Risk register / FMEA"
+  },
+  {
+   "code": "M09",
+   "module": "M",
+   "name": "Upravljanje promjenama",
+   "question": "Da li se promjene testiraju, komuniciraju i stabilizuju?",
+   "evidence": "Pilot zapisi, SOP revizije, obuke",
+   "kpi": "Udio promjena održanih 90 dana",
+   "financial": "Upravljanje učinkom",
+   "recommendation": "PDCA / change management"
+  },
+  {
+   "code": "M10",
+   "module": "M",
+   "name": "Digitalni podaci i ERP disciplina",
+   "question": "Jesu li transakcije pravovremene, tačne i sljedive?",
+   "evidence": "ERP logovi, usklađenja, audit trail",
+   "kpi": "Tačnost i pravovremenost knjiženja",
+   "financial": "Upravljanje učinkom",
+   "recommendation": "Data governance / ERP controls"
+  },
+  {
+   "code": "M11",
+   "module": "M",
+   "name": "Međufunkcionalna koordinacija",
+   "question": "Usklađuju li se prodaja, proizvodnja, nabavka i finansije?",
+   "evidence": "S&OP zapisnici, konfliktni prioriteti",
+   "kpi": "Udio riješenih međufunkcionalnih blokada",
+   "financial": "Upravljanje učinkom",
+   "recommendation": "S&OP / cross-functional governance"
+  },
+  {
+   "code": "M12",
+   "module": "M",
+   "name": "Kontinuirano poboljšanje i održivost",
+   "question": "Postoje li redovne inicijative i provjera održivosti efekata?",
+   "evidence": "Kaizen registar, audit 30/60/90",
+   "kpi": "Udio potvrđenih održivih poboljšanja",
+   "financial": "Upravljanje učinkom",
+   "recommendation": "Kaizen / sustain audit"
+  }
+ ]
+}

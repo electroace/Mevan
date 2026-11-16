@@ -1,0 +1,2059 @@
+{
+ "id": "v2",
+ "label": "65 kriterija / 6 modula",
+ "status": "draft",
+ "status_note": "Nacrt metodologije: svih 65 mapiranja čeka stručnu potvrdu (PENDING_EXPERT_SIGNOFF).",
+ "scale": {
+  "unknown": "NEPOZNATO = nedostaje materijal za ocjenu; nije nula.",
+  "blocked": "BLOKIRANO = kontradiktorni ključni izvori.",
+  "not_applicable": "N/A = obrazložena neprimjenjivost."
+ },
+ "modules": [
+  {
+   "code": "S",
+   "name": "Strategija, Uprava i poslovni model"
+  },
+  {
+   "code": "F",
+   "name": "Finansije i stvaranje vrijednosti"
+  },
+  {
+   "code": "O",
+   "name": "Operacije, proizvodnja i kvalitet"
+  },
+  {
+   "code": "P",
+   "name": "Planiranje i Supply Chain"
+  },
+  {
+   "code": "L",
+   "name": "Ljudi, organizacija i liderstvo"
+  },
+  {
+   "code": "M",
+   "name": "Sistem upravljanja i kontinuirano unapređenje"
+  }
+ ],
+ "criteria": [
+  {
+   "code": "M08",
+   "module": "S",
+   "name": "Upravljanje rizicima",
+   "question": "Prepoznaju li se operativni, finansijski i kontinuitetni rizici?",
+   "evidence": "Registar rizika, FMEA, plan kontinuiteta",
+   "kpi": "Udio visokih rizika s mjerama",
+   "recommendation": "Registrirati rizike i testirati kontrole",
+   "owner": "Uprava / strategija",
+   "consequence_hypothesis": "Neobrađeni visoki rizici",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-M08",
+   "anchors": [
+    "Nema dokazive prakse za „Upravljanje rizicima” nakon provjere relevantnih izvora.",
+    "„Upravljanje rizicima” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Upravljanje rizicima”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Upravljanje rizicima”, imenovani vlasnik i ponovljiva evidencija: Registar rizika, FMEA, plan kontinuiteta.",
+    "KPI (Udio visokih rizika s mjerama) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Udio visokih rizika s mjerama) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "izbjegnuti trošak incidenta",
+    "model": "RISK",
+    "family": "RISK_EXPECTED_LOSS",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "promjena_vjerovatnoce_incidenta × provjerena_finansijska_posljedica - trosak_kontrole"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "S01",
+   "module": "S",
+   "name": "Tržišna pozicija i segmenti",
+   "question": "Kako Uprava bira tržišta, kupce i segmente i provjerava stvarnu konkurentsku prednost?",
+   "evidence": "Mjera/KPI: Segmentna marža, rast, tržišni udio gdje je pouzdan  |  Dokaz: Strategija; analiza segmenata; odluke Uprave",
+   "kpi": "Definisati na pilotu; ne izmišljati pragove",
+   "recommendation": "Analizirati profitabilnost i rast po segmentu",
+   "owner": "Uprava / strategija",
+   "consequence_hypothesis": "Pogrešan fokus na tržišne segmente",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-S01",
+   "anchors": [
+    "Nema dokazive prakse za „Tržišna pozicija i segmenti” nakon provjere relevantnih izvora.",
+    "„Tržišna pozicija i segmenti” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Tržišna pozicija i segmenti”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Tržišna pozicija i segmenti”, imenovani vlasnik i ponovljiva evidencija: Mjera/KPI: Segmentna marža, rast, tržišni udio gdje je pouzdan  |  Dokaz: Strategija; analiza segmenata; odluke Uprave.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "kontribucija po segmentu",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Market share alone does not demonstrate incremental profit",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "S02",
+   "module": "S",
+   "name": "Profitabilnost portfolija",
+   "question": "Kako Uprava mijenja portfolio na osnovu kontribucije, potražnje i kapaciteta?",
+   "evidence": "Mjera/KPI: Kontribucija po SKU/kupcu i iskorištenje ograničenja  |  Dokaz: Profitabilnost; odluke o portfoliju",
+   "kpi": "Definisati na pilotu; ne izmišljati pragove",
+   "recommendation": "Uvesti SKU/kupac kontribuciju po ograničenju",
+   "owner": "Uprava / strategija",
+   "consequence_hypothesis": "Niskoprofitabilni proizvodi troše ograničeni kapacitet",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-S02",
+   "anchors": [
+    "Nema dokazive prakse za „Profitabilnost portfolija” nakon provjere relevantnih izvora.",
+    "„Profitabilnost portfolija” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Profitabilnost portfolija”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Profitabilnost portfolija”, imenovani vlasnik i ponovljiva evidencija: Mjera/KPI: Kontribucija po SKU/kupcu i iskorištenje ograničenja  |  Dokaz: Profitabilnost; odluke o portfoliju.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "kontribucija po SKU",
+    "model": "PORTFOLIO",
+    "family": "PORTFOLIO_MARGIN",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "Portfolio margin improvement, shared with contribution margin",
+    "formula": "SUM[(nova_kontribucija_SKU - stara_kontribucija_SKU) × ostvarena_kolicina_SKU] - dodatni_troskovi"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "S03",
+   "module": "S",
+   "name": "Kvalitet strateških izbora",
+   "question": "Koje je ključne poslovne izazove Uprava dijagnosticirala i koje je alternative odbacila?",
+   "evidence": "Mjera/KPI: Ishod strateških inicijativa  |  Dokaz: Dokumentovane odluke; pretpostavke; rezultati",
+   "kpi": "Definisati na pilotu; ne izmišljati pragove",
+   "recommendation": "Uvesti decision memo sa opcijama i ex-post provjerom",
+   "owner": "Uprava / strategija",
+   "consequence_hypothesis": "Odluke bez poređenja alternativa",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-S03",
+   "anchors": [
+    "Nema dokazive prakse za „Kvalitet strateških izbora” nakon provjere relevantnih izvora.",
+    "„Kvalitet strateških izbora” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Kvalitet strateških izbora”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Kvalitet strateških izbora”, imenovani vlasnik i ponovljiva evidencija: Mjera/KPI: Ishod strateških inicijativa  |  Dokaz: Dokumentovane odluke; pretpostavke; rezultati.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "izbjegnuti gubitak pogrešne odluke",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Strategic decision quality has no direct quality-cost formula",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "S04",
+   "module": "S",
+   "name": "Alokacija resursa",
+   "question": "Jesu li kapital, ljudi i vrijeme raspoređeni prema prioritetima i ograničenjima?",
+   "evidence": "Mjera/KPI: Ostvarene koristi po uloženoj KM  |  Dokaz: Budžet; portfelj projekata; resursni plan",
+   "kpi": "Definisati na pilotu; ne izmišljati pragove",
+   "recommendation": "Uspostaviti portfelj i kapacitet resursa",
+   "owner": "Uprava / strategija",
+   "consequence_hypothesis": "Resursi nisu usklađeni s prioritetima",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-S04",
+   "anchors": [
+    "Nema dokazive prakse za „Alokacija resursa” nakon provjere relevantnih izvora.",
+    "„Alokacija resursa” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Alokacija resursa”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Alokacija resursa”, imenovani vlasnik i ponovljiva evidencija: Mjera/KPI: Ostvarene koristi po uloženoj KM  |  Dokaz: Budžet; portfelj projekata; resursni plan.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "korist po uloženoj KM",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "S05",
+   "module": "S",
+   "name": "Komercijalna i kupovna koncentracija",
+   "question": "Koji su rizici ovisnosti o ključnim kupcima, dobavljačima i tržištima?",
+   "evidence": "Mjera/KPI: Udio top kupaca/dobavljača; scenarij prekida  |  Dokaz: Ugovori; koncentracija; scenariji",
+   "kpi": "Definisati na pilotu; ne izmišljati pragove",
+   "recommendation": "Izmjeriti zavisnost i plan diversifikacije",
+   "owner": "Uprava / strategija",
+   "consequence_hypothesis": "Koncentracija kupaca i nabavke",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-S05",
+   "anchors": [
+    "Nema dokazive prakse za „Komercijalna i kupovna koncentracija” nakon provjere relevantnih izvora.",
+    "„Komercijalna i kupovna koncentracija” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Komercijalna i kupovna koncentracija”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Komercijalna i kupovna koncentracija”, imenovani vlasnik i ponovljiva evidencija: Mjera/KPI: Udio top kupaca/dobavljača; scenarij prekida  |  Dokaz: Ugovori; koncentracija; scenariji.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "prihod/marža pod rizikom",
+    "model": "RISK",
+    "family": "RISK_CONCENTRATION",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "Concentration exposure; monetary EV only with validated likelihood",
+    "formula": "promjena_vjerovatnoce_incidenta × provjerena_finansijska_posljedica - trosak_kontrole"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "S06",
+   "module": "S",
+   "name": "Kvalitet investicijskih odluka",
+   "question": "Kako se provjeravaju pretpostavke, alternative i koristi CAPEX ulaganja nakon realizacije?",
+   "evidence": "Mjera/KPI: ROI, NPV/IRR gdje je primjereno; realizacija koristi  |  Dokaz: Business case; post-investicijski pregled",
+   "kpi": "Definisati na pilotu; ne izmišljati pragove",
+   "recommendation": "Uvesti investicijski business case i stage-gate",
+   "owner": "Uprava / strategija",
+   "consequence_hypothesis": "CAPEX bez validiranog ograničenja",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-S06",
+   "anchors": [
+    "Nema dokazive prakse za „Kvalitet investicijskih odluka” nakon provjere relevantnih izvora.",
+    "„Kvalitet investicijskih odluka” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Kvalitet investicijskih odluka”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Kvalitet investicijskih odluka”, imenovani vlasnik i ponovljiva evidencija: Mjera/KPI: ROI, NPV/IRR gdje je primjereno; realizacija koristi  |  Dokaz: Business case; post-investicijski pregled.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "NPV i izbjegnuti CAPEX",
+    "model": "CAPEX",
+    "family": "INVESTMENT_NPV",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "NPV is investment appraisal, never added to recurring gains",
+    "formula": "NPV(inkrementalni_novcani_tokovi, diskontna_stopa) - pocetni_CAPEX"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "S07",
+   "module": "S",
+   "name": "Ritam i kvalitet odlučivanja Uprave",
+   "question": "Kako Uprava odlučuje na osnovu pouzdanih podataka, prati odluke i mijenja kurs?",
+   "evidence": "Mjera/KPI: Vrijeme do odluke; zatvaranje akcija  |  Dokaz: Zapisnici; dashboard; akcioni registar",
+   "kpi": "Definisati na pilotu; ne izmišljati pragove",
+   "recommendation": "Uvesti dnevnik odluka, vlasnika i rok",
+   "owner": "Uprava / strategija",
+   "consequence_hypothesis": "Odluke kasne ili se ne prate",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-S07",
+   "anchors": [
+    "Nema dokazive prakse za „Ritam i kvalitet odlučivanja Uprave” nakon provjere relevantnih izvora.",
+    "„Ritam i kvalitet odlučivanja Uprave” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Ritam i kvalitet odlučivanja Uprave”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Ritam i kvalitet odlučivanja Uprave”, imenovani vlasnik i ponovljiva evidencija: Mjera/KPI: Vrijeme do odluke; zatvaranje akcija  |  Dokaz: Zapisnici; dashboard; akcioni registar.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak kašnjenja odluke",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Governance cadence is a driver not a directly additive benefit",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "S08",
+   "module": "S",
+   "name": "Otpornost poslovnog modela",
+   "question": "Kako Uprava testira scenarije pada potražnje, marže, likvidnosti i raspoloživosti kapaciteta?",
+   "evidence": "Mjera/KPI: Likvidnosni i operativni stres scenariji  |  Dokaz: Scenariji; plan kontinuiteta; testovi",
+   "kpi": "Definisati na pilotu; ne izmišljati pragove",
+   "recommendation": "Testirati scenarije prekida i plan kontinuiteta",
+   "owner": "Uprava / strategija",
+   "consequence_hypothesis": "Niska otpornost na poremećaje",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-S08",
+   "anchors": [
+    "Nema dokazive prakse za „Otpornost poslovnog modela” nakon provjere relevantnih izvora.",
+    "„Otpornost poslovnog modela” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Otpornost poslovnog modela”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Otpornost poslovnog modela”, imenovani vlasnik i ponovljiva evidencija: Mjera/KPI: Likvidnosni i operativni stres scenariji  |  Dokaz: Scenariji; plan kontinuiteta; testovi.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "očekivani gubitak prekida",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "F01",
+   "module": "F",
+   "name": "Profitabilnost",
+   "question": "Da li su EBITDA i marža pouzdano obračunati i analizirani po periodima?",
+   "evidence": "P&L 12–24 mj; usklađenje EBITDA",
+   "kpi": "EBITDA %; trend",
+   "recommendation": "Izraditi most EBITDA po faktorima",
+   "owner": "Finansije / kontroling",
+   "consequence_hypothesis": "Slaba operativna profitabilnost",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-F01",
+   "anchors": [
+    "Nema dokazive prakse za „Profitabilnost” nakon provjere relevantnih izvora.",
+    "„Profitabilnost” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Profitabilnost”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Profitabilnost”, imenovani vlasnik i ponovljiva evidencija: P&L 12–24 mj; usklađenje EBITDA.",
+    "KPI (EBITDA %; trend) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (EBITDA %; trend) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "EBITDA po uzroku",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Profitability is an outcome metric, not a separate savings pool",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "F02",
+   "module": "F",
+   "name": "Kontribucijska marža",
+   "question": "Da li je poznata kontribucija po proizvodu, kupcu i narudžbi?",
+   "evidence": "Prodaja; varijabilni troškovi; kalkulacije",
+   "kpi": "Kontribucija KM/%",
+   "recommendation": "Izračunati doprinos po proizvodu/kupcu",
+   "owner": "Finansije / kontroling",
+   "consequence_hypothesis": "Nedovoljno poznata kontribucija",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-F02",
+   "anchors": [
+    "Nema dokazive prakse za „Kontribucijska marža” nakon provjere relevantnih izvora.",
+    "„Kontribucijska marža” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Kontribucijska marža”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Kontribucijska marža”, imenovani vlasnik i ponovljiva evidencija: Prodaja; varijabilni troškovi; kalkulacije.",
+    "KPI (Kontribucija KM/%) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Kontribucija KM/%) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "kontribucija po jedinici",
+    "model": "MARGIN",
+    "family": "PORTFOLIO_MARGIN",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "Contribution margin is same economic pool as portfolio",
+    "formula": "SUM[(neto_cijena - varijabilni_trosak) × prodana_kolicina] - referentna_kontribucija"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "F03",
+   "module": "F",
+   "name": "Struktura troškova",
+   "question": "Da li se odstupanja materijala, rada, energije i režije objašnjavaju?",
+   "evidence": "Glavna knjiga; centri troška; trend",
+   "kpi": "Trošak po jedinici",
+   "recommendation": "Izraditi cost-driver mapu",
+   "owner": "Finansije / kontroling",
+   "consequence_hypothesis": "Troškovi bez jasnih pokretača",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-F03",
+   "anchors": [
+    "Nema dokazive prakse za „Struktura troškova” nakon provjere relevantnih izvora.",
+    "„Struktura troškova” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Struktura troškova”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Struktura troškova”, imenovani vlasnik i ponovljiva evidencija: Glavna knjiga; centri troška; trend.",
+    "KPI (Trošak po jedinici) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Trošak po jedinici) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "izbjegnuti operativni trošak",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Cost structure requires account-level decomposition",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "F04",
+   "module": "F",
+   "name": "Standardni troškovi",
+   "question": "Jesu li BOM, normativi i standardi ažurni i upoređeni sa stvarnim?",
+   "evidence": "BOM; radni normativi; variance izvještaji",
+   "kpi": "Odstupanje standard/stvarno",
+   "recommendation": "Revidirati standarde i varijanse",
+   "owner": "Finansije / kontroling",
+   "consequence_hypothesis": "Netačni ili neažurni normativi",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-F04",
+   "anchors": [
+    "Nema dokazive prakse za „Standardni troškovi” nakon provjere relevantnih izvora.",
+    "„Standardni troškovi” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Standardni troškovi”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Standardni troškovi”, imenovani vlasnik i ponovljiva evidencija: BOM; radni normativi; variance izvještaji.",
+    "KPI (Odstupanje standard/stvarno) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Odstupanje standard/stvarno) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "odstupanje standard/stvarno",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Standard costing is a control, not incremental margin",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "F08",
+   "module": "F",
+   "name": "Obrtni kapital",
+   "question": "Da li se potraživanja, obaveze i gotovina aktivno planiraju?",
+   "evidence": "AR/AP aging; cash flow",
+   "kpi": "DSO; DPO; CCC",
+   "recommendation": "Analizirati DIO/DSO/DPO i strukturu zaliha",
+   "owner": "Finansije / kontroling",
+   "consequence_hypothesis": "Previše gotovine vezano u ciklusu",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-F08",
+   "anchors": [
+    "Nema dokazive prakse za „Obrtni kapital” nakon provjere relevantnih izvora.",
+    "„Obrtni kapital” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Obrtni kapital”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Obrtni kapital”, imenovani vlasnik i ponovljiva evidencija: AR/AP aging; cash flow.",
+    "KPI (DSO; DPO; CCC) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (DSO; DPO; CCC) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "oslobađanje obrtnog kapitala",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Working capital requires component-specific DSO/DIO/DPO models",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "F09",
+   "module": "F",
+   "name": "Budžet i odstupanja",
+   "question": "Da li se budžet i forecast redovno porede s realizacijom?",
+   "evidence": "Budžet; forecast; mjesečna odstupanja",
+   "kpi": "Forecast error %",
+   "recommendation": "Uvesti rolling forecast i root-cause varijanse",
+   "owner": "Finansije / kontroling",
+   "consequence_hypothesis": "Budžetska odstupanja bez korekcije",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-F09",
+   "anchors": [
+    "Nema dokazive prakse za „Budžet i odstupanja” nakon provjere relevantnih izvora.",
+    "„Budžet i odstupanja” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Budžet i odstupanja”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Budžet i odstupanja”, imenovani vlasnik i ponovljiva evidencija: Budžet; forecast; mjesečna odstupanja.",
+    "KPI (Forecast error %) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Forecast error %) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "izbjegnuto negativno odstupanje",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "F10",
+   "module": "F",
+   "name": "Finansijsko izvještavanje",
+   "question": "Jesu li podaci tačni, pravovremeni i usklađeni s operativom?",
+   "evidence": "Close kalendar; ERP; reconciliations",
+   "kpi": "Dani do izvještaja",
+   "recommendation": "Uvesti close calendar i kontrolu usaglašenosti",
+   "owner": "Finansije / kontroling",
+   "consequence_hypothesis": "Zakašnjelo ili neusaglašeno izvještavanje",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-F10",
+   "anchors": [
+    "Nema dokazive prakse za „Finansijsko izvještavanje” nakon provjere relevantnih izvora.",
+    "„Finansijsko izvještavanje” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Finansijsko izvještavanje”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Finansijsko izvještavanje”, imenovani vlasnik i ponovljiva evidencija: Close kalendar; ERP; reconciliations.",
+    "KPI (Dani do izvještaja) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Dani do izvještaja) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak pogrešnih odluka",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "F13",
+   "module": "F",
+   "name": "Kvalitet gotovine",
+   "question": "Kako se EBITDA pretvara u operativni novčani tok i gdje nastaje razlika?",
+   "evidence": "Mjera/KPI: Cash conversion; CFO/EBITDA  |  Dokaz: P&L; cash flow; bilans stanja",
+   "kpi": "Definisati na pilotu; ne izmišljati pragove",
+   "recommendation": "Uvesti cash conversion bridge",
+   "owner": "Finansije / kontroling",
+   "consequence_hypothesis": "Dobit nije praćena gotovinom",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-F13",
+   "anchors": [
+    "Nema dokazive prakse za „Kvalitet gotovine” nakon provjere relevantnih izvora.",
+    "„Kvalitet gotovine” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Kvalitet gotovine”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Kvalitet gotovine”, imenovani vlasnik i ponovljiva evidencija: Mjera/KPI: Cash conversion; CFO/EBITDA  |  Dokaz: P&L; cash flow; bilans stanja.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "novčani tok i trošak finansiranja",
+    "model": "CASH",
+    "family": "CASH_AR",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "Cash release only; not EBITDA",
+    "formula": "smanjenje_DSO_dana × godisnja_kreditna_prodaja / 365"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "O01",
+   "module": "O",
+   "name": "Produktivnost rada",
+   "question": "Komadi ili standardni sati po efektivnom satu rada",
+   "evidence": "Radni nalozi; evidencija sati; normativi",
+   "kpi": "Učinak / efektivni sati",
+   "recommendation": "Izmjeriti output po plaćenom satu i gubitke",
+   "owner": "Direktor proizvodnje",
+   "consequence_hypothesis": "Niska produktivnost radnog sata",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-O01",
+   "anchors": [
+    "Nema dokazive prakse za „Produktivnost rada” nakon provjere relevantnih izvora.",
+    "„Produktivnost rada” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Produktivnost rada”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Produktivnost rada”, imenovani vlasnik i ponovljiva evidencija: Radni nalozi; evidencija sati; normativi.",
+    "KPI (Učinak / efektivni sati) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Učinak / efektivni sati) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak sata po dobrom komadu",
+    "model": "LABOR",
+    "family": "LABOR_COST",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "(baseline_sati_po_jedinici - actual_sati_po_jedinici) × ostvarena_kolicina × izbjegnuti_trosak_sata"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "O02",
+   "module": "O",
+   "name": "Iskorištenost kapaciteta",
+   "question": "Usklađenost opterećenja i raspoloživih kapaciteta",
+   "evidence": "Plan kapaciteta; smjene; stvarna proizvodnja",
+   "kpi": "Opterećenje / raspoloživi kapacitet",
+   "recommendation": "Izraditi kapacitetski model po centru",
+   "owner": "Direktor proizvodnje",
+   "consequence_hypothesis": "Neiskorišten ili pogrešno raspoređen kapacitet",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-O02",
+   "anchors": [
+    "Nema dokazive prakse za „Iskorištenost kapaciteta” nakon provjere relevantnih izvora.",
+    "„Iskorištenost kapaciteta” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Iskorištenost kapaciteta”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Iskorištenost kapaciteta”, imenovani vlasnik i ponovljiva evidencija: Plan kapaciteta; smjene; stvarna proizvodnja.",
+    "KPI (Opterećenje / raspoloživi kapacitet) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Opterećenje / raspoloživi kapacitet) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "kontribucija dodatnog outputa",
+    "model": "OEE",
+    "family": "THROUGHPUT",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "Capacity gains need constrained demand and incremental sales",
+    "formula": "dodatne_prodane_jedinice_zbog_ogranicenja × kontribucija_po_jedinici - dodatni_troskovi"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "O03",
+   "module": "O",
+   "name": "OEE / efikasnost opreme",
+   "question": "Dostupnost, performanse i kvalitet kritične opreme",
+   "evidence": "Dnevnik mašina; zastoji; kvalitet",
+   "kpi": "OEE = A × P × Q",
+   "recommendation": "Validirati availability/performance/quality",
+   "owner": "Direktor proizvodnje",
+   "consequence_hypothesis": "OEE gubici bez validirane strukture",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-O03",
+   "anchors": [
+    "Nema dokazive prakse za „OEE / efikasnost opreme” nakon provjere relevantnih izvora.",
+    "„OEE / efikasnost opreme” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „OEE / efikasnost opreme”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „OEE / efikasnost opreme”, imenovani vlasnik i ponovljiva evidencija: Dnevnik mašina; zastoji; kvalitet.",
+    "KPI (OEE = A × P × Q) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (OEE = A × P × Q) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "kontribucija oslobođenih sati",
+    "model": "OEE",
+    "family": "THROUGHPUT",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "OEE is a driver of bottleneck throughput; no direct OEE monetization",
+    "formula": "dodatne_prodane_jedinice_zbog_ogranicenja × kontribucija_po_jedinici - dodatni_troskovi"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "O05",
+   "module": "O",
+   "name": "Škart i dorada",
+   "question": "Gubici kvaliteta po proizvodu i uzroku",
+   "evidence": "Kontrola kvaliteta; reklamacije; radni nalozi",
+   "kpi": "Škart %; FPY; sati dorade",
+   "recommendation": "Pareto uzroka i kontrolni plan",
+   "owner": "Direktor proizvodnje",
+   "consequence_hypothesis": "Škart i dorada troše resurse",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-O05",
+   "anchors": [
+    "Nema dokazive prakse za „Škart i dorada” nakon provjere relevantnih izvora.",
+    "„Škart i dorada” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Škart i dorada”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Škart i dorada”, imenovani vlasnik i ponovljiva evidencija: Kontrola kvaliteta; reklamacije; radni nalozi.",
+    "KPI (Škart %; FPY; sati dorade) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Škart %; FPY; sati dorade) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "materijal+rad dorade",
+    "model": "SCRAP",
+    "family": "MATERIAL_LOSS",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "Scrap material and rework must be itemized separately",
+    "formula": "(skart_baseline_kg - skart_actual_kg) × neto_izbjegnuti_trosak_po_kg - dodatni_troskovi"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "O06",
+   "module": "O",
+   "name": "Protočno vrijeme",
+   "question": "Vrijeme od naloga do završetka proizvodnje",
+   "evidence": "ERP vremenske oznake; VSM; nalozi",
+   "kpi": "Lead time; WIP",
+   "recommendation": "Value-stream mapping i redukcija čekanja",
+   "owner": "Direktor proizvodnje",
+   "consequence_hypothesis": "Predugo protočno vrijeme",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-O06",
+   "anchors": [
+    "Nema dokazive prakse za „Protočno vrijeme” nakon provjere relevantnih izvora.",
+    "„Protočno vrijeme” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Protočno vrijeme”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Protočno vrijeme”, imenovani vlasnik i ponovljiva evidencija: ERP vremenske oznake; VSM; nalozi.",
+    "KPI (Lead time; WIP) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Lead time; WIP) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak WIP-a i kašnjenja",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Lead-time reduction is not itself inventory release",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "O07",
+   "module": "O",
+   "name": "Promjene alata / serija",
+   "question": "Trajanje i standardizacija setupa",
+   "evidence": "Setup evidencije; video analiza; plan",
+   "kpi": "Prosječan setup (min)",
+   "recommendation": "SMED pilot i standard podešavanja",
+   "owner": "Direktor proizvodnje",
+   "consequence_hypothesis": "Duge promjene alata/serija",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-O07",
+   "anchors": [
+    "Nema dokazive prakse za „Promjene alata / serija” nakon provjere relevantnih izvora.",
+    "„Promjene alata / serija” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Promjene alata / serija”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Promjene alata / serija”, imenovani vlasnik i ponovljiva evidencija: Setup evidencije; video analiza; plan.",
+    "KPI (Prosječan setup (min)) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Prosječan setup (min)) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "oslobođeni sati × kontribucija",
+    "model": "CHANGEOVER",
+    "family": "THROUGHPUT",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "SMED released minutes only valuable with validated demand/bottleneck",
+    "formula": "(baseline_min - actual_min) × broj_promjena × doprinos_po_min_ogranicenja - trosak_implementacije_operativni"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "O08",
+   "module": "O",
+   "name": "Standardizovani rad",
+   "question": "Postojanje i primjena standardnih postupaka",
+   "evidence": "Radne instrukcije; audit; Gemba",
+   "kpi": "Usklađenost sa standardom %",
+   "recommendation": "Standard work i audit procesa",
+   "owner": "Direktor proizvodnje",
+   "consequence_hypothesis": "Varijacije u izvršenju rada",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-O08",
+   "anchors": [
+    "Nema dokazive prakse za „Standardizovani rad” nakon provjere relevantnih izvora.",
+    "„Standardizovani rad” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Standardizovani rad”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Standardizovani rad”, imenovani vlasnik i ponovljiva evidencija: Radne instrukcije; audit; Gemba.",
+    "KPI (Usklađenost sa standardom %) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Usklađenost sa standardom %) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "škart i vrijeme varijacije",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Standard work is causal driver, not direct scrap saving",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "O09",
+   "module": "O",
+   "name": "Tok materijala i WIP",
+   "question": "Transport, čekanje i međufazne zalihe",
+   "evidence": "Spaghetti mapa; VSM; WIP izvještaji",
+   "kpi": "WIP dani; udaljenost toka",
+   "recommendation": "WIP limit i FIFO kontrola",
+   "owner": "Direktor proizvodnje",
+   "consequence_hypothesis": "Nagomilavanje međufaznih zaliha",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-O09",
+   "anchors": [
+    "Nema dokazive prakse za „Tok materijala i WIP” nakon provjere relevantnih izvora.",
+    "„Tok materijala i WIP” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Tok materijala i WIP”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Tok materijala i WIP”, imenovani vlasnik i ponovljiva evidencija: Spaghetti mapa; VSM; WIP izvještaji.",
+    "KPI (WIP dani; udaljenost toka) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (WIP dani; udaljenost toka) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "oslobođeni WIP × vrijednost",
+    "model": "INVENTORY",
+    "family": "INVENTORY_CASH",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "WIP release must be reconciled with total inventory",
+    "formula": "(prosjek_zaliha_baseline - prosjek_zaliha_actual) × udio_oslobodivog_kapitala"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "O10",
+   "module": "O",
+   "name": "Preventivno održavanje",
+   "question": "Planiranje i izvršenje održavanja",
+   "evidence": "CMMS; planovi; evidencija kvarova",
+   "kpi": "PM compliance %; MTBF; MTTR",
+   "recommendation": "Kritičnost opreme i preventivni plan",
+   "owner": "Direktor proizvodnje",
+   "consequence_hypothesis": "Neplanirani zastoji opreme",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-O10",
+   "anchors": [
+    "Nema dokazive prakse za „Preventivno održavanje” nakon provjere relevantnih izvora.",
+    "„Preventivno održavanje” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Preventivno održavanje”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Preventivno održavanje”, imenovani vlasnik i ponovljiva evidencija: CMMS; planovi; evidencija kvarova.",
+    "KPI (PM compliance %; MTBF; MTTR) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (PM compliance %; MTBF; MTTR) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak zastoja i održavanja",
+    "model": "DOWNTIME",
+    "family": "THROUGHPUT",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "Downtime on bottleneck may overlap with OEE and SMED",
+    "formula": "izbjegnuti_zastoji_sati × vrijednost_sata_ogranicenja - dodatni_troskovi"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "O11",
+   "module": "O",
+   "name": "Isporuka iz proizvodnje",
+   "question": "Poštovanje proizvodnih rokova i količina",
+   "evidence": "Plan i realizacija; ERP; otpremnice",
+   "kpi": "Plan attainment %; OTD %",
+   "recommendation": "Mjerenje proizvodnog OTIF-a po nalogu",
+   "owner": "Direktor proizvodnje",
+   "consequence_hypothesis": "Nerealizovane interne isporuke",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-O11",
+   "anchors": [
+    "Nema dokazive prakse za „Isporuka iz proizvodnje” nakon provjere relevantnih izvora.",
+    "„Isporuka iz proizvodnje” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Isporuka iz proizvodnje”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Isporuka iz proizvodnje”, imenovani vlasnik i ponovljiva evidencija: Plan i realizacija; ERP; otpremnice.",
+    "KPI (Plan attainment %; OTD %) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Plan attainment %; OTD %) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "penali, ekspresni transport",
+    "model": "OTIF",
+    "family": "DELIVERY_COST",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "Penalty/expedite claims require unique source transactions",
+    "formula": "izbjegnuti_penali + izbjegnuti_ekspres_troskovi + dodatna_dokazana_kontribucija - dodatni_troskovi"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "O13",
+   "module": "O",
+   "name": "Energetska efikasnost",
+   "question": "Potrošnja energije po jedinici učinka",
+   "evidence": "Računi; mjerenja; evidencija proizvodnje",
+   "kpi": "kWh / jedinici",
+   "recommendation": "Energetski bilans i mjerenje po procesu",
+   "owner": "Direktor proizvodnje",
+   "consequence_hypothesis": "Visoka potrošnja energije po jedinici",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-O13",
+   "anchors": [
+    "Nema dokazive prakse za „Energetska efikasnost” nakon provjere relevantnih izvora.",
+    "„Energetska efikasnost” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Energetska efikasnost”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Energetska efikasnost”, imenovani vlasnik i ponovljiva evidencija: Računi; mjerenja; evidencija proizvodnje.",
+    "KPI (kWh / jedinici) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (kWh / jedinici) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "kWh/jedinici × tarifa",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "O14",
+   "module": "O",
+   "name": "Sigurnost i ergonomija",
+   "question": "Kontrola operativnih rizika i ergonomskih opterećenja",
+   "evidence": "Procjene rizika; incidenti; Gemba",
+   "kpi": "Incidenti; zatvorene mjere %",
+   "recommendation": "Procjena rizika i korektivne mjere",
+   "owner": "Direktor proizvodnje",
+   "consequence_hypothesis": "Rizici sigurnosti i ergonomije",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-O14",
+   "anchors": [
+    "Nema dokazive prakse za „Sigurnost i ergonomija” nakon provjere relevantnih izvora.",
+    "„Sigurnost i ergonomija” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Sigurnost i ergonomija”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Sigurnost i ergonomija”, imenovani vlasnik i ponovljiva evidencija: Procjene rizika; incidenti; Gemba.",
+    "KPI (Incidenti; zatvorene mjere %) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Incidenti; zatvorene mjere %) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "očekivani trošak incidenta",
+    "model": "RISK",
+    "family": "RISK_EXPECTED_LOSS",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "Risk expected value, not realized profit",
+    "formula": "promjena_vjerovatnoce_incidenta × provjerena_finansijska_posljedica - trosak_kontrole"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "O15",
+   "module": "O",
+   "name": "Kontinuirano poboljšavanje",
+   "question": "Sistem prijedloga, kaizen i održivost mjera",
+   "evidence": "Kaizen registar; audit; KPI trend",
+   "kpi": "Realizovane mjere / mjesec",
+   "recommendation": "Kaizen backlog i provjera održivosti",
+   "owner": "Direktor proizvodnje",
+   "consequence_hypothesis": "Poboljšanja nisu standardizovana",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-O15",
+   "anchors": [
+    "Nema dokazive prakse za „Kontinuirano poboljšavanje” nakon provjere relevantnih izvora.",
+    "„Kontinuirano poboljšavanje” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Kontinuirano poboljšavanje”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Kontinuirano poboljšavanje”, imenovani vlasnik i ponovljiva evidencija: Kaizen registar; audit; KPI trend.",
+    "KPI (Realizovane mjere / mjesec) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Realizovane mjere / mjesec) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "potvrđene neto uštede",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "O16",
+   "module": "O",
+   "name": "Validacija stvarnog uskog grla",
+   "question": "Gdje je trenutno ograničenje toka i kako je dokazano opažanjem i podacima?",
+   "evidence": "Mjera/KPI: Throughput ograničenja; čekanja; red  |  Dokaz: Gemba; podaci o ciklusu; WIP",
+   "kpi": "Definisati na pilotu; ne izmišljati pragove",
+   "recommendation": "TOC analiza toka i kapaciteta",
+   "owner": "Direktor proizvodnje",
+   "consequence_hypothesis": "Pogrešno identifikovano usko grlo",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-O16",
+   "anchors": [
+    "Nema dokazive prakse za „Validacija stvarnog uskog grla” nakon provjere relevantnih izvora.",
+    "„Validacija stvarnog uskog grla” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Validacija stvarnog uskog grla”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Validacija stvarnog uskog grla”, imenovani vlasnik i ponovljiva evidencija: Mjera/KPI: Throughput ograničenja; čekanja; red  |  Dokaz: Gemba; podaci o ciklusu; WIP.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "izbjegnuti CAPEX / kontribucija",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Bottleneck validation is prerequisite not independent CAPEX gain",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "P01",
+   "module": "P",
+   "name": "Prognoza potražnje",
+   "question": "Da li se prognoza zasniva na podacima i redovno mjeri njena tačnost?",
+   "evidence": "Prognoza, narudžbe, istorija prodaje",
+   "kpi": "WAPE, bias",
+   "recommendation": "Mjeriti WAPE/bias po segmentu",
+   "owner": "Planiranje / SCM",
+   "consequence_hypothesis": "Prognoza nije pouzdana",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-P01",
+   "anchors": [
+    "Nema dokazive prakse za „Prognoza potražnje” nakon provjere relevantnih izvora.",
+    "„Prognoza potražnje” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Prognoza potražnje”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Prognoza potražnje”, imenovani vlasnik i ponovljiva evidencija: Prognoza, narudžbe, istorija prodaje.",
+    "KPI (WAPE, bias) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (WAPE, bias) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak nestašica i viška",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "P02",
+   "module": "P",
+   "name": "S&OP / IBP",
+   "question": "Postoji li redovan proces usaglašavanja prodaje, operacija i finansija?",
+   "evidence": "Zapisnici S&OP, scenariji, odobren plan",
+   "kpi": "Usklađenost plana; broj eskalacija",
+   "recommendation": "Mjesečni S&OP s jednim planom",
+   "owner": "Planiranje / SCM",
+   "consequence_hypothesis": "Prodaja i proizvodnja nisu usklađene",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-P02",
+   "anchors": [
+    "Nema dokazive prakse za „S&OP / IBP” nakon provjere relevantnih izvora.",
+    "„S&OP / IBP” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „S&OP / IBP”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „S&OP / IBP”, imenovani vlasnik i ponovljiva evidencija: Zapisnici S&OP, scenariji, odobren plan.",
+    "KPI (Usklađenost plana; broj eskalacija) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Usklađenost plana; broj eskalacija) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "kontribucija izgubljene prodaje",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "S&OP coordinates benefits but cannot claim them separately",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "P03",
+   "module": "P",
+   "name": "Glavni plan proizvodnje",
+   "question": "Postoji li realan, zamrznut i rolling plan proizvodnje?",
+   "evidence": "MPS, sedmični plan, promjene verzija",
+   "kpi": "Plan attainment; schedule adherence",
+   "recommendation": "MPS s vremenskim ogradama",
+   "owner": "Planiranje / SCM",
+   "consequence_hypothesis": "Glavni plan nije izvediv",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-P03",
+   "anchors": [
+    "Nema dokazive prakse za „Glavni plan proizvodnje” nakon provjere relevantnih izvora.",
+    "„Glavni plan proizvodnje” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Glavni plan proizvodnje”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Glavni plan proizvodnje”, imenovani vlasnik i ponovljiva evidencija: MPS, sedmični plan, promjene verzija.",
+    "KPI (Plan attainment; schedule adherence) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Plan attainment; schedule adherence) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak promjena i kašnjenja",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Master schedule is a causal driver, not changeover benefit by default",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "P04",
+   "module": "P",
+   "name": "Planiranje kapaciteta",
+   "question": "Da li se plan provjerava prema ljudima, mašinama i uskim grlima?",
+   "evidence": "RCCP, kapaciteti, smjene, takti",
+   "kpi": "Opterećenje kritičnog resursa",
+   "recommendation": "RCCP po kritičnim centrima",
+   "owner": "Planiranje / SCM",
+   "consequence_hypothesis": "Plan ignorira stvarni kapacitet",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-P04",
+   "anchors": [
+    "Nema dokazive prakse za „Planiranje kapaciteta” nakon provjere relevantnih izvora.",
+    "„Planiranje kapaciteta” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Planiranje kapaciteta”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Planiranje kapaciteta”, imenovani vlasnik i ponovljiva evidencija: RCCP, kapaciteti, smjene, takti.",
+    "KPI (Opterećenje kritičnog resursa) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Opterećenje kritičnog resursa) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak prekovremenog i kašnjenja",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Capacity planning cannot claim labor savings without time records",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "P05",
+   "module": "P",
+   "name": "MRP i materijalne potrebe",
+   "question": "Jesu li materijalni zahtjevi vezani za tačan BOM i plan?",
+   "evidence": "BOM, MRP izuzeci, rezervacije",
+   "kpi": "Stockout; planirani vs stvarni utrošak",
+   "recommendation": "MRP parametri i provjera BOM-a",
+   "owner": "Planiranje / SCM",
+   "consequence_hypothesis": "Nedostatak ili višak materijala",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-P05",
+   "anchors": [
+    "Nema dokazive prakse za „MRP i materijalne potrebe” nakon provjere relevantnih izvora.",
+    "„MRP i materijalne potrebe” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „MRP i materijalne potrebe”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „MRP i materijalne potrebe”, imenovani vlasnik i ponovljiva evidencija: BOM, MRP izuzeci, rezervacije.",
+    "KPI (Stockout; planirani vs stvarni utrošak) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Stockout; planirani vs stvarni utrošak) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak zaliha i zastoja",
+    "model": "INVENTORY",
+    "family": "INVENTORY_CASH",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "MRP savings share inventory balance with WIP and stock policy",
+    "formula": "(prosjek_zaliha_baseline - prosjek_zaliha_actual) × udio_oslobodivog_kapitala"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "P06",
+   "module": "P",
+   "name": "Pouzdanost dobavljača",
+   "question": "Da li se prate rok, kvalitet i rizik dobavljača?",
+   "evidence": "Narudžbenice, prijemi, reklamacije",
+   "kpi": "Supplier OTD; PPM",
+   "recommendation": "Supplier OTIF i akcioni plan",
+   "owner": "Planiranje / SCM",
+   "consequence_hypothesis": "Dobavljači ne ispunjavaju obaveze",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-P06",
+   "anchors": [
+    "Nema dokazive prakse za „Pouzdanost dobavljača” nakon provjere relevantnih izvora.",
+    "„Pouzdanost dobavljača” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Pouzdanost dobavljača”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Pouzdanost dobavljača”, imenovani vlasnik i ponovljiva evidencija: Narudžbenice, prijemi, reklamacije.",
+    "KPI (Supplier OTD; PPM) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Supplier OTD; PPM) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "ekspresni transport i zastoji",
+    "model": "OTIF",
+    "family": "DELIVERY_COST",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "Supplier OTIF may overlap customer OTIF penalties",
+    "formula": "izbjegnuti_penali + izbjegnuti_ekspres_troskovi + dodatna_dokazana_kontribucija - dodatni_troskovi"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "P07",
+   "module": "P",
+   "name": "Politika zaliha",
+   "question": "Jesu li sigurnosne zalihe, ABC/XYZ i obrt definisani?",
+   "evidence": "Stanje zaliha, starost, inventure",
+   "kpi": "DIO; obrt; obsolete %",
+   "recommendation": "ABC/XYZ i sigurnosne zalihe",
+   "owner": "Planiranje / SCM",
+   "consequence_hypothesis": "Zalihe bez segmentirane politike",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-P07",
+   "anchors": [
+    "Nema dokazive prakse za „Politika zaliha” nakon provjere relevantnih izvora.",
+    "„Politika zaliha” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Politika zaliha”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Politika zaliha”, imenovani vlasnik i ponovljiva evidencija: Stanje zaliha, starost, inventure.",
+    "KPI (DIO; obrt; obsolete %) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (DIO; obrt; obsolete %) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "oslobođeni kapital / nestašice",
+    "model": "INVENTORY",
+    "family": "INVENTORY_CASH",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "Stock policy must share same inventory pool",
+    "formula": "(prosjek_zaliha_baseline - prosjek_zaliha_actual) × udio_oslobodivog_kapitala"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "P08",
+   "module": "P",
+   "name": "Tačnost ERP podataka",
+   "question": "Jesu li stanja, rokovi, BOM i rute pouzdani i ažurni?",
+   "evidence": "ERP transakcije, inventure, master data",
+   "kpi": "Inventory accuracy; BOM accuracy",
+   "recommendation": "Master-data audit i vlasništvo podataka",
+   "owner": "Planiranje / SCM",
+   "consequence_hypothesis": "Netačni matični ERP podaci",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-P08",
+   "anchors": [
+    "Nema dokazive prakse za „Tačnost ERP podataka” nakon provjere relevantnih izvora.",
+    "„Tačnost ERP podataka” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Tačnost ERP podataka”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Tačnost ERP podataka”, imenovani vlasnik i ponovljiva evidencija: ERP transakcije, inventure, master data.",
+    "KPI (Inventory accuracy; BOM accuracy) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Inventory accuracy; BOM accuracy) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak grešaka u nalozima",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "P09",
+   "module": "P",
+   "name": "Realizacija proizvodnog plana",
+   "question": "Da li se dnevno mjeri izvršenje i analiziraju odstupanja?",
+   "evidence": "Dnevni plan/realizacija, razlozi",
+   "kpi": "Plan attainment %",
+   "recommendation": "Plan adherence i reason-code",
+   "owner": "Planiranje / SCM",
+   "consequence_hypothesis": "Plan se često ne izvršava",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-P09",
+   "anchors": [
+    "Nema dokazive prakse za „Realizacija proizvodnog plana” nakon provjere relevantnih izvora.",
+    "„Realizacija proizvodnog plana” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Realizacija proizvodnog plana”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Realizacija proizvodnog plana”, imenovani vlasnik i ponovljiva evidencija: Dnevni plan/realizacija, razlozi.",
+    "KPI (Plan attainment %) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Plan attainment %) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak odstupanja plana",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "P10",
+   "module": "P",
+   "name": "Pouzdanost isporuka",
+   "question": "Da li su rokovi kupcima realni i mjerljivo ispunjeni?",
+   "evidence": "Narudžbe, otpremnice, reklamacije",
+   "kpi": "OTIF; OTD",
+   "recommendation": "Jedinstveni OTIF i Pareto kašnjenja",
+   "owner": "Planiranje / SCM",
+   "consequence_hypothesis": "Kupci ne dobijaju na vrijeme i kompletno",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-P10",
+   "anchors": [
+    "Nema dokazive prakse za „Pouzdanost isporuka” nakon provjere relevantnih izvora.",
+    "„Pouzdanost isporuka” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Pouzdanost isporuka”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Pouzdanost isporuka”, imenovani vlasnik i ponovljiva evidencija: Narudžbe, otpremnice, reklamacije.",
+    "KPI (OTIF; OTD) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (OTIF; OTD) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "penali i izgubljena kontribucija",
+    "model": "OTIF",
+    "family": "DELIVERY_COST",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "Customer OTIF needs penalties and incremental sales separation",
+    "formula": "izbjegnuti_penali + izbjegnuti_ekspres_troskovi + dodatna_dokazana_kontribucija - dodatni_troskovi"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "P11",
+   "module": "P",
+   "name": "Interna i izlazna logistika",
+   "question": "Da li su tokovi materijala i otpreme stabilni?",
+   "evidence": "Tok materijala, skladišne lokacije",
+   "kpi": "Vrijeme manipulacije; trošak transporta",
+   "recommendation": "Spaghetti map i milk-run/FIFO",
+   "owner": "Planiranje / SCM",
+   "consequence_hypothesis": "Interna logistika usporava tok",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-P11",
+   "anchors": [
+    "Nema dokazive prakse za „Interna i izlazna logistika” nakon provjere relevantnih izvora.",
+    "„Interna i izlazna logistika” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Interna i izlazna logistika”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Interna i izlazna logistika”, imenovani vlasnik i ponovljiva evidencija: Tok materijala, skladišne lokacije.",
+    "KPI (Vrijeme manipulacije; trošak transporta) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Vrijeme manipulacije; trošak transporta) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak rukovanja i čekanja",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "P12",
+   "module": "P",
+   "name": "Upravljanje odstupanjima",
+   "question": "Postoje li vlasnici, rokovi i zatvaranje uzroka odstupanja?",
+   "evidence": "Action log, eskalacije, zapisnici",
+   "kpi": "On-time action closure %",
+   "recommendation": "Daily exception management",
+   "owner": "Planiranje / SCM",
+   "consequence_hypothesis": "Odstupanja se ponavljaju",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-P12",
+   "anchors": [
+    "Nema dokazive prakse za „Upravljanje odstupanjima” nakon provjere relevantnih izvora.",
+    "„Upravljanje odstupanjima” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Upravljanje odstupanjima”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Upravljanje odstupanjima”, imenovani vlasnik i ponovljiva evidencija: Action log, eskalacije, zapisnici.",
+    "KPI (On-time action closure %) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (On-time action closure %) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak ponovljenih poremećaja",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "P14",
+   "module": "P",
+   "name": "Segmentacija usluge i zaliha",
+   "question": "Jesu li politike rokova, zaliha i nivoa usluge usklađene s potražnjom i rizikom?",
+   "evidence": "Mjera/KPI: OTIF; servisni nivo; višak zaliha  |  Dokaz: ABC/XYZ; politika servisa",
+   "kpi": "Definisati na pilotu; ne izmišljati pragove",
+   "recommendation": "Segmentirati nivo usluge i zalihe",
+   "owner": "Planiranje / SCM",
+   "consequence_hypothesis": "Jednaka usluga svim SKU-ovima",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-P14",
+   "anchors": [
+    "Nema dokazive prakse za „Segmentacija usluge i zaliha” nakon provjere relevantnih izvora.",
+    "„Segmentacija usluge i zaliha” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Segmentacija usluge i zaliha”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Segmentacija usluge i zaliha”, imenovani vlasnik i ponovljiva evidencija: Mjera/KPI: OTIF; servisni nivo; višak zaliha  |  Dokaz: ABC/XYZ; politika servisa.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak servisa po segmentu",
+    "model": "INVENTORY",
+    "family": "INVENTORY_CASH",
+    "status": "CONDITIONAL_EVIDENCE_REQUIRED",
+    "mapping_reason": "Segmentation is driver of same inventory cash release",
+    "formula": "(prosjek_zaliha_baseline - prosjek_zaliha_actual) × udio_oslobodivog_kapitala"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "L01",
+   "module": "L",
+   "name": "Organizaciona struktura",
+   "question": "Jesu li funkcije, linije izvještavanja i zamjene jasno definisane?",
+   "evidence": "Organigram, opisi poslova, intervjui",
+   "kpi": "Udio ključnih uloga s dokumentovanom odgovornošću",
+   "recommendation": "RACI i raspon odgovornosti",
+   "owner": "HR / rukovodioci",
+   "consequence_hypothesis": "Nejasna organizaciona struktura",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-L01",
+   "anchors": [
+    "Nema dokazive prakse za „Organizaciona struktura” nakon provjere relevantnih izvora.",
+    "„Organizaciona struktura” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Organizaciona struktura”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Organizaciona struktura”, imenovani vlasnik i ponovljiva evidencija: Organigram, opisi poslova, intervjui.",
+    "KPI (Udio ključnih uloga s dokumentovanom odgovornošću) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Udio ključnih uloga s dokumentovanom odgovornošću) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak dupliranja i čekanja",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "L02",
+   "module": "L",
+   "name": "Odgovornost za rezultate",
+   "question": "Ima li svaki KPI imenovanog vlasnika i ritam praćenja?",
+   "evidence": "KPI izvještaji, zapisnici, RACI",
+   "kpi": "Udio KPI s vlasnikom i akcijom",
+   "recommendation": "KPI ownership i odgovornost",
+   "owner": "HR / rukovodioci",
+   "consequence_hypothesis": "Rezultati nemaju jasnog vlasnika",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-L02",
+   "anchors": [
+    "Nema dokazive prakse za „Odgovornost za rezultate” nakon provjere relevantnih izvora.",
+    "„Odgovornost za rezultate” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Odgovornost za rezultate”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Odgovornost za rezultate”, imenovani vlasnik i ponovljiva evidencija: KPI izvještaji, zapisnici, RACI.",
+    "KPI (Udio KPI s vlasnikom i akcijom) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Udio KPI s vlasnikom i akcijom) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak neotklonjenih odstupanja",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "L03",
+   "module": "L",
+   "name": "Kompetencije rukovodilaca",
+   "question": "Mogu li rukovodioci planirati, voditi i rješavati probleme?",
+   "evidence": "Intervjui, simulacije, evaluacije",
+   "kpi": "Udio procijenjenih rukovodilaca",
+   "recommendation": "Procjena kompetencija i razvojni plan",
+   "owner": "HR / rukovodioci",
+   "consequence_hypothesis": "Nedostatak rukovodilačkih kompetencija",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-L03",
+   "anchors": [
+    "Nema dokazive prakse za „Kompetencije rukovodilaca” nakon provjere relevantnih izvora.",
+    "„Kompetencije rukovodilaca” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Kompetencije rukovodilaca”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Kompetencije rukovodilaca”, imenovani vlasnik i ponovljiva evidencija: Intervjui, simulacije, evaluacije.",
+    "KPI (Udio procijenjenih rukovodilaca) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Udio procijenjenih rukovodilaca) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak grešaka upravljanja",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "L04",
+   "module": "L",
+   "name": "Matrica vještina",
+   "question": "Jesu li ključne operativne vještine evidentirane i pokrivene?",
+   "evidence": "Matrice vještina, certifikati, provjera na radnom mjestu",
+   "kpi": "Pokrivenost kritičnih operacija (%)",
+   "recommendation": "Matrica vještina i cross-training",
+   "owner": "HR / rukovodioci",
+   "consequence_hypothesis": "Nedostaju zamjene i multiskill",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-L04",
+   "anchors": [
+    "Nema dokazive prakse za „Matrica vještina” nakon provjere relevantnih izvora.",
+    "„Matrica vještina” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Matrica vještina”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Matrica vještina”, imenovani vlasnik i ponovljiva evidencija: Matrice vještina, certifikati, provjera na radnom mjestu.",
+    "KPI (Pokrivenost kritičnih operacija (%)) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Pokrivenost kritičnih operacija (%)) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak zastoja zbog odsustva",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Skills matrix is an enabler, not direct downtime savings",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "L05",
+   "module": "L",
+   "name": "Uvođenje i obuka",
+   "question": "Postoji li standardan onboarding i provjera osposobljenosti?",
+   "evidence": "Planovi obuke, testovi, evidencije",
+   "kpi": "Vrijeme do samostalnosti (dani)",
+   "recommendation": "Standardizovan onboarding",
+   "owner": "HR / rukovodioci",
+   "consequence_hypothesis": "Sporo uvođenje novih radnika",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-L05",
+   "anchors": [
+    "Nema dokazive prakse za „Uvođenje i obuka” nakon provjere relevantnih izvora.",
+    "„Uvođenje i obuka” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Uvođenje i obuka”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Uvođenje i obuka”, imenovani vlasnik i ponovljiva evidencija: Planovi obuke, testovi, evidencije.",
+    "KPI (Vrijeme do samostalnosti (dani)) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Vrijeme do samostalnosti (dani)) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak učenja i škarta",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Training requires measured before/after scrap attributable to training",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "L06",
+   "module": "L",
+   "name": "Upravljanje učinkom",
+   "question": "Postoje li jasni ciljevi, feedback i korektivne aktivnosti?",
+   "evidence": "Ciljevi, evaluacije, sastanci",
+   "kpi": "Udio realizovanih razvojnih mjera",
+   "recommendation": "Jasni standardi i coaching",
+   "owner": "HR / rukovodioci",
+   "consequence_hypothesis": "Učinak se ne mjeri dosljedno",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-L06",
+   "anchors": [
+    "Nema dokazive prakse za „Upravljanje učinkom” nakon provjere relevantnih izvora.",
+    "„Upravljanje učinkom” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Upravljanje učinkom”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Upravljanje učinkom”, imenovani vlasnik i ponovljiva evidencija: Ciljevi, evaluacije, sastanci.",
+    "KPI (Udio realizovanih razvojnih mjera) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Udio realizovanih razvojnih mjera) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak produktivnosti",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "L07",
+   "module": "L",
+   "name": "Komunikacija i eskalacija",
+   "question": "Da li problemi brzo dolaze do osobe koja ih može riješiti?",
+   "evidence": "Zapisnici smjena, eskalacijske procedure",
+   "kpi": "Prosječno vrijeme eskalacije (h)",
+   "recommendation": "Eskalacijska matrica i dnevni huddle",
+   "owner": "HR / rukovodioci",
+   "consequence_hypothesis": "Problemi se kasno eskaliraju",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-L07",
+   "anchors": [
+    "Nema dokazive prakse za „Komunikacija i eskalacija” nakon provjere relevantnih izvora.",
+    "„Komunikacija i eskalacija” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Komunikacija i eskalacija”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Komunikacija i eskalacija”, imenovani vlasnik i ponovljiva evidencija: Zapisnici smjena, eskalacijske procedure.",
+    "KPI (Prosječno vrijeme eskalacije (h)) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Prosječno vrijeme eskalacije (h)) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak kašnjenja reakcije",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "L08",
+   "module": "L",
+   "name": "Angažovanost i zadržavanje",
+   "question": "Znamo li uzroke odlazaka i prepreke angažmanu?",
+   "evidence": "Fluktuacija, exit intervjui, ankete",
+   "kpi": "Dobrovoljna fluktuacija (%)",
+   "recommendation": "Analiza odlazaka i akcioni plan",
+   "owner": "HR / rukovodioci",
+   "consequence_hypothesis": "Fluktuacija i slab angažman",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-L08",
+   "anchors": [
+    "Nema dokazive prakse za „Angažovanost i zadržavanje” nakon provjere relevantnih izvora.",
+    "„Angažovanost i zadržavanje” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Angažovanost i zadržavanje”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Angažovanost i zadržavanje”, imenovani vlasnik i ponovljiva evidencija: Fluktuacija, exit intervjui, ankete.",
+    "KPI (Dobrovoljna fluktuacija (%)) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Dobrovoljna fluktuacija (%)) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak zamjene zaposlenog",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "L10",
+   "module": "L",
+   "name": "Nasljeđivanje i održivost",
+   "question": "Može li sistem funkcionisati bez ključnog pojedinca ili konsultanta?",
+   "evidence": "Plan nasljeđivanja, zamjene, audit",
+   "kpi": "Udio kritičnih funkcija s obučenom zamjenom",
+   "recommendation": "Plan nasljeđivanja i transfer znanja",
+   "owner": "HR / rukovodioci",
+   "consequence_hypothesis": "Zavisnost od ključnih pojedinaca",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-L10",
+   "anchors": [
+    "Nema dokazive prakse za „Nasljeđivanje i održivost” nakon provjere relevantnih izvora.",
+    "„Nasljeđivanje i održivost” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Nasljeđivanje i održivost”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Nasljeđivanje i održivost”, imenovani vlasnik i ponovljiva evidencija: Plan nasljeđivanja, zamjene, audit.",
+    "KPI (Udio kritičnih funkcija s obučenom zamjenom) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Udio kritičnih funkcija s obučenom zamjenom) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "očekivani gubitak prekida",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "L11",
+   "module": "L",
+   "name": "Ponašanje rukovodilaca na Gembi",
+   "question": "Da li rukovodioci redovno provjeravaju stvarno stanje i podučavaju rješavanje problema?",
+   "evidence": "Mjera/KPI: Zatvoreni problemi; razvoj kompetencija  |  Dokaz: Gemba zapisi; A3; intervjui",
+   "kpi": "Definisati na pilotu; ne izmišljati pragove",
+   "recommendation": "Leader standard work i Gemba",
+   "owner": "HR / rukovodioci",
+   "consequence_hypothesis": "Rukovodioci nisu prisutni na procesu",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-L11",
+   "anchors": [
+    "Nema dokazive prakse za „Ponašanje rukovodilaca na Gembi” nakon provjere relevantnih izvora.",
+    "„Ponašanje rukovodilaca na Gembi” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Ponašanje rukovodilaca na Gembi”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Ponašanje rukovodilaca na Gembi”, imenovani vlasnik i ponovljiva evidencija: Mjera/KPI: Zatvoreni problemi; razvoj kompetencija  |  Dokaz: Gemba zapisi; A3; intervjui.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak kasno otkrivenih grešaka",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "L12",
+   "module": "L",
+   "name": "Usklađenost poticaja",
+   "question": "Podstiču li ciljevi i bonusi lokalnu efikasnost ili rezultat cijelog sistema?",
+   "evidence": "Mjera/KPI: Sukobi KPI; učinci poticaja  |  Dokaz: Sistem bonusa; KPI; intervjui",
+   "kpi": "Definisati na pilotu; ne izmišljati pragove",
+   "recommendation": "Uskladiti bonuse s tokom i kvalitetom",
+   "owner": "HR / rukovodioci",
+   "consequence_hypothesis": "Poticaji podstiču lokalnu optimizaciju",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-L12",
+   "anchors": [
+    "Nema dokazive prakse za „Usklađenost poticaja” nakon provjere relevantnih izvora.",
+    "„Usklađenost poticaja” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Usklađenost poticaja”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Usklađenost poticaja”, imenovani vlasnik i ponovljiva evidencija: Mjera/KPI: Sukobi KPI; učinci poticaja  |  Dokaz: Sistem bonusa; KPI; intervjui.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak nepoželjnih ponašanja",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "M03",
+   "module": "M",
+   "name": "Dnevno upravljanje",
+   "question": "Postoje li dnevni sastanci s odstupanjima, akcijama i odgovornima?",
+   "evidence": "Dnevne table, zapisnici, dnevni izvještaji",
+   "kpi": "Udio zatvorenih dnevnih akcija",
+   "recommendation": "Tier daily management",
+   "owner": "Uprava / PMO",
+   "consequence_hypothesis": "Nema dnevne kontrole učinka",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-M03",
+   "anchors": [
+    "Nema dokazive prakse za „Dnevno upravljanje” nakon provjere relevantnih izvora.",
+    "„Dnevno upravljanje” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Dnevno upravljanje”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Dnevno upravljanje”, imenovani vlasnik i ponovljiva evidencija: Dnevne table, zapisnici, dnevni izvještaji.",
+    "KPI (Udio zatvorenih dnevnih akcija) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Udio zatvorenih dnevnih akcija) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak zakašnjele reakcije",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "M04",
+   "module": "M",
+   "name": "KPI arhitektura",
+   "question": "Jesu li KPI definisani, tačni i povezani s poslovnim rezultatom?",
+   "evidence": "KPI katalog, definicije, izvori podataka",
+   "kpi": "Udio KPI s definicijom i izvorom",
+   "recommendation": "KPI tree i data dictionary",
+   "owner": "Uprava / PMO",
+   "consequence_hypothesis": "KPI-jevi nisu povezani s ciljevima",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-M04",
+   "anchors": [
+    "Nema dokazive prakse za „KPI arhitektura” nakon provjere relevantnih izvora.",
+    "„KPI arhitektura” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „KPI arhitektura”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „KPI arhitektura”, imenovani vlasnik i ponovljiva evidencija: KPI katalog, definicije, izvori podataka.",
+    "KPI (Udio KPI s definicijom i izvorom) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Udio KPI s definicijom i izvorom) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak pogrešnih prioriteta",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "M05",
+   "module": "M",
+   "name": "Ritam poslovnih pregleda",
+   "question": "Održavaju li se sedmični i mjesečni pregledi rezultata?",
+   "evidence": "Agende, zapisnici, odluke",
+   "kpi": "Pravovremenost i realizacija odluka",
+   "recommendation": "Standardni review i action log",
+   "owner": "Uprava / PMO",
+   "consequence_hypothesis": "Pregledi ne vode do odluka",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-M05",
+   "anchors": [
+    "Nema dokazive prakse za „Ritam poslovnih pregleda” nakon provjere relevantnih izvora.",
+    "„Ritam poslovnih pregleda” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Ritam poslovnih pregleda”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Ritam poslovnih pregleda”, imenovani vlasnik i ponovljiva evidencija: Agende, zapisnici, odluke.",
+    "KPI (Pravovremenost i realizacija odluka) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Pravovremenost i realizacija odluka) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak neprovedenih odluka",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "M06",
+   "module": "M",
+   "name": "Upravljanje odstupanjima",
+   "question": "Istražuju li se sistemski uzroci ponovljenih odstupanja?",
+   "evidence": "A3, 5 Why, CAPA evidencije",
+   "kpi": "Udio ponovljenih problema",
+   "recommendation": "A3/8D i verifikacija uzroka",
+   "owner": "Uprava / PMO",
+   "consequence_hypothesis": "Problemi se ne zatvaraju sistemski",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-M06",
+   "anchors": [
+    "Nema dokazive prakse za „Upravljanje odstupanjima” nakon provjere relevantnih izvora.",
+    "„Upravljanje odstupanjima” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Upravljanje odstupanjima”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Upravljanje odstupanjima”, imenovani vlasnik i ponovljiva evidencija: A3, 5 Why, CAPA evidencije.",
+    "KPI (Udio ponovljenih problema) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Udio ponovljenih problema) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak ponavljanja problema",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "M07",
+   "module": "M",
+   "name": "Izvršenje akcionih planova",
+   "question": "Postoji li jedinstvena evidencija mjera, rokova i statusa?",
+   "evidence": "Akcioni planovi, historija zatvaranja",
+   "kpi": "On-time action closure %",
+   "recommendation": "Owner-due-evidence workflow",
+   "owner": "Uprava / PMO",
+   "consequence_hypothesis": "Akcije se ne izvršavaju",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-M07",
+   "anchors": [
+    "Nema dokazive prakse za „Izvršenje akcionih planova” nakon provjere relevantnih izvora.",
+    "„Izvršenje akcionih planova” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Izvršenje akcionih planova”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Izvršenje akcionih planova”, imenovani vlasnik i ponovljiva evidencija: Akcioni planovi, historija zatvaranja.",
+    "KPI (On-time action closure %) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (On-time action closure %) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "neostvarene koristi projekata",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "M09",
+   "module": "M",
+   "name": "Upravljanje promjenama",
+   "question": "Da li se promjene testiraju, komuniciraju i stabilizuju?",
+   "evidence": "Pilot zapisi, SOP revizije, obuke",
+   "kpi": "Udio promjena održanih 90 dana",
+   "recommendation": "Stakeholder i adoption plan",
+   "owner": "Uprava / PMO",
+   "consequence_hypothesis": "Promjene se ne prihvataju",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-M09",
+   "anchors": [
+    "Nema dokazive prakse za „Upravljanje promjenama” nakon provjere relevantnih izvora.",
+    "„Upravljanje promjenama” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Upravljanje promjenama”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Upravljanje promjenama”, imenovani vlasnik i ponovljiva evidencija: Pilot zapisi, SOP revizije, obuke.",
+    "KPI (Udio promjena održanih 90 dana) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Udio promjena održanih 90 dana) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak neuspjele implementacije",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Change management is not SMED changeover",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "M10",
+   "module": "M",
+   "name": "Digitalni podaci i ERP disciplina",
+   "question": "Jesu li transakcije pravovremene, tačne i sljedive?",
+   "evidence": "ERP logovi, usklađenja, audit trail",
+   "kpi": "Tačnost i pravovremenost knjiženja",
+   "recommendation": "Kontrole knjiženja i master data",
+   "owner": "Uprava / PMO",
+   "consequence_hypothesis": "ERP disciplina je slaba",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-M10",
+   "anchors": [
+    "Nema dokazive prakse za „Digitalni podaci i ERP disciplina” nakon provjere relevantnih izvora.",
+    "„Digitalni podaci i ERP disciplina” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Digitalni podaci i ERP disciplina”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Digitalni podaci i ERP disciplina”, imenovani vlasnik i ponovljiva evidencija: ERP logovi, usklađenja, audit trail.",
+    "KPI (Tačnost i pravovremenost knjiženja) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Tačnost i pravovremenost knjiženja) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak pogrešnih podataka",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "M11",
+   "module": "M",
+   "name": "Međufunkcionalna koordinacija",
+   "question": "Usklađuju li se prodaja, proizvodnja, nabavka i finansije?",
+   "evidence": "S&OP zapisnici, konfliktni prioriteti",
+   "kpi": "Udio riješenih međufunkcionalnih blokada",
+   "recommendation": "Cross-functional escalation i S&OP",
+   "owner": "Uprava / PMO",
+   "consequence_hypothesis": "Funkcije optimizuju lokalno",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-M11",
+   "anchors": [
+    "Nema dokazive prakse za „Međufunkcionalna koordinacija” nakon provjere relevantnih izvora.",
+    "„Međufunkcionalna koordinacija” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Međufunkcionalna koordinacija”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Međufunkcionalna koordinacija”, imenovani vlasnik i ponovljiva evidencija: S&OP zapisnici, konfliktni prioriteti.",
+    "KPI (Udio riješenih međufunkcionalnih blokada) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Udio riješenih međufunkcionalnih blokada) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak konfliktnih prioriteta",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "M13",
+   "module": "M",
+   "name": "Disciplina eksperimenta i provjere koristi",
+   "question": "Da li se promjene testiraju, mjeri rezultat i provjerava održivost nakon 30/60/90 dana?",
+   "evidence": "Mjera/KPI: Realizovane i održane koristi  |  Dokaz: A3; projektni dosje; KPI trend",
+   "kpi": "Definisati na pilotu; ne izmišljati pragove",
+   "recommendation": "Pilot, baseline, control group gdje moguće",
+   "owner": "Uprava / PMO",
+   "consequence_hypothesis": "Koristi projekata se ne potvrđuju",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-M13",
+   "anchors": [
+    "Nema dokazive prakse za „Disciplina eksperimenta i provjere koristi” nakon provjere relevantnih izvora.",
+    "„Disciplina eksperimenta i provjere koristi” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Disciplina eksperimenta i provjere koristi”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Disciplina eksperimenta i provjere koristi”, imenovani vlasnik i ponovljiva evidencija: Mjera/KPI: Realizovane i održane koristi  |  Dokaz: A3; projektni dosje; KPI trend.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "verifikovane neto koristi",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  },
+  {
+   "code": "M14",
+   "module": "M",
+   "name": "Pouzdanost menadžerskih podataka",
+   "question": "Mogu li se ključni izvještaji rekonstruisati do izvora i uskladiti s finansijama?",
+   "evidence": "Mjera/KPI: Usklađenje izvora; stopa grešaka  |  Dokaz: ERP trag; kontrole; usklađenja",
+   "kpi": "Definisati na pilotu; ne izmišljati pragove",
+   "recommendation": "Data lineage, reconciliation, audit",
+   "owner": "Uprava / PMO",
+   "consequence_hypothesis": "Menadžerski izvještaji nisu pouzdani",
+   "required_check": "Potvrditi uzrok, opseg, period, jedinice, kontrafaktual i izvodivost",
+   "gate": "Bez VERIFIED nema potvrđenog efekta; prije odobrenja konsultantska revizija",
+   "causal_hypothesis_id": "HYP-M14",
+   "anchors": [
+    "Nema dokazive prakse za „Pouzdanost menadžerskih podataka” nakon provjere relevantnih izvora.",
+    "„Pouzdanost menadžerskih podataka” se rješava reaktivno; ne postoji vlasnik ili ponovljiv zapis.",
+    "Postoje parcijalni zapisi za „Pouzdanost menadžerskih podataka”, ali nisu potpuni po periodu, pogonu ili relevantnom proizvodu.",
+    "Postoji dokumentovan standard za „Pouzdanost menadžerskih podataka”, imenovani vlasnik i ponovljiva evidencija: Mjera/KPI: Usklađenje izvora; stopa grešaka  |  Dokaz: ERP trag; kontrole; usklađenja.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) se redovno računa i koristi za korekciju odstupanja; provjeriti trag odluke i efekta.",
+    "KPI (Definisati na pilotu; ne izmišljati pragove) pokazuje održiv rezultat kroz više uporedivih ciklusa; neovisna provjera i korekcije su dokumentovane."
+   ],
+   "financial": {
+    "category": "trošak odluka na lošim podacima",
+    "model": "GENERAL",
+    "family": "NONE",
+    "status": "NO_AUTO_VALUE",
+    "mapping_reason": "Provisional family; requires evidence and transaction-level allocation",
+    "formula": "NEMA_AUTOMATSKE_MONETIZACIJE: zahtijeva poseban model i provjerene ulaze"
+   },
+   "validation": "PENDING_EXPERT_SIGNOFF"
+  }
+ ],
+ "sources": {
+  "MEVAN_65_Kriterija_Mapiranje_Audit_v1_2.csv": "c72f8d7bd0f25be4d9830e1f76372d4c1d0525ca26b12a2d8c2e367aff86354f",
+  "MEVAN_65_KRITERIJA_REVIZIJA_I_SKALE_RADNA.docx": "96b7c74c8657af7b6060a483f66b5d40fcf0d036a7da6ce436b55bd99b01c476",
+  "MEVAN_Engine_v1_1_rules.json": "8082210fdd438e1b2d5de1fcad6f429aff2871961fb127ac4a1ed8795f70113b"
+ }
+}
