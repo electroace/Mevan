@@ -13,6 +13,7 @@ import threading
 import mevan_ai
 import mevan_i18n
 import mevan_methodology
+import mevan_findings
 
 BASE=Path(__file__).parent
 DB=Path(os.getenv('MEVAN_DB',str(BASE/'mevan.sqlite3')))
@@ -219,6 +220,11 @@ async def store(req:Request):
             raise HTTPException(409, 'Radni prostor je promijenjen. Uporedite lokalnu i serversku verziju.')
         c.execute('INSERT INTO workspace(id,payload,updated) VALUES(1,?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload,updated=excluded.updated',(encoded,int(time.time())))
         c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'workspace_save',f"companies={len(obj['companies'])}"))
+        # Model 65/6: svaka promjena ocjene, statusa dokaza, primjenjivosti ili statusa uzroka ide u dnevnik (bez teksta dokaza).
+        try:before=json.loads(previous[0]) if previous else {}
+        except ValueError:before={}
+        for change in mevan_findings.assessment_changes(before,obj):
+            c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'v2_assessment_changed',json.dumps(change,ensure_ascii=False)[:500]))
     return {'ok':True,'version':hashlib.sha256(encoded.encode()).hexdigest()}
 
 
@@ -301,6 +307,23 @@ def methodology(version:str,req:Request):
     if not logged(req):raise HTTPException(401)
     if version not in mevan_methodology.available():raise HTTPException(404,'Verzija metodologije nije dostupna')
     return mevan_methodology.load(version)
+
+@app.post('/api/v2/findings')
+async def v2_findings(req:Request):
+    """Lanac nalaza za dijagnostiku 65/6. Izračun je deterministički; AI se ne koristi i ništa se ne računa u novcu."""
+    if not logged(req):raise HTTPException(401)
+    if not same_origin(req):raise HTTPException(403)
+    if 'v2' not in mevan_methodology.available():raise HTTPException(404,'Model 65/6 nije uključen na ovom serveru')
+    raw=await req.body()
+    if len(raw)>400000:raise HTTPException(413,'Prevelik zahtjev')
+    try:
+        data=json.loads(raw)
+        result=mevan_findings.build(data['assess'],simulated=data.get('simulated') is True)
+    except (ValueError,KeyError,TypeError):
+        raise HTTPException(400,'Neispravan ulaz')
+    with conn() as c:
+        c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'v2_findings_built',json.dumps({'counts':result['counts'],'simulated':result['simulated']},ensure_ascii=False)[:400]))
+    return result
 
 @app.exception_handler(mevan_ai.AllowanceExceeded)
 async def ai_allowance_exceeded(request:Request,error:mevan_ai.AllowanceExceeded):
