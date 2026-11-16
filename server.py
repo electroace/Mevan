@@ -14,6 +14,7 @@ import mevan_ai
 import mevan_i18n
 import mevan_methodology
 import mevan_findings
+import mevan_finance_v2
 
 BASE=Path(__file__).parent
 DB=Path(os.getenv('MEVAN_DB',str(BASE/'mevan.sqlite3')))
@@ -323,6 +324,30 @@ async def v2_findings(req:Request):
         raise HTTPException(400,'Neispravan ulaz')
     with conn() as c:
         c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'v2_findings_built',json.dumps({'counts':result['counts'],'simulated':result['simulated']},ensure_ascii=False)[:400]))
+    return result
+
+@app.get('/api/v2/finance/models')
+def v2_finance_models(req:Request):
+    if not logged(req):raise HTTPException(401)
+    if 'v2' not in mevan_methodology.available():raise HTTPException(404,'Model 65/6 nije uključen na ovom serveru')
+    criteria={c['code']:list(mevan_finance_v2.allowed_models(c['code'])) for c in mevan_methodology.load('v2')['criteria']}
+    return {'models':mevan_finance_v2.model_catalogue(),'criteria':{code:models for code,models in criteria.items() if models}}
+
+@app.post('/api/v2/finance')
+async def v2_finance(req:Request):
+    """Obračun finansijskih efekata 65/6 iz ulaza formula, s kontrolom dvostrukog računanja. Ništa se ne čuva."""
+    if not logged(req):raise HTTPException(401)
+    if not same_origin(req):raise HTTPException(403)
+    if 'v2' not in mevan_methodology.available():raise HTTPException(404,'Model 65/6 nije uključen na ovom serveru')
+    raw=await req.body()
+    if len(raw)>400000:raise HTTPException(413,'Prevelik zahtjev')
+    try:
+        data=json.loads(raw)
+        result=mevan_finance_v2.evaluate(data['effects'],simulated=data.get('simulated') is True)
+    except (ValueError,KeyError,TypeError):
+        raise HTTPException(400,'Neispravan ulaz')
+    with conn() as c:
+        c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'v2_finance_evaluated',json.dumps({'confirmed':result['confirmed'],'blocked':len(result['blocked']),'simulated':result['simulated']},ensure_ascii=False)[:400]))
     return result
 
 @app.exception_handler(mevan_ai.AllowanceExceeded)
