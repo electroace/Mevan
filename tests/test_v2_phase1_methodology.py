@@ -150,7 +150,7 @@ def test_counts_follow_the_active_model_instead_of_fixed_61_and_5():
 def test_v2_shows_criterion_anchors_and_blocks_unfinished_screens():
     html=(ROOT/'index.html').read_text(encoding='utf-8')
     assert "(c.anchors?c.anchors.map((text,level)=>level+' — '+text):SCORE_GUIDE)" in html
-    assert "const V2_BLOCKED_PAGES=['v2','review','report'];" in html
+    assert "const V2_BLOCKED_PAGES=['v2'];" in html  # od faze 1c zatvorena je samo integrisana AI analiza
     assert "else if(METHOD.active==='v2'&&V2_BLOCKED_PAGES.includes(page)){" in html
     assert "if(METHOD.missing&&!['workspace','data'].includes(page)){" in html
     assert "if(methodologyOf(diagnostic)==='v2')return mvNotify('Vođeno prikupljanje još nije dostupno za model 65/6.',true);" in html
@@ -174,3 +174,32 @@ def test_workspace_with_a_v2_diagnostic_round_trips_through_the_server(fx):
     assert 'methodology' not in stored[0] and stored[1]['methodology']=='v2' and stored[1]['assess']['S01']['score']==4
     assert registry.maturity(registry.version_of(stored[1]),stored[1]['assess'])['index']==80.0
     assert registry.maturity(registry.version_of(stored[0]),stored[0]['assess'])['index']==60.0
+
+
+# ---- faza 1c: izvještaji i analiza po pravilima za 65/6, kopiranje 61/5 → 65/6
+
+def test_v2_reports_carry_the_draft_methodology_notice_and_ai_stays_closed():
+    html=(ROOT/'index.html').read_text(encoding='utf-8')
+    assert "const V2_DRAFT_NOTICE='MODEL 65/6 — NACRT METODOLOGIJE: mapiranja kriterija čekaju stručnu potvrdu. Nije za klijenta.';" in html
+    assert "if(METHOD.active==='v2')add(V2_DRAFT_NOTICE,'Notice');" in html
+    # Oznaka mora biti u samom pregledu za štampu, odmah ispod dugmeta, ne negdje drugdje u stranici.
+    assert "Štampaj / sačuvaj PDF</button>${METHOD.active==='v2'?'<p><em>'+esc(V2_DRAFT_NOTICE)+'</em></p>':''}${body}</body></html>" in html
+    assert "async function makeAIDraft(dim){if(METHOD.active==='v2')return mvNotify('AI nacrt još nije dostupan za model 65/6." in html
+
+
+def test_copy_to_v2_creates_a_new_unverified_diagnostic_and_never_edits_the_source():
+    html=(ROOT/'index.html').read_text(encoding='utf-8')
+    copy=html[html.index('async function copyToV2(){'):html.index('async function addCompany(){')]
+    assert "if(methodologyOf(source)!=='v1'||!METHOD.v2)return mvNotify(" in copy
+    assert "const shared=METHOD.v2.criteria.filter(c=>oldNames[c.code]===c.name).map(c=>c.code);" in copy
+    assert "const target=makeAssessment(source.name+' — kopija 65/6','v2');" in copy
+    # Kopira se vrijednost, ne veza, i status dokaza se vraća na „nije provjereno”.
+    assert "const entry=JSON.parse(JSON.stringify(source.assess[code]));entry.proof='none';target.assess[code]=entry" in copy
+    assert 'source.assess[code]=' not in copy and 'delete source' not in copy and 'await mvConfirm(text,' in copy
+    assert "${METHOD.v2&&methodologyOf(d)==='v1'?'<button class=\"btn secondary\" onclick=\"copyToV2()\">Kopiraj u novu dijagnostiku 65/6</button>':''}" in html
+
+
+def test_shared_criteria_used_for_copy_are_the_same_fifty_on_server_and_in_browser():
+    v1={c['code']:c['name'] for c in registry.load('v1')['criteria']}
+    browser_rule=[c['code'] for c in registry.load('v2')['criteria'] if v1.get(c['code'])==c['name']]
+    assert browser_rule==registry.shared_codes() and len(browser_rule)==50

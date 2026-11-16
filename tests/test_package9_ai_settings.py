@@ -321,7 +321,7 @@ def test_every_ai_button_warns_about_credits_first():
     root=Path(mevan_ai.__file__).parent
     index=(root/'index.html').read_text(encoding='utf-8')
     assert "async function runV3(){\n if(!await mvConfirmAiCost('Integrisana analiza'))return;" in index
-    assert "async function makeAIDraft(dim){if(!await mvConfirmAiCost('AI nacrt'))return;" in index
+    assert "if(!await mvConfirmAiCost('AI nacrt'))return;" in index[index.index('async function makeAIDraft(dim){'):index.index('async function makeAIDraft(dim){')+260]
     assert "if(!basic&&!await mvConfirmAiCost('AI projektni nacrt'))return;" in (root/'projects_ui.html').read_text(encoding='utf-8')
     import mevan_nav
     assert 'window.mvConfirmAiCost=async function(action){' in mevan_nav.JS and "okLabel:'Pokreni i potroši kredite'" in mevan_nav.JS
