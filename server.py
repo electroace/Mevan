@@ -17,6 +17,7 @@ import mevan_findings
 import mevan_finance_v2
 import mevan_confidence
 import mevan_projects_v2
+import mevan_premium_pdf
 
 BASE=Path(__file__).parent
 DB=Path(os.getenv('MEVAN_DB',str(BASE/'mevan.sqlite3')))
@@ -327,6 +328,24 @@ async def v2_findings(req:Request):
     with conn() as c:
         c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'v2_findings_built',json.dumps({'counts':result['counts'],'simulated':result['simulated']},ensure_ascii=False)[:400]))
     return result
+
+@app.post('/api/v2/report/premium')
+async def v2_premium_report(req:Request):
+    """Premium PDF za dijagnostiku 65/6. Svi brojevi dolaze iz engine-a; izvještaj uvijek nosi oznaku nacrta i neodobrenog statusa."""
+    if not logged(req):raise HTTPException(401)
+    if not same_origin(req):raise HTTPException(403)
+    if 'v2' not in mevan_methodology.available():raise HTTPException(404,'Model 65/6 nije uključen na ovom serveru')
+    raw=await req.body()
+    if len(raw)>1500000:raise HTTPException(413,'Prevelik zahtjev')
+    try:
+        data=json.loads(raw)
+        if not isinstance(data,dict) or not isinstance(data.get('assess'),dict):raise ValueError()
+        content=await asyncio.to_thread(mevan_premium_pdf.render,data)
+    except (ValueError,KeyError,TypeError):
+        raise HTTPException(400,'Neispravan ulaz')
+    with conn() as c:
+        c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'v2_premium_pdf',json.dumps({'simulated':data.get('simulated') is True,'bytes':len(content)})))
+    return Response(content,media_type='application/pdf',headers={'Content-Disposition':'attachment; filename="MEVAN_premium_nacrt.pdf"','Cache-Control':'no-store'})
 
 @app.post('/api/v2/projects/rank')
 async def v2_projects_rank(req:Request):
