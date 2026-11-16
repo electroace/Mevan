@@ -16,6 +16,7 @@ import mevan_methodology
 import mevan_findings
 import mevan_finance_v2
 import mevan_confidence
+import mevan_projects_v2
 
 BASE=Path(__file__).parent
 DB=Path(os.getenv('MEVAN_DB',str(BASE/'mevan.sqlite3')))
@@ -325,6 +326,24 @@ async def v2_findings(req:Request):
         raise HTTPException(400,'Neispravan ulaz')
     with conn() as c:
         c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'v2_findings_built',json.dumps({'counts':result['counts'],'simulated':result['simulated']},ensure_ascii=False)[:400]))
+    return result
+
+@app.post('/api/v2/projects/rank')
+async def v2_projects_rank(req:Request):
+    """Rang projektnih opcija 65/6 po verzionisanim ponderima. Ne odobrava ništa i ništa ne čuva."""
+    if not logged(req):raise HTTPException(401)
+    if not same_origin(req):raise HTTPException(403)
+    if 'v2' not in mevan_methodology.available():raise HTTPException(404,'Model 65/6 nije uključen na ovom serveru')
+    raw=await req.body()
+    if len(raw)>800000:raise HTTPException(413,'Prevelik zahtjev')
+    try:
+        data=json.loads(raw)
+        result=mevan_projects_v2.rank(data['options'],data.get('assess') or {},simulated=data.get('simulated') is True)
+    except (ValueError,KeyError,TypeError) as e:
+        raise HTTPException(400,str(e) if isinstance(e,ValueError) and str(e).startswith('Duplirana') else 'Neispravan ulaz')
+    result['plan_steps']={option['id']:mevan_projects_v2.plan_steps(option) for option in result['options']}
+    with conn() as c:
+        c.execute('INSERT INTO audit(ts,event,details) VALUES(?,?,?)',(int(time.time()),'v2_projects_ranked',json.dumps({'options':len(result['options']),'status':result['status'],'first':result['first']},ensure_ascii=False)[:300]))
     return result
 
 @app.post('/api/v2/confidence')

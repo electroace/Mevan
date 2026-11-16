@@ -136,4 +136,4 @@ def test_page_has_cause_fields_only_for_v2_and_a_findings_screen():
     card=html[html.index('data-field="finding">${esc(a.finding)}</textarea>'):html.index('<label>Finansijski efekat (opis i pretpostavke)</label>')]
     assert card.startswith('data-field="finding">${esc(a.finding)}</textarea>${c.anchors?`') and card.endswith('`:""}')
     assert "else if(page==='findings'){html=findingsPage()}" in html and "fetch('/api/v2/findings'," in html
-    assert "'findings'];" in html[html.index('const NAV_PAGES='):html.index('const NAV_PAGES=')+140]
+    assert "'findings'" in html[html.index('const NAV_PAGES='):html.index('const NAV_PAGES=')+140]
