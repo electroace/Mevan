@@ -75,7 +75,9 @@ def test_real_data_is_not_labelled_simulation_but_stays_a_draft(tmp_path):
 def test_empty_diagnostic_renders_without_zero_indices(tmp_path):
     result,_=pages({'company':'Prazna d.o.o.','assess':{}},tmp_path)
     text=flat(' '.join(result))
-    assert 'Neocjenjivo' in text and '0.0/100' not in text and 'Nijedan modul još nema potvrđene ocjene' in text
+    assert 'Neocjenjivo' in text and 'Nijedan modul još nema potvrđene ocjene' in text
+    # Jedina nula je pokrivenost dokazima u pouzdanosti: to je poznata vrijednost (0 potvrđenih od 65), a ne nepoznato prikazano kao nula.
+    assert text.count('0.0/100')==1 and '0.0/100 × 30 %' in text
     assert 'Radar nije zatvoren' in text and 'Za poređenje modula potrebne su potvrđene ocjene u najmanje dva modula.' in text
 
 
@@ -127,3 +129,78 @@ def test_page_offers_the_premium_pdf_only_through_the_server():
     html=(Path(premium.__file__).parent/'index.html').read_text(encoding='utf-8')
     assert 'onclick="downloadPremiumPdf()">Premium PDF (nacrt)</button>' in html
     assert "fetch('/api/v2/report/premium',{method:'POST'" in html and "if(METHOD.active!=='v2')return mvNotify('Premium PDF je dostupan za dijagnostike modela 65/6.',true);" in html
+
+
+# ---- faza 6b: uzročni lanac, finansije, pouzdanost, rang, plan i dodatak
+
+def full(**extra):
+    src=lambda v:{'value':v,'source':'ERP','period':'2026'}
+    effects=[{'id':'E1','criterion':'O03','model':'OEE','inputs':{'dodatne_prodane_jedinice_zbog_ogranicenja':src(2000),'kontribucija_po_jedinici':src(55),'dodatni_troskovi':src(10000)},
+              'key':{'site':'Pogon','period':'2027','account':'6001','item':'Linija'},'status':'hypothesis'},
+             {'id':'E2','criterion':'P10','model':'OTIF','inputs':{'izbjegnuti_penali':src(6000)},'key':{},'status':'hypothesis'},
+             {'id':'E3','criterion':'S01','model':'OEE','inputs':{},'key':{},'status':'hypothesis'}]
+    option=lambda i,title,value,**k:dict({'id':i,'title':title,'type':'project','criteria':['P02'],'ratings':{f:{'value':value,'rationale':'Procjena.'} for f in ('profit','liquidity','delivery','risk','feasibility')},
+                                       'business_case':'Slučaj','owner':'Direktor','budget_km':1000,'resources':'Tim','kpi':'KPI','steps_30':['Prvi korak'],'steps_90':['Kasniji korak']},**k)
+    plan=[{'task':'Pilot S&OP sastanak','owner':'Direktor','due':'','kpi':'Pridržavanje plana','status':'Nije počelo'},{'task':'Pregled rezultata','owner':'','due':'2027-02-15','kpi':'','status':'U toku'}]
+    return wood(effects=effects,options=[option('P1','Pilot planiranja',5),option('P2','Zalihe',4),option('P3','Odgoda',3,type='defer',criteria=[])],plan=plan,**extra)
+
+
+def test_full_report_has_every_required_section(tmp_path):
+    result,_=pages(full(),tmp_path)
+    text=flat(' '.join(result))
+    for section in ('UZROČNA ANALIZA','Od nalaza do uzroka','FINANSIJSKI EFEKTI','Šta je potvrđeno, a šta hipoteza','POUZDANOST NALAZA','Zašto nalazu vjerujemo',
+                    'PROJEKTNE OPCIJE','Koja opcija ima prioritet?','PLAN 90 DANA','Prvi koraci','DODATAK','Svih 65 kriterija'):
+        assert section in text,section
+    assert len(result)>=15
+
+
+def test_causal_chain_shows_one_finding_and_never_claims_links_between_criteria(tmp_path):
+    text=flat(' '.join(pages(full(),tmp_path)[0]))
+    # Najniža ocjena u simulaciji je 0 (P02, zatim P14); lanac prikazuje prvi po šifri.
+    assert 'P02 · S&OP / IBP · 0/5' in text and 'UZROK — HIPOTEZA' in text and 'POSLOVNA POSLJEDICA — HIPOTEZA' in text
+    assert 'Veze između kriterija nisu modelirane' in text and 'Bez konkurentskog objašnjenja uzrok ostaje hipoteza.' in text
+    assert 'OSTALI KANDIDATI ZA SLABOST' in text and 'UZROK — POTVRĐEN DOKAZOM' not in text
+
+
+def test_finance_page_keeps_columns_apart_and_explains_blocked_effects_in_words(tmp_path):
+    text=flat(' '.join(pages(full(),tmp_path)[0]))
+    assert 'SIMULACIJA: NIŠTA NIJE POTVRĐENO' in text and 'HIPOTETIČKI POTENCIJAL' in text and 'GODIŠNJI P&L PO EFEKTIMA (JEDNA KOLONA)' in text
+    assert 'Zbir uključuje hipoteze i zato nije potvrđena korist.' in text
+    assert 'blokiran: nedostaju ulazi formule' in text and 'blokiran: kriterij nema finansijski model' in text and 'podaci su simulacija' in text
+    for code in ('NEDOSTAJU_ULAZI','NEMA_AUTOMATSKE_MONETIZACIJE','PODACI_SU_SIMULACIJA','NEPOTPUN_KLJUC'):
+        assert code not in text,code  # tehničke oznake se ne prikazuju čitaocu
+
+
+def test_every_engine_reason_code_has_a_readable_text():
+    for code in ('NEMA_AUTOMATSKE_MONETIZACIJE','MODEL_NIJE_DOZVOLJEN_ZA_KRITERIJ','NEPOZNAT_KRITERIJ','NEDOSTAJU_ULAZI: a, b','IZNOS_NIJE_POZITIVAN',
+                 'ULAZI_BEZ_IZVORA_ILI_PERIODA: a','NIJE_OZNACEN_KAO_POTVRDJEN','NEDOSTAJE_DOKAZ','NEDOSTAJE_KONTRAFAKTUAL','NEDOSTAJE_ODOBRENJE_KONSULTANTA',
+                 'NEPOTPUN_KLJUC','PODACI_SU_SIMULACIJA','ISTI_KLJUC_KAO_E1','MOGUCE_PREKLAPANJE_S_E2','USTUPLJENO_EFEKTU_E3'):
+        readable=premium.reason_text(code)
+        assert readable!=code and readable==readable.lower().replace('e1','E1').replace('e2','E2').replace('e3','E3') or 'E' in readable,code
+    assert premium.reason_text('ISTI_KLJUC_KAO_E1')=='isti ključ kao efekat E1' and premium.reason_text('NEPOZNATA_OZNAKA')=='NEPOZNATA_OZNAKA'
+
+
+def test_confidence_ranking_and_plan_pages_show_engine_values(tmp_path):
+    text=flat(' '.join(pages(full(),tmp_path)[0]))
+    assert 'Nepoznato: nema podataka za ovu komponentu. Nije nula.' in text and 'privremeni i nisu empirijski kalibrisani' in text
+    assert '01 Pilot planiranja' in text and '100.0/100' in text and '03 Odgoda (odgoda / bez ulaganja)' in text and 'KONAČAN RANG' in text and 'v2-2026-11-11' in text
+    assert 'Pilot S&OP sastanak' in text and 'nije određen' in text and '2027-02-15' in text and 'nije dodijeljen' in text and 'nije definisan' in text
+
+
+def test_appendix_lists_all_65_criteria_once_with_score_and_evidence_status(tmp_path):
+    result,_=pages(full(),tmp_path)
+    start=next(i for i,page in enumerate(result) if 'Svih 65 kriterija' in page)
+    appendix=flat(' '.join(result[start:]))
+    import mevan_methodology
+    for criterion in mevan_methodology.load('v2')['criteria']:
+        assert appendix.count(criterion['code']+' '+criterion['name'])==1,criterion['code']
+    assert 'potvrdio konsultant' in appendix and 'djelimično razvijeno' in appendix
+
+
+def test_empty_sections_say_so_instead_of_inventing_content(tmp_path):
+    text=flat(' '.join(pages({'company':'Prazna d.o.o.','assess':{}},tmp_path)[0]))
+    for sentence in ('Nema kandidata za slabost s ocjenom i dokazom, pa se uzročni lanac ne može prikazati.','Finansijski efekti nisu uneseni.',
+                     'Projektne opcije nisu unesene.','Plan 90 dana nije unesen.','Indeks je nepoznat jer nedostaju podaci'):
+        assert sentence in text,sentence
+    assert text.count('Nepoznato')>=65  # dodatak: nijedan kriterij nije prikazan kao 0/5
+    assert ' 0/5' not in text

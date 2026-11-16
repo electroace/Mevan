@@ -1,4 +1,5 @@
-"""Premium PDF izvještaj za model 65/6 (dio 6a: naslovnica, pregled, metodologija, radar, strane po modulima).
+"""Premium PDF izvještaj za model 65/6: naslovnica, pregled, metodologija, radar, strane po modulima, uzročni lanac,
+finansije, pouzdanost, rang opcija, plan 90 dana i dodatak sa svih 65 kriterija.
 
 Vizuelni uzor je MEVAN_DRVONOVA_Premium_Diagnostic_v2_SIMULACIJA.pdf iz integracijskog paketa. Uzor je samo izgled:
 svaki broj i tekst u ovom izvještaju dolazi iz podataka dijagnostike i iz engine-a (nalazi, pouzdanost, finansije, rang).
@@ -25,6 +26,26 @@ NAVY, TEAL, GOLD, RED, INK, MUTED, SOFT, LINE = '#10263b', '#0f7f7a', '#c8a76a',
 WIDTH, HEIGHT = A4
 MARGIN = 20 * mm
 BAND = {'HIGH': 'VISOKA', 'MEDIUM': 'SREDNJA', 'LOW': 'NISKA', 'UNKNOWN': 'NEPOZNATA'}
+EVIDENCE = {'POTVRDIO_KONSULTANT': 'potvrdio konsultant', 'U_PROVJERI': 'u provjeri', 'DOKAZ_NEDOSTUPAN': 'dokaz nedostupan', 'NIJE_PROVJERENO': 'nije provjereno'}
+UNIT = {mevan_finance_v2.PNL: 'Godišnji P&L (KM/god)', mevan_finance_v2.CASH: 'Jednokratna gotovina (KM)', mevan_finance_v2.NPV: 'NPV (KM)',
+        mevan_finance_v2.RISK: 'Očekivana vrijednost rizika (KM/god)'}
+STATE = {'POTVRĐEN': 'potvrđen', 'HIPOTEZA': 'hipoteza', 'BLOKIRAN': 'blokiran'}
+# Tehničke oznake razloga iz finansijskog engine-a, prevedene u rečenice za čitaoca izvještaja.
+REASON = (('NEMA_AUTOMATSKE_MONETIZACIJE', 'kriterij nema finansijski model'), ('MODEL_NIJE_DOZVOLJEN_ZA_KRITERIJ', 'model nije predviđen za ovaj kriterij'),
+          ('NEPOZNAT_KRITERIJ', 'nepoznat kriterij'), ('NEDOSTAJU_ULAZI', 'nedostaju ulazi formule'), ('IZNOS_NIJE_POZITIVAN', 'izračunati iznos nije pozitivan'),
+          ('ULAZI_BEZ_IZVORA_ILI_PERIODA', 'ulazi nemaju izvor ili period'), ('NIJE_OZNACEN_KAO_POTVRDJEN', 'nije označen kao potvrđen'),
+          ('NEDOSTAJE_DOKAZ', 'nedostaje dokaz'), ('NEDOSTAJE_KONTRAFAKTUAL', 'nedostaje kontrafaktual'), ('NEDOSTAJE_ODOBRENJE_KONSULTANTA', 'nedostaje odobrenje konsultanta'),
+          ('NEPOTPUN_KLJUC', 'nepotpun ključ (lokacija, period, konto, proizvod/nalog)'), ('PODACI_SU_SIMULACIJA', 'podaci su simulacija'),
+          ('ISTI_KLJUC_KAO_', 'isti ključ kao efekat '), ('MOGUCE_PREKLAPANJE_S_', 'moguće preklapanje s efektom '), ('USTUPLJENO_EFEKTU_', 'ustupljeno efektu '))
+
+
+def reason_text(code):
+    for prefix, text in REASON:
+        if code.startswith(prefix):
+            return text + (code[len(prefix):] if prefix.endswith('_') else '')
+    return code
+
+
 KIND = {'KANDIDAT_SLABOST': 'kandidat za slabost', 'PRAZNINA_U_DOKAZIMA': 'praznina u dokazima', 'DJELIMICNO_RAZVIJENO': 'djelimično razvijeno',
         'NEPOTVRDJENA_SNAGA': 'nepotvrđena snaga', 'KANDIDAT_SNAGA': 'kandidat za snagu', 'NIJE_PRIMJENJIVO': 'nije primjenjivo'}
 
@@ -56,6 +77,7 @@ def prepare(data):
         'generated': str(data.get('generated') or '')[:40], 'simulated': simulated, 'findings': findings, 'modules': modules,
         'confidence': mevan_confidence.build(assess, effects, simulated), 'finance': mevan_finance_v2.evaluate(effects, simulated),
         'ranking': mevan_projects_v2.rank(options, assess, simulated) if options else None,
+        'plan': [item for item in data.get('plan', []) if isinstance(item, dict)][:60] if isinstance(data.get('plan'), list) else [],
         'status': ('SIMULACIJA · ' if simulated else '') + 'NACRT METODOLOGIJE 65/6 · NEODOBRENO',
     }
 
@@ -63,16 +85,16 @@ def prepare(data):
 class Bar(Flowable):
     """Traka 0–100 s vrijednošću. Nepoznata vrijednost nema traku i piše „Neocjenjivo”."""
 
-    def __init__(self, label, value, note, width, fonts):
+    def __init__(self, label, value, note, width, fonts, empty='Neocjenjivo: nema potvrđenih ocjena. Nije nula.'):
         super().__init__()
-        self.label, self.value, self.note, self.width, self.fonts, self.height = label, value, note, width, fonts, 15 * mm
+        self.label, self.value, self.note, self.width, self.fonts, self.height, self.empty = label, value, note, width, fonts, 15 * mm, empty
 
     def draw(self):
         c = self.canv
         c.setFont(self.fonts['bold'], 9.5); c.setFillColor(colors.HexColor(INK)); c.drawString(0, 10 * mm, self.label)
         c.setFont(self.fonts['body'], 8); c.setFillColor(colors.HexColor(MUTED)); c.drawRightString(self.width, 10 * mm, self.note)
         if self.value is None:
-            c.setFont(self.fonts['body'], 8.5); c.drawString(0, 4.6 * mm, 'Neocjenjivo: nema potvrđenih ocjena. Nije nula.')
+            c.setFont(self.fonts['body'], 8.5); c.drawString(0, 4.6 * mm, self.empty)
             return
         c.setFillColor(colors.HexColor('#e2e9ee')); c.roundRect(0, 4.2 * mm, self.width, 2.6 * mm, 1.3 * mm, stroke=0, fill=1)
         tone = RED if self.value < 30 else GOLD if self.value < 50 else TEAL
@@ -113,6 +135,34 @@ class Radar(Flowable):
         else:
             for i, value in known:
                 x, y = point(i, radius * value / 100); c.circle(x, y, 1.6 * mm, stroke=0, fill=1)
+
+
+class Waterfall(Flowable):
+    """Kumulativni prikaz efekata JEDNE kolone (godišnji P&L). Potvrđeni i hipotetički efekti imaju različitu boju."""
+
+    def __init__(self, steps, width, fonts):
+        super().__init__()
+        self.steps, self.width, self.fonts, self.height = steps, width, fonts, 62 * mm
+
+    def draw(self):
+        c, total = self.canv, sum(amount for _, amount, _ in self.steps)
+        columns = len(self.steps) + 1
+        slot, base, top = self.width / columns, 12 * mm, self.height - 9 * mm
+        scale = (top - base) / total if total else 0
+        c.setStrokeColor(colors.HexColor(LINE)); c.setLineWidth(.4); c.line(0, base, self.width, base)
+        running = 0
+        for index, (label, amount, confirmed) in enumerate(self.steps):
+            x, y = index * slot + slot * .18, base + running * scale
+            c.setFillColor(colors.HexColor(TEAL if confirmed else GOLD)); c.rect(x, y, slot * .64, max(1, amount * scale), stroke=0, fill=1)
+            c.setFont(self.fonts['bold'], 7.5); c.setFillColor(colors.HexColor(INK)); c.drawCentredString(x + slot * .32, y + amount * scale + 1.5 * mm, number(amount))
+            c.setFont(self.fonts['body'], 7); c.setFillColor(colors.HexColor(MUTED)); c.drawCentredString(x + slot * .32, 7 * mm, label[:16])
+            c.drawCentredString(x + slot * .32, 3.4 * mm, 'potvrđen' if confirmed else 'hipoteza')
+            running += amount
+        x = len(self.steps) * slot + slot * .18
+        c.setFillColor(colors.HexColor(NAVY)); c.rect(x, base, slot * .64, max(1, total * scale), stroke=0, fill=1)
+        c.setFont(self.fonts['bold'], 7.5); c.setFillColor(colors.HexColor(INK)); c.drawCentredString(x + slot * .32, base + total * scale + 1.5 * mm, number(total))
+        c.setFont(self.fonts['body'], 7); c.setFillColor(colors.HexColor(MUTED)); c.drawCentredString(x + slot * .32, 7 * mm, 'Kolona ukupno')
+        c.drawCentredString(x + slot * .32, 3.4 * mm, 'nije potvrđena korist')
 
 
 def _furniture(report, fonts):
@@ -262,7 +312,112 @@ def render(data):
                                        text('Nalaz konsultanta: ' + (finding['claim'] or 'nije unesen.'), 'body'), text(cause, 'small'),
                                        text('Posljedica (hipoteza): ' + finding['consequence']['text'] + '. Preporuka: ' + finding['recommendation'] + '. Vlasnik: ' + finding['owner_role'] + '.', 'small'), Spacer(1, 5)]))
         story.append(PageBreak())
-    story.pop()
+
+    def grid(rows, widths):
+        return Table(rows, colWidths=widths, repeatRows=1, style=TableStyle([('LINEBELOW', (0, 0), (-1, 0), .7, colors.HexColor(NAVY)),
+                     ('LINEBELOW', (0, 1), (-1, -1), .3, colors.HexColor(LINE)), ('VALIGN', (0, 0), (-1, -1), 'TOP'), ('LEFTPADDING', (0, 0), (-1, -1), 0),
+                     ('RIGHTPADDING', (0, 0), (-1, -1), 6), ('TOPPADDING', (0, 0), (-1, -1), 3.5), ('BOTTOMPADDING', (0, 0), (-1, -1), 3.5)]))
+    header = lambda *labels: [text(label, 'label') for label in labels]
+    all_findings = [f for module in report['modules'] for f in module['findings']]
+    weakest = sorted((f for f in all_findings if f['kind'] == 'KANDIDAT_SLABOST'), key=lambda f: (f['score'], f['code']))
+
+    # ---- uzročni lanac
+    story += head('UZROČNA ANALIZA', 'Od nalaza do uzroka', 'Lanac prikazuje jedan nalaz. Veze između kriterija nisu modelirane; uzrok je hipoteza dok se ne potvrdi dokazom.')
+    if weakest:
+        first = weakest[0]
+        verified = first['cause']['status'] == 'POTVRĐEN_UZROK'
+        chain = [('NALAZ', f"{first['code']} · {first['name']} · {first['score']}/5", first['claim'] or 'Nalaz konsultanta nije unesen.', SOFT, 'cellbold', 'body'),
+                 ('UZROK — ' + ('POTVRĐEN DOKAZOM' if verified else 'HIPOTEZA'), first['cause']['evidence'] if verified else 'Nije potvrđen jer: ' + '; '.join(first['cause']['not_verified_because']) + '.', '', SOFT, 'body', 'body'),
+                 ('POSLOVNA POSLJEDICA — HIPOTEZA', first['consequence']['text'] + '.', 'Preporuka: ' + first['recommendation'] + '. Vlasnik: ' + first['owner_role'] + '. KPI: ' + first['kpi'] + '.', NAVY, 'white', 'whitelabel')]
+        for position, (label, main, extra, background, main_style, extra_style) in enumerate(chain):
+            rows = [text(label, 'whitelabel' if background == NAVY else 'label'), Spacer(1, 3), text(main, main_style)] + ([Spacer(1, 2), text(extra, extra_style)] if extra else [])
+            story.append(box(rows, background, 10))
+            if position < len(chain) - 1:
+                story.append(Paragraph('↓', style('arrow', 'bold', 13, 15, TEAL, alignment=1)))
+        story += [Spacer(1, 8), box([text('KONKURENTSKO OBJAŠNJENJE', 'label'), Spacer(1, 3), text(first['cause']['alternative'] or 'Nije razmotreno. Bez konkurentskog objašnjenja uzrok ostaje hipoteza.', 'body')], '#fdf3df', 10)]
+        if len(weakest) > 1:
+            rows = [header('KRITERIJ', 'OCJENA', 'UZROK', 'KONKURENTSKO OBJAŠNJENJE')]
+            rows += [[text(f"{f['code']}  {f['name']}", 'cell'), text(f"{f['score']}/5", 'cellbold'), text('potvrđen' if f['cause']['status'] == 'POTVRĐEN_UZROK' else 'hipoteza', 'cell'),
+                      text('razmotreno' if f['cause']['alternative'] else 'nije razmotreno', 'cell')] for f in weakest[1:13]]
+            story += [text('OSTALI KANDIDATI ZA SLABOST', 'h2'), grid(rows, [page_width - 96 * mm, 20 * mm, 26 * mm, 50 * mm])]
+    else:
+        story.append(text('Nema kandidata za slabost s ocjenom i dokazom, pa se uzročni lanac ne može prikazati.', 'body'))
+    story.append(PageBreak())
+
+    # ---- finansije
+    story += head('FINANSIJSKI EFEKTI', 'Šta je potvrđeno, a šta hipoteza', 'Četiri kolone se ne sabiraju. Hipotetički potencijal nije potvrđena korist. Iznos se računa iz ulaza formule.')
+    units = list(UNIT)
+    story += [text('POTVRĐENO' + (' — SIMULACIJA: NIŠTA NIJE POTVRĐENO' if report['simulated'] else ''), 'h2'),
+              stats([(UNIT[u].split(' (')[0], number(finance['confirmed'][u]), UNIT[u].split('(')[1].rstrip(')')) for u in units]),
+              text('HIPOTETIČKI POTENCIJAL', 'h2'),
+              stats([(UNIT[u].split(' (')[0], number(finance['hypothetical_potential'][u]), 'nije potvrđena korist') for u in units])]
+    steps = [(e['id'], e['amount'], e['state'] == 'POTVRĐEN') for e in finance['effects'] if e['unit'] == mevan_finance_v2.PNL and e['state'] in ('POTVRĐEN', 'HIPOTEZA')][:8]
+    if steps:
+        story += [text('GODIŠNJI P&L PO EFEKTIMA (JEDNA KOLONA)', 'h2'), Waterfall(steps, page_width, fonts),
+                  text('Prikaz sabira samo efekte iste kolone. Zbir uključuje hipoteze i zato nije potvrđena korist.', 'small')]
+    if finance['effects']:
+        rows = [header('EFEKAT', 'KRITERIJ / MODEL', 'IZNOS', 'STANJE I RAZLOG')]
+        for e in finance['effects']:
+            amount = '—' if e['amount'] is None else number(e['amount']) + ' KM'
+            why = STATE[e['state']] + (': ' + '; '.join(reason_text(r) for r in e['reasons']) if e['reasons'] else '')
+            rows.append([text(e['id'], 'cellbold'), text(f"{e['criterion']} · {e['model']}", 'cell'), text(amount, 'cell'), text(why, 'cell')])
+        story += [text('SVI EFEKTI', 'h2'), grid(rows, [20 * mm, 40 * mm, 30 * mm, page_width - 90 * mm])]
+    else:
+        story.append(text('Finansijski efekti nisu uneseni.', 'body'))
+    story.append(PageBreak())
+
+    # ---- pouzdanost
+    story += head('POUZDANOST NALAZA', 'Zašto nalazu vjerujemo — ili ne?', 'Indeks pouzdanosti je odvojen od indeksa zrelosti i ne mijenja ga.')
+    story.append(stats([('Indeks pouzdanosti', 'Nepoznato' if confidence['score'] is None else f"{confidence['score']:.1f}/100", 'Razred: ' + BAND[confidence['band']]),
+                        ('Indeks zrelosti', index_text(maturity['index']), 'Prikazan radi poređenja; računa se zasebno')]))
+    for component in confidence['components']:
+        raw = ' · '.join(f"{key.replace('_', ' ')}: {value}" for key, value in component['raw'].items())
+        note = ('nepoznato' if component['value'] is None else f"{component['value']:.1f}/100") + f"  ×  {round(component['weight'] * 100)} %"
+        story += [Bar(component['label'], component['value'], note, page_width, fonts, 'Nepoznato: nema podataka za ovu komponentu. Nije nula.'), text(component['rule'] + ' Izvorne vrijednosti: ' + raw + '.', 'small')]
+    if confidence['score'] is None:
+        story.append(box([text('Indeks je nepoznat jer nedostaju podaci: ' + ' '.join(confidence['unknown_because']) + ' Nedostajući podatak nije nula.', 'small')], '#fdf3df'))
+    story += [Spacer(1, 6), box([text(f"OGRANIČENJE: ponderi i pragovi (visoka ≥ {confidence['thresholds']['HIGH']}, srednja ≥ {confidence['thresholds']['MEDIUM']}) su privremeni i nisu empirijski kalibrisani.", 'small')], '#fdf3df'), PageBreak()]
+
+    # ---- rang opcija
+    story += head('PROJEKTNE OPCIJE', 'Koja opcija ima prioritet?', 'Rang po verzionisanim ponderima. Rang nije odobrenje ulaganja ni potvrda koristi.')
+    if ranking and ranking['options']:
+        for option in ranking['options']:
+            label = (f"{option['rank']:02d}  " if option['rank'] else '—  ') + option['title'] + ('  (odgoda / bez ulaganja)' if option['type'] == 'defer' else '')
+            note = ('bez ocjene' if option['score'] is None else f"{option['score']:.1f}/100") + ('' if option['complete'] else '  |  nepotpuna')
+            story.append(Bar(label[:70], option['score'], note, page_width, fonts, 'Bez rezultata: nedostaju ocjene 1–5.'))
+            details = [f"Vlasnik: {option['owner'] or 'nije unesen'}", 'Budžet: ' + ('nije unesen' if option['budget_km'] is None else number(option['budget_km']) + ' KM'),
+                       'Kriteriji: ' + (', '.join(option['criteria']) or 'nema')]
+            if option['missing']:
+                details.append('Nedostaje: ' + ', '.join(option['missing']))
+            story.append(text(' · '.join(details) + ('. ' + ' '.join(option['notes']) if option['notes'] else '.'), 'small'))
+        sensitivity = ranking['sensitivity']
+        stability = 'Prvi izbor se ne mijenja kad se bilo kojem faktoru doda 10 procentnih poena.' if sensitivity['stable'] else 'Prvi izbor zavisi od pondera: mijenja se kad poraste težina faktora ' + ', '.join(f"{c['label']} (prvi postaje {c['first_becomes']})" for c in sensitivity['first_changes_when_weight_rises']) + '.'
+        story += [Spacer(1, 6), box([text(('KONAČAN RANG' if ranking['status'] == 'KONAČAN_RANG' else 'PRELIMINARAN RANG: ' + ranking['status_reason']), 'whitelabel'), Spacer(1, 4),
+                                     text(stability, 'white')], NAVY, 12),
+                  text(f"Ponderi ({ranking['weights_version']}): profit 30 %, likvidnost 20 %, isporuka 20 %, rizik 15 %, izvedivost 15 %. Rezultat = {ranking['formula']}.", 'small')]
+    else:
+        story.append(text('Projektne opcije nisu unesene.', 'body'))
+    story.append(PageBreak())
+
+    # ---- plan 90 dana
+    story += head('PLAN 90 DANA', 'Prvi koraci', 'Stavke plana kako ih je unio konsultant. Rok koji nije unesen ostaje prazan.')
+    if report['plan']:
+        rows = [header('AKTIVNOST', 'VLASNIK', 'ROK', 'KPI', 'STATUS')]
+        rows += [[text(str(item.get('task') or '')[:400], 'cell'), text(str(item.get('owner') or 'nije dodijeljen')[:80], 'cell'), text(str(item.get('due') or 'nije određen')[:20], 'cell'),
+                  text(str(item.get('kpi') or 'nije definisan')[:120], 'cell'), text(str(item.get('status') or '')[:30], 'cell')] for item in report['plan']]
+        story.append(grid(rows, [page_width - 118 * mm, 32 * mm, 22 * mm, 40 * mm, 24 * mm]))
+    else:
+        story.append(text('Plan 90 dana nije unesen.', 'body'))
+    story.append(PageBreak())
+
+    # ---- dodatak: svih 65 kriterija
+    story += head('DODATAK', 'Svih 65 kriterija', 'Ocjena, status dokaza i vrsta nalaza za svaki kriterij.')
+    rows = [header('KRITERIJ', 'MODUL', 'OCJENA', 'DOKAZ', 'NALAZ')]
+    for finding in all_findings:
+        score = 'N/P' if finding['kind'] == 'NIJE_PRIMJENJIVO' else 'Nepoznato' if finding['score'] is None else f"{finding['score']}/5"
+        rows.append([text(f"{finding['code']}  {finding['name']}", 'cell'), text(finding['module'], 'cell'), text(score, 'cellbold'),
+                     text(EVIDENCE[finding['evidence']['status']], 'cell'), text(KIND[finding['kind']], 'cell')])
+    story.append(grid(rows, [page_width - 100 * mm, 14 * mm, 20 * mm, 32 * mm, 34 * mm]))
 
     cover, later = _furniture(report, fonts)
     buffer = BytesIO()
