@@ -1,0 +1,407 @@
+{
+ "methodology_61_5": {
+  "browser_catalogue_codes_sha256": "aaa9aa64283f18caa48d303afe5443ece4e6b342a8943d2bdb1f8ab0382abad8",
+  "browser_catalogue_text_sha256": "1899f8efd934180f4760df5d938f141bfb6047aadd50bf5fcf352eee49f205a2",
+  "codes_sha256": "aaa9aa64283f18caa48d303afe5443ece4e6b342a8943d2bdb1f8ab0382abad8",
+  "criteria": 61,
+  "dimensions": {
+   "F": "Finansije",
+   "L": "Ljudi",
+   "M": "Upravljanje",
+   "O": "Operacije",
+   "P": "Planiranje"
+  },
+  "per_dimension": {
+   "F": 12,
+   "L": 10,
+   "M": 12,
+   "O": 15,
+   "P": 12
+  }
+ },
+ "server_demo": {
+  "candidates": [
+   {
+    "criterion_codes": [
+     "P02",
+     "P03",
+     "P04",
+     "P09",
+     "O11"
+    ],
+    "financial_impact": "NIJE_VERIFICIRANO",
+    "hypothesis_status": "NEPOTVRĐENO",
+    "id": "C1",
+    "priority": "PRIJEDLOG_AI_BEZ_VALIDIRANOG_RANGIRANJA",
+    "title": "Provjeriti: Nestabilan plan i kapacitet"
+   },
+   {
+    "criterion_codes": [
+     "O05",
+     "F06",
+     "O08",
+     "M06"
+    ],
+    "financial_impact": "NIJE_VERIFICIRANO",
+    "hypothesis_status": "NEPOTVRĐENO",
+    "id": "C2",
+    "priority": "PRIJEDLOG_AI_BEZ_VALIDIRANOG_RANGIRANJA",
+    "title": "Provjeriti: Gubici kvaliteta"
+   },
+   {
+    "criterion_codes": [
+     "F07",
+     "F08",
+     "P07",
+     "P08"
+    ],
+    "financial_impact": "NIJE_VERIFICIRANO",
+    "hypothesis_status": "NEPOTVRĐENO",
+    "id": "C3",
+    "priority": "PRIJEDLOG_AI_BEZ_VALIDIRANOG_RANGIRANJA",
+    "title": "Provjeriti: Zalihe i likvidnost"
+   }
+  ],
+  "causal_hypotheses": [
+   {
+    "criteria": [
+     "P02",
+     "P03",
+     "P04",
+     "P09",
+     "O11"
+    ],
+    "status": "hypothesis",
+    "title": "Nestabilan plan i kapacitet"
+   },
+   {
+    "criteria": [
+     "O05",
+     "F06",
+     "O08",
+     "M06"
+    ],
+    "status": "hypothesis",
+    "title": "Gubici kvaliteta"
+   },
+   {
+    "criteria": [
+     "F07",
+     "F08",
+     "P07",
+     "P08"
+    ],
+    "status": "hypothesis",
+    "title": "Zalihe i likvidnost"
+   },
+   {
+    "criteria": [
+     "O03",
+     "O04",
+     "O07",
+     "O10"
+    ],
+    "status": "hypothesis",
+    "title": "Oprema i zastoji"
+   },
+   {
+    "criteria": [
+     "L02",
+     "M03",
+     "M06",
+     "M07"
+    ],
+    "status": "hypothesis",
+    "title": "Upravljačka disciplina"
+   }
+  ],
+  "confirmed_annual_km": 0,
+  "confirmed_one_time_km": 0,
+  "coverage": {
+   "applicable": 61,
+   "confirmed": 61,
+   "confirmed_meaning": "popunjena procjena sa tekstom dokaza; nije nezavisna verifikacija",
+   "independently_verified": 0,
+   "unverified": 0
+  },
+  "critical": [
+   {
+    "code": "O14",
+    "reason": "Potencijalni sigurnosni ili kontinuitetni rizik – provjeriti odmah; nije dokaz incidenta."
+   },
+   {
+    "code": "L09",
+    "reason": "Potencijalni sigurnosni ili kontinuitetni rizik – provjeriti odmah; nije dokaz incidenta."
+   },
+   {
+    "code": "M08",
+    "reason": "Potencijalni sigurnosni ili kontinuitetni rizik – provjeriti odmah; nije dokaz incidenta."
+   }
+  ],
+  "dimensions": {
+   "F": {
+    "applicable": 12,
+    "index": 38.3,
+    "na": 0,
+    "unverified": 0,
+    "verified": 12
+   },
+   "L": {
+    "applicable": 10,
+    "index": 42.0,
+    "na": 0,
+    "unverified": 0,
+    "verified": 10
+   },
+   "M": {
+    "applicable": 12,
+    "index": 33.3,
+    "na": 0,
+    "unverified": 0,
+    "verified": 12
+   },
+   "O": {
+    "applicable": 15,
+    "index": 34.7,
+    "na": 0,
+    "unverified": 0,
+    "verified": 15
+   },
+   "P": {
+    "applicable": 12,
+    "index": 35.0,
+    "na": 0,
+    "unverified": 0,
+    "verified": 12
+   }
+  },
+  "financial_scenarios": [
+   {
+    "annual_gross_benefit_km": 26083.5,
+    "annual_net_benefit_km": 23583.5,
+    "confirmed_annual_benefit_km": 0,
+    "confirmed_one_time_benefit_km": 0,
+    "name": "pesimistični",
+    "one_time_working_capital_release_km": 80000.0,
+    "status": "estimated"
+   },
+   {
+    "annual_gross_benefit_km": 52167.0,
+    "annual_net_benefit_km": 49667.0,
+    "confirmed_annual_benefit_km": 0,
+    "confirmed_one_time_benefit_km": 0,
+    "name": "realni",
+    "one_time_working_capital_release_km": 160000.0,
+    "status": "estimated"
+   },
+   {
+    "annual_gross_benefit_km": 67817.1,
+    "annual_net_benefit_km": 65317.1,
+    "confirmed_annual_benefit_km": 0,
+    "confirmed_one_time_benefit_km": 0,
+    "name": "optimistični",
+    "one_time_working_capital_release_km": 208000.0,
+    "status": "estimated"
+   }
+  ],
+  "independently_verified_criteria": 0,
+  "independently_verified_financial_km": 0,
+  "index": 36.4,
+  "priority_decisions": [
+   {
+    "criteria": [
+     "P02",
+     "P03",
+     "P04",
+     "P09",
+     "O11"
+    ],
+    "status": "hypothesis",
+    "title": "Provjeriti: Nestabilan plan i kapacitet"
+   },
+   {
+    "criteria": [
+     "O05",
+     "F06",
+     "O08",
+     "M06"
+    ],
+    "status": "hypothesis",
+    "title": "Provjeriti: Gubici kvaliteta"
+   },
+   {
+    "criteria": [
+     "F07",
+     "F08",
+     "P07",
+     "P08"
+    ],
+    "status": "hypothesis",
+    "title": "Provjeriti: Zalihe i likvidnost"
+   }
+  ],
+  "project_status": "DRAFT_REQUIRES_CONSULTANT_APPROVAL",
+  "proposed_project": "Provjeriti: Nestabilan plan i kapacitet",
+  "ranking": [
+   {
+    "id": "C1",
+    "score": 60.0
+   },
+   {
+    "id": "C2",
+    "score": 60.0
+   },
+   {
+    "id": "C3",
+    "score": 60.0
+   }
+  ],
+  "weak_criteria": [
+   {
+    "code": "F12",
+    "score": 1
+   },
+   {
+    "code": "M09",
+    "score": 1
+   },
+   {
+    "code": "M10",
+    "score": 1
+   },
+   {
+    "code": "M11",
+    "score": 1
+   },
+   {
+    "code": "M12",
+    "score": 1
+   },
+   {
+    "code": "O12",
+    "score": 1
+   },
+   {
+    "code": "O13",
+    "score": 1
+   },
+   {
+    "code": "O14",
+    "score": 1
+   },
+   {
+    "code": "O15",
+    "score": 1
+   },
+   {
+    "code": "P10",
+    "score": 1
+   },
+   {
+    "code": "P11",
+    "score": 1
+   },
+   {
+    "code": "P12",
+    "score": 1
+   }
+  ]
+ },
+ "word_report": {
+  "criteria_count": 61,
+  "criteria_sha256": "7d9a046e50aaa3de8656c5045253db6a2cee392a210b4f51c2e24f81c1fbee79",
+  "dimension_table": [
+   [
+    "Dimenzija",
+    "Potvrđeno",
+    "Indeks / 100"
+   ],
+   [
+    "Finansije",
+    "12/12",
+    "38.3 / 100"
+   ],
+   [
+    "Operacije",
+    "15/15",
+    "34.7 / 100"
+   ],
+   [
+    "Planiranje i Supply Chain",
+    "12/12",
+    "35.0 / 100"
+   ],
+   [
+    "Ljudi i liderstvo",
+    "10/10",
+    "42.0 / 100"
+   ],
+   [
+    "Sistem upravljanja",
+    "12/12",
+    "33.3 / 100"
+   ]
+  ],
+  "finance_table": [
+   [
+    "Kategorija",
+    "Stručno potvrđeno u registru"
+   ],
+   [
+    "Direktne godišnje uštede",
+    "0 KM"
+   ],
+   [
+    "Dodatna kontribucija",
+    "0 KM"
+   ],
+   [
+    "Izbjegnuti budući troškovi",
+    "0 KM"
+   ],
+   [
+    "Oslobođeni obrtni kapital (jednokratno)",
+    "0 KM"
+   ],
+   [
+    "Nepotvrđene stavke",
+    "6"
+   ],
+   [
+    "Moguća preklapanja",
+    "1"
+   ]
+  ],
+  "index_from_scores": 36.4,
+  "overview_table": [
+   [
+    "Pokazatelj",
+    "Vrijednost"
+   ],
+   [
+    "Obuhvat",
+    "61 / 61 primjenjivih kriterija"
+   ],
+   [
+    "Indeks zrelosti",
+    "36.4 / 100"
+   ],
+   [
+    "Status izvještaja",
+    "Radni nacrt"
+   ],
+   [
+    "Dokazna osnova",
+    "Isključivo simulirana"
+   ]
+  ],
+  "sections": [
+   "01  |  Izvršni pregled",
+   "02  |  Finansijski efekti i ograničenja",
+   "03  |  Integrisana COO analiza",
+   "04  |  Plan prvih 90 dana",
+   "05  |  Registar kriterija i dokaza"
+  ],
+  "table_count": 66
+ }
+}
