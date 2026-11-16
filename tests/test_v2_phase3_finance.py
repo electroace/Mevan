@@ -217,3 +217,30 @@ def test_api_is_protected_logged_and_stores_nothing(fx,monkeypatch):
     monkeypatch.setenv('MEVAN_METHODOLOGY_V2','1')
     fx.client.post('/logout',headers=fx.headers,follow_redirects=False)
     assert fx.client.post('/api/v2/finance',json=body,headers=fx.headers).status_code==401
+
+
+# ---- faza 3b: stranica „Finansijski efekti” za model 65/6
+
+def test_v2_finance_screen_sends_formula_inputs_and_never_a_typed_amount():
+    from pathlib import Path
+    html=(Path(finance.__file__).parent/'index.html').read_text(encoding='utf-8')
+    assert "else if(page==='finance'&&METHOD.active==='v2'){html=financeV2Page()}\nelse if(page==='finance')" in html
+    page=html[html.index('let v2Finance=null'):html.index('// Lanac nalaza (model 65/6)')]
+    # Novi efekat nema polje za iznos; iznos dolazi samo iz odgovora servera.
+    new_effect=page[page.index('list.push({'):page.index('fxOpen.add(id)')]
+    assert 'amount' not in new_effect and "status:'hypothesis'" in new_effect
+    assert "fetch('/api/v2/finance',{method:'POST'" in page and 'row.amount' in page and 'data-path="amount"' not in page
+    for unit in ('RECURRING_PNL_KM_YEAR','ONE_TIME_CASH_KM','NPV_KM','RISK_EXPECTED_KM_YEAR'):
+        assert unit in page,unit
+    assert 'Hipotetički potencijal (nije potvrđena korist)' in page and 'Blokirani efekti nisu ni u jednoj koloni.' in page
+    # Svaka izmjena poništava prethodni obračun, da se ne prikazuju zastarjeli zbirovi.
+    assert page.count('v2Finance=null')>=5
+    assert "document.querySelectorAll('[data-fx2]').forEach(el=>el.onchange=()=>setFx2(el));" in html
+    assert "if(METHOD.v2){const models=await fetch('/api/v2/finance/models');if(models.ok)METHOD.finance=await models.json()}" in html
+
+
+def test_v1_financial_register_is_untouched_by_the_new_screen():
+    from pathlib import Path
+    html=(Path(finance.__file__).parent/'index.html').read_text(encoding='utf-8')
+    assert html.count('<h1>Registar finansijskih efekata</h1>')==1 and 'function effects(){' in html
+    assert 'effects_v2' not in html[html.index('function effects(){'):html.index('function effects(){')+300]
