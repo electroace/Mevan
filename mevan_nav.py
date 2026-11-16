@@ -48,6 +48,9 @@ body{margin:0;max-width:none;padding:0;background:var(--mv-bg);color:var(--mv-in
 .mv-main .muted,.mv-main .mv-lead{color:var(--mv-muted)}
 .mv-main .panel,.mv-main .card,.mv-main .rv-page section,.mv-main .rv-page details{background:var(--mv-card);border:1px solid var(--mv-line);border-radius:var(--mv-radius)}
 .mv-main .big,.mv-main .number{font-size:26px;font-weight:750;line-height:1.2}
+/* Kutije s brojkama se smiju suziti, a dug tekst (npr. „Nije procijenjeno”) prelazi u novi red umjesto da širi stranicu. */
+.mv-main .grid>*,.mv-main .stats>*,.mv-main .stat{min-width:0}
+.mv-main .big,.mv-main .number{overflow-wrap:anywhere}
 .mv-main input:not([type=checkbox]):not([type=radio]):not([type=file]),.mv-main select,.mv-main textarea{border:1px solid var(--mv-field);border-radius:var(--mv-radius-s);padding:10px;min-height:42px;font:inherit;font-weight:400;background:#fff;color:var(--mv-ink)}
 .mv-main input:focus-visible,.mv-main select:focus-visible,.mv-main textarea:focus-visible,.mv-main summary:focus-visible,.mv-main a:focus-visible,.mv-main .item:focus-visible{outline:3px solid var(--mv-brand);outline-offset:2px}
 .mv-main .warning,.mv-main .warn{color:var(--mv-warn-ink);background:var(--mv-warn-bg);border:1px solid var(--mv-warn-line);border-radius:var(--mv-radius-s);padding:10px 12px;font-size:14px}
