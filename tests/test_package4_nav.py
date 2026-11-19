@@ -26,8 +26,9 @@ def test_every_screen_has_one_shared_menu(fx,path):
     assert html.count('id="mvNav"')==1 and html.count('id="mvToggle"')==1
     assert html.count('action="/logout"')==1
     nav=html[html.index('<nav class="mv-nav"'):html.index('</nav>')]
-    for group in ('Kompanija','Procjena','Analiza i izvještaji','Projekti'):
-        assert f'<p class="mv-label">{group}</p>' in nav
+    # Meni prati šest koraka rada (redizajn od 19.11.2026.); stavke i njihove oznake stranica su iste kao prije.
+    steps=re.findall(r'<p class="mv-label"><span class="mv-step">(\d)</span>([^<]+)</p>',nav)
+    assert steps==[('1','Kompanija'),('2','Procjena'),('3','Nalazi'),('4','Finansije'),('5','Opcije i plan'),('6','Izvještaji')]
     for key in mevan_nav.PAGES:
         assert html.count(f'data-page="{key}"')==1,key
     for key,_ in mevan_nav.MODULES:

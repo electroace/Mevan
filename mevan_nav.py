@@ -17,7 +17,7 @@ MODULES = (
     ('Ljudi', 'Ljudi i liderstvo'),
     ('Upravljanje', 'Sistem upravljanja'),
 )
-PAGES = ('workspace', 'company', 'overview', 'finance', 'v2', 'review', 'report', 'plan', 'data')
+PAGES = ('workspace', 'company', 'overview', 'findings', 'v2', 'review', 'finance', 'options', 'plan', 'report', 'data')
 SCREENS = ('diagnostic', 'guided', 'projects', 'portfolio')
 
 CSS = """<style id="mevan-nav-style">
@@ -27,8 +27,6 @@ body{margin:0;max-width:none;padding:0;background:var(--mv-bg);color:var(--mv-in
 .mv-top .mv-brand{flex:1;min-width:0}
 .mv-top .mv-logo{font-size:22px;font-weight:800;letter-spacing:2px;color:#fff}
 .mv-top .mv-logo span{font-size:13px;font-weight:400;letter-spacing:0}
-.mv-top .mv-sub{color:#b9c9d7;font-size:12px}
-.mv-top .mv-meta{color:#b9c9d7;font-size:12px;white-space:nowrap}
 .mv-top .mv-user{color:#fff;font-size:13px;line-height:1.25;text-align:right;min-width:0;max-width:34vw;border-left:1px solid #3d5870;padding-left:14px}
 .mv-top .mv-user small{display:block;color:#b9c9d7;font-size:11px}
 .mv-top .mv-user b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -90,6 +88,13 @@ body{margin:0;max-width:none;padding:0;background:var(--mv-bg);color:var(--mv-in
 .mv-dialog.is-danger button[value=ok]{background:var(--mv-danger);border-color:var(--mv-danger)}
 .mv-nav{background:#fff;border:1px solid #dfe7ef;border-radius:14px;padding:12px 10px 0;box-shadow:0 4px 16px #102b4210;position:sticky;top:16px;max-height:calc(100vh - var(--mv-head,76px) - 32px);overflow:auto;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
 .mv-nav .mv-group{margin:0 0 6px}
+html[data-model="v2"] .mv-nav [data-model="v1"],html:not([data-model="v2"]) .mv-nav [data-model="v2"]{display:none}
+.mv-nav .mv-step{display:inline-grid;place-items:center;width:18px;height:18px;margin-right:7px;border-radius:50%;background:var(--mv-brand-dark);color:#fff;font-size:10px;font-weight:700;letter-spacing:0}
+.mv-top .mv-context{display:flex;align-items:center;gap:8px;min-width:0;color:#b9c9d7;font-size:12px}
+.mv-top .mv-context select{max-width:230px;min-height:34px;padding:5px 8px;border:1px solid #3d5870;border-radius:8px;background:#1c3a55;color:#fff;font:600 13px/1.2 Inter,system-ui,sans-serif}
+.mv-top .mv-context select:focus-visible{outline:3px solid #7cc4e0;outline-offset:2px}
+.mv-top .mv-context .mv-badge{padding:4px 8px;border-radius:999px;border:1px solid #3d5870;color:#fff;font-weight:650;white-space:nowrap}
+.mv-top .mv-context .mv-badge.is-demo{border-color:#e3bd6d;color:#ffdf9c}
 .mv-nav .mv-label{margin:0;padding:6px 10px 3px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#566b7c}
 .mv-nav .mv-item{all:unset;display:block;box-sizing:border-box;width:100%;cursor:pointer;border-radius:8px;padding:7px 10px;margin:1px 0;color:#29445a;font-size:14px;line-height:1.3;text-align:left}
 .mv-nav .mv-item small{color:#566b7c;font-size:11px}
@@ -116,7 +121,7 @@ body{margin:0;max-width:none;padding:0;background:var(--mv-bg);color:var(--mv-in
 .mv-lead{color:#566b7c;font-size:13px;margin:0 0 14px}
 @media(max-width:1000px){
 .mv-top .mv-toggle{display:inline-block}
-.mv-top .mv-meta,.mv-top .mv-sub,.mv-top .mv-user small{display:none}
+.mv-top .mv-context,.mv-top .mv-user small{display:none}
 .mv-top .mv-user{border-left:0;padding-left:0;max-width:26vw;font-size:12px}
 .mv-top .mv-logo span{display:none}
 .mv-top{gap:10px}
@@ -260,14 +265,16 @@ SCREEN_PATHS = {'diagnostic': '/', 'guided': '/diagnostic-review', 'projects': '
 LANG_NAMES = (('bs', 'BS', 'Bosanski'), ('en', 'EN', 'English'))
 
 
-def _page(key, label):
+def _page(key, label, model=''):
     # Na glavnom ekranu stavku aktivira postojeći render(); drugdje je običan link.
-    return f'<a class="mv-item" href="/#{escape(key)}" data-page="{escape(key)}">{escape(label)}</a>'
+    # `model` ograničava stavku na dijagnostike jedne metodologije (v1 = 61/5, v2 = 65/6).
+    only = f' data-model="{model}"' if model else ''
+    return f'<a class="mv-item" href="/#{escape(key)}" data-page="{escape(key)}"{only}>{escape(label)}</a>'
 
 
 def _screen(href, label, active):
     current = ' aria-current="page"' if active else ''
-    return f'<a class="mv-item" href="{href}"{current}>{escape(label)}</a>'
+    return f'<a class="mv-item" href="{href}" data-model="v1"{current}>{escape(label)}</a>'
 
 
 def nav_html(active: str, lang: str = DEFAULT_LANG) -> str:
@@ -276,21 +283,24 @@ def nav_html(active: str, lang: str = DEFAULT_LANG) -> str:
     T = lambda text: t(lang, text)
     modules = ''.join(_page('m:' + key, T(label)) for key, label in MODULES)
     guided_current = ' aria-current="page"' if active == 'guided' else ''
-    guided = ('<button type="button" class="mv-item" data-mv-guided'
+    guided = ('<button type="button" class="mv-item" data-mv-guided data-model="v1"'
               f' aria-label="{escape(T("Vođeno prikupljanje i završni izvještaji"))}"'
               f'{guided_current}>{escape(T("Vođeno prikupljanje"))}</button>')
-    groups = (
+    # Meni prati redoslijed rada: šest koraka od kompanije do izvještaja. Stavke koje važe samo za jedan
+    # model metodologije nose oznaku modela i skrivaju se kad je aktivna dijagnostika drugog modela.
+    steps = (
         ('Kompanija', _page('workspace', T('Kompanije i dijagnostike')) + _page('company', T('Profil kompanije'))),
-        ('Procjena', _page('overview', T('Pregled')) + f'<div id="navModules">{modules}</div>'
-         + _page('finance', T('Finansijski efekti'))),
-        ('Analiza i izvještaji', guided + _page('v2', T('Integrisana analiza (AI)'))
-         + _page('review', T('Analiza i odobravanje')) + _page('report', T('Izvještaji'))
-         + _page('plan', T('Plan 90 dana'))),
-        ('Projekti', _screen('/projects-ui', T('Projekti'), active == 'projects')
+        ('Procjena', _page('overview', T('Pregled')) + f'<div id="navModules">{modules}</div>'),
+        ('Nalazi', _page('findings', T('Lanac nalaza'), 'v2') + _page('v2', T('Integrisana analiza (AI)'), 'v1')
+         + _page('review', T('Analiza i odobravanje'))),
+        ('Finansije', _page('finance', T('Finansijski efekti'))),
+        ('Opcije i plan', _page('options', T('Projektne opcije'), 'v2') + _page('plan', T('Plan 90 dana'))
+         + _screen('/projects-ui', T('Projekti'), active == 'projects')
          + _screen('/dashboard-ui', T('Pregled portfolija'), active == 'portfolio')),
+        ('Izvještaji', _page('report', T('Izvještaji')) + guided),
     )
-    body = ''.join(f'<div class="mv-group"><p class="mv-label">{escape(T(title))}</p>{items}</div>'
-                   for title, items in groups)
+    body = ''.join(f'<div class="mv-group"><p class="mv-label"><span class="mv-step">{number}</span>{escape(T(title))}</p>{items}</div>'
+                   for number, (title, items) in enumerate(steps, 1))
     foot = ('<div class="mv-foot">' + _page('data', T('Podaci i sigurnost'))
             + '<form method="post" action="/logout"><input type="hidden" name="csrf_token" value="__MEVAN_LOGOUT_TOKEN__">'
             f'<button class="mv-logout" type="submit">{escape(T("Odjava"))}</button></form></div>')
@@ -310,9 +320,9 @@ def shell_start(active: str, user: str = '', lang: str = DEFAULT_LANG) -> str:
     who = (f'<div class="mv-user" title="{escape(user)}"><small>{escape(T("Prijavljeni korisnik"))}</small><b>{escape(user)}</b></div>' if user else '')
     return ('<header class="mv-top">'
             f'<button type="button" class="mv-toggle" id="mvToggle" aria-controls="mvNav" aria-expanded="false">{escape(T("Meni"))}</button>'
-            '<div class="mv-brand"><div class="mv-logo">MEVAN <span>DIAGNOSTIC</span></div>'
-            '<div class="mv-sub">Operational &amp; Business Performance Transformation · PRIVATE DEMO v2.0 · SIMULACIJA</div></div>'
-            f'<div class="mv-meta">{escape(T("61 kriterij · 5 dimenzija"))}</div>' + who + language_switch(lang, SCREEN_PATHS[active]) + '</header>'
+            '<div class="mv-brand"><div class="mv-logo">MEVAN <span>DIAGNOSTIC</span></div></div>'
+            # Kontekst rada (kompanija, dijagnostika, model, DEMO) popunjava glavni ekran; na ostalima ostaje prazan.
+            '<div class="mv-context" id="mvContext"></div>' + who + language_switch(lang, SCREEN_PATHS[active]) + '</header>'
             '<div class="mv-backdrop" id="mvBackdrop"></div>'
             f'<div class="mv-shell">{nav_html(active, lang)}<div class="mv-main">')
 

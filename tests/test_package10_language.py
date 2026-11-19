@@ -26,7 +26,7 @@ def test_default_language_is_bosnian_and_sends_no_dictionary(fx):
     html=fx.client.get('/').text
     assert html.startswith('<!doctype html><html lang="bs">')
     assert 'window.MV_LANG="bs";window.MV_I18N={};' in html
-    assert '<p class="mv-label">Kompanija</p>' in html and '>Odjava</button>' in html
+    assert '<span class="mv-step">1</span>Kompanija</p>' in html and '>Odjava</button>' in html
 
 
 def test_language_choice_is_remembered_and_applies_to_every_screen(fx):
@@ -36,14 +36,14 @@ def test_language_choice_is_remembered_and_applies_to_every_screen(fx):
         html=fx.client.get(path).text
         assert '<html lang="en">' in html[:60],path
         nav=html[html.index('<nav class="mv-nav"'):html.index('</nav>')]
-        for label in ('Company','Assessment','Analysis &amp; reports','Projects','Data &amp; security','Sign out','Guided collection'):
+        for label in ('Company','Assessment','Findings','Finance','Options &amp; plan','Reports','Projects','Data &amp; security','Sign out','Guided collection'):
             assert '>'+label+'<' in nav,(path,label)
         header=html[html.index('<header class="mv-top">'):html.index('</header>')]
         assert '<small>Signed in as</small>' in header and 'data-lang="en" lang="en" title="English" aria-current="true"' in header
         assert 'window.MV_LANG="en"' in html and '"Sačuvaj": "Save"' in html
         assert '<button value="ok">Confirm</button><button value="cancel" formnovalidate>Cancel</button>' in html
     fx.client.get('/lang/bs',follow_redirects=False)
-    assert '<p class="mv-label">Kompanija</p>' in fx.client.get('/').text
+    assert '<span class="mv-step">1</span>Kompanija</p>' in fx.client.get('/').text
 
 
 def test_unknown_language_and_foreign_return_address_are_refused(fx):

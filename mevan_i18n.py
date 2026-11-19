@@ -14,8 +14,9 @@ COOKIE = 'mevan_lang'
 EN = {
     # zaglavlje, meni, prijava
     'Meni': 'Menu', 'Glavni meni': 'Main menu', 'Prijavljeni korisnik': 'Signed in as', 'Odjava': 'Sign out',
-    '61 kriterij · 5 dimenzija': '61 criteria · 5 dimensions', 'Jezik': 'Language',
-    'Kompanija': 'Company', 'Procjena': 'Assessment', 'Analiza i izvještaji': 'Analysis & reports', 'Projekti': 'Projects',
+    'Jezik': 'Language', 'Nalazi': 'Findings', 'Opcije i plan': 'Options & plan', 'Lanac nalaza': 'Finding chain', 'Projektne opcije': 'Project options',
+    'model 61/5': 'model 61/5', 'model 65/6 (nacrt)': 'model 65/6 (draft)', 'Premium PDF (nacrt)': 'Premium PDF (draft)',
+    'Kompanija': 'Company', 'Procjena': 'Assessment', 'Projekti': 'Projects',
     'Kompanije i dijagnostike': 'Companies & diagnostics', 'Profil kompanije': 'Company profile', 'Pregled': 'Overview',
     'Finansije': 'Finance', 'Operacije': 'Operations', 'Planiranje i Supply Chain': 'Planning & Supply Chain',
     'Ljudi i liderstvo': 'People & Leadership', 'Sistem upravljanja': 'Management System', 'Finansijski efekti': 'Financial effects',
